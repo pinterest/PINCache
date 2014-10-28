@@ -181,8 +181,8 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     dispatch_group_t group = dispatch_group_create();
     
     for (NSUInteger i = 0; i < max; i++) {
-        NSString *key = [[NSString alloc] initWithFormat:@"key %d", i];
-        NSString *obj = [[NSString alloc] initWithFormat:@"obj %d", i];
+        NSString *key = [[NSString alloc] initWithFormat:@"key %lu", (unsigned long)i];
+        NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
         
         [self.cache setObject:obj forKey:key block:nil];
 
@@ -190,10 +190,12 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     }
     
     for (NSUInteger i = 0; i < max; i++) {
-        NSString *key = [[NSString alloc] initWithFormat:@"key %d", i];
+        NSString *key = [[NSString alloc] initWithFormat:@"key %lu", (unsigned long)i];
         
         [self.cache objectForKey:key block:^(TMCache *cache, NSString *key, id object) {
             dispatch_async(queue, ^{
+                NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
+                STAssertTrue([object isEqualToString:obj] == YES, @"object returned was not object set");
                 count -= 1;
                 dispatch_group_leave(group);
             });
@@ -324,6 +326,26 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     dispatch_semaphore_wait(semaphore, [self timeout]);
 
     STAssertTrue(objectCount == enumCount, @"some objects were not enumerated");
+}
+
+- (void)testDeadlocks
+{
+    NSString *key = @"key";
+    NSUInteger objectCount = 1000;
+    [self.cache setObject:[self image] forKey:key];
+    dispatch_queue_t testQueue = dispatch_queue_create("test queue", DISPATCH_QUEUE_CONCURRENT);
+    
+    __block NSUInteger enumCount = 0;
+    dispatch_group_t group = dispatch_group_create();
+    for (NSUInteger idx = 0; idx < objectCount; idx++) {
+        dispatch_group_async(group, testQueue, ^{
+            [self.cache objectForKey:key];
+            enumCount++;
+        });
+    }
+    
+    dispatch_group_wait(group, [self timeout]);
+    STAssertTrue(objectCount == enumCount, @"was not able to fetch 1000 objects, possibly due to deadlock.");
 }
 
 @end
