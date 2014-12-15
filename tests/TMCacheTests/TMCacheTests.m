@@ -335,12 +335,15 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     [self.cache setObject:[self image] forKey:key];
     dispatch_queue_t testQueue = dispatch_queue_create("test queue", DISPATCH_QUEUE_CONCURRENT);
     
+    NSLock *enumCountLock = [[NSLock alloc] init];
     __block NSUInteger enumCount = 0;
     dispatch_group_t group = dispatch_group_create();
     for (NSUInteger idx = 0; idx < objectCount; idx++) {
         dispatch_group_async(group, testQueue, ^{
             [self.cache objectForKey:key];
+            [enumCountLock lock];
             enumCount++;
+            [enumCountLock unlock];
         });
     }
     
