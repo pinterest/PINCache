@@ -275,7 +275,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     dispatch_apply(objectCount, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t index) {
         NSString *key = [[NSString alloc] initWithFormat:@"key %zd", index];
         NSString *obj = [[NSString alloc] initWithFormat:@"obj %zd", index];
-        [self.cache.memoryCache setObject:obj forKey:key block:nil];
+        [self.cache.memoryCache setObject:obj forKey:key];
     });
 
     self.cache.memoryCache.removeAllObjectsOnMemoryWarning = NO;
