@@ -7,11 +7,12 @@
 NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 
 @interface TMMemoryCache ()
-@property (strong, nonatomic) dispatch_semaphore_t lock;
 #if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic) dispatch_queue_t queue;
+@property (strong, nonatomic) dispatch_semaphore_t lock;
 #else
 @property (assign, nonatomic) dispatch_queue_t queue;
+@property (assign, nonatomic) dispatch_semaphore_t lock;
 #endif
 @property (strong, nonatomic) NSMutableDictionary *dictionary;
 @property (strong, nonatomic) NSMutableDictionary *dates;
