@@ -7,7 +7,7 @@
 NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 
 @interface TMMemoryCache ()
-@property (assign, nonatomic) pthread_rwlock_t readWriteLock;
+@property (strong, nonatomic) dispatch_semaphore_t lock;
 #if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic) dispatch_queue_t queue;
 #else
@@ -40,16 +40,15 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 
     #if !OS_OBJECT_USE_OBJC
     dispatch_release(_queue);
+    dispatch_release(_lock);
     _queue = nil;
     #endif
-    
-    pthread_rwlock_destroy(&_readWriteLock);
 }
 
 - (id)init
 {
     if (self = [super init]) {
-        pthread_rwlock_init(&_readWriteLock, NULL);
+        _lock = dispatch_semaphore_create(1);
         NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", TMMemoryCachePrefix, self];
         _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
@@ -675,22 +674,22 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 
 - (void)lockForReading
 {
-    pthread_rwlock_rdlock(&(_readWriteLock));
+    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
 }
 
 - (void)unlockForReading
 {
-    pthread_rwlock_unlock(&(_readWriteLock));
+    dispatch_semaphore_signal(_lock);
 }
 
 - (void)lockForWriting
 {
-    pthread_rwlock_wrlock(&(_readWriteLock));
+    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
 }
 
 - (void)unlockForWriting
 {
-    pthread_rwlock_unlock(&(_readWriteLock));
+    dispatch_semaphore_signal(_lock);
 }
 
 @end
