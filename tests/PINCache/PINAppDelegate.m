@@ -1,15 +1,15 @@
-#import "TMAppDelegate.h"
-#import "TMCache.h"
-#import "TMExampleView.h"
+#import "PINAppDelegate.h"
+#import "PINCache.h"
+#import "PINExampleView.h"
 
-@implementation TMAppDelegate
+@implementation PINAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] initWithNibName:nil bundle:nil];
     
-    TMExampleView *view = [[TMExampleView alloc] initWithFrame:self.window.rootViewController.view.bounds];
+    PINExampleView *view = [[PINExampleView alloc] initWithFrame:self.window.rootViewController.view.bounds];
     view.imageURL = [[NSURL alloc] initWithString:@"http://upload.wikimedia.org/wikipedia/commons/6/62/Sts114_033.jpg"];
     view.contentMode = UIViewContentModeScaleAspectFill;
     

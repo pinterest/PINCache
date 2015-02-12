@@ -1,5 +1,5 @@
 #import <SenTestingKit/SenTestingKit.h>
 
-@interface TMCacheTests : SenTestCase
+@interface PINCacheTests : SenTestCase
 
 @end

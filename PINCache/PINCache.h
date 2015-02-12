@@ -1,29 +1,29 @@
 /**
- `TMCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
+ `PINCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
  reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar
- stores, one in memory (<TMMemoryCache>) and one on disk (<TMDiskCache>).
+ stores, one in memory (<PINMemoryCache>) and one on disk (<PINDiskCache>).
  
- `TMCache` itself actually does very little; its main function is providing a front end for a common use case:
+ `PINCache` itself actually does very little; its main function is providing a front end for a common use case:
  a small, fast memory cache that asynchronously persists itself to a large, slow disk cache. When objects are
  removed from the memory cache in response to an "apocalyptic" event they remain in the disk cache and are
- repopulated in memory the next time they are accessed. `TMCache` also does the tedious work of creating a
+ repopulated in memory the next time they are accessed. `PINCache` also does the tedious work of creating a
  dispatch group to wait for both caches to finish their operations without blocking each other.
  
  The parallel caches are accessible as public properties (<memoryCache> and <diskCache>) and can be manipulated
- separately if necessary. See the docs for <TMMemoryCache> and <TMDiskCache> for more details.
+ separately if necessary. See the docs for <PINMemoryCache> and <PINDiskCache> for more details.
  */
 
 #import <Foundation/Foundation.h>
 
-#import "TMDiskCache.h"
-#import "TMMemoryCache.h"
+#import "PINDiskCache.h"
+#import "PINMemoryCache.h"
 
-@class TMCache;
+@class PINCache;
 
-typedef void (^TMCacheBlock)(TMCache *cache);
-typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
+typedef void (^PINCacheBlock)(PINCache *cache);
+typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
-@interface TMCache : NSObject
+@interface PINCache : NSObject
 
 #pragma mark -
 /// @name Core
@@ -44,14 +44,14 @@ typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
 @property (readonly) NSUInteger diskByteCount;
 
 /**
- The underlying disk cache, see <TMDiskCache> for additional configuration and trimming options.
+ The underlying disk cache, see <PINDiskCache> for additional configuration and trimming options.
  */
-@property (readonly) TMDiskCache *diskCache;
+@property (readonly) PINDiskCache *diskCache;
 
 /**
- The underlying memory cache, see <TMMemoryCache> for additional configuration and trimming options.
+ The underlying memory cache, see <PINMemoryCache> for additional configuration and trimming options.
  */
-@property (readonly) TMMemoryCache *memoryCache;
+@property (readonly) PINMemoryCache *memoryCache;
 
 #pragma mark -
 /// @name Initialization
@@ -94,7 +94,7 @@ typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(TMCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -104,7 +104,7 @@ typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(TMCacheObjectBlock)block;
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -113,7 +113,7 @@ typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(TMCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date. This method returns immediately and
@@ -122,7 +122,7 @@ typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(TMCacheBlock)block;
+- (void)trimToDate:(NSDate *)date block:(PINCacheBlock)block;
 
 /**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
@@ -130,7 +130,7 @@ typedef void (^TMCacheObjectBlock)(TMCache *cache, NSString *key, id object);
  
  @param block A block to be executed concurrently after the cache has been cleared, or nil.
  */
-- (void)removeAllObjects:(TMCacheBlock)block;
+- (void)removeAllObjects:(PINCacheBlock)block;
 
 #pragma mark -
 /// @name Synchronous Methods

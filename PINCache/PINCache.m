@@ -1,9 +1,9 @@
-#import "TMCache.h"
+#import "PINCache.h"
 
-NSString * const TMCachePrefix = @"com.tumblr.TMCache";
-NSString * const TMCacheSharedName = @"TMCacheShared";
+NSString * const PINCachePrefix = @"com.pinterest.PINCache";
+NSString * const PINCacheSharedName = @"PINCacheShared";
 
-@interface TMCache ()
+@interface PINCache ()
 #if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic) dispatch_queue_t asyncQueue;
 #else
@@ -11,7 +11,7 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
 #endif
 @end
 
-@implementation TMCache
+@implementation PINCache
 
 #pragma mark - Initialization -
 
@@ -36,18 +36,18 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
     if (self = [super init]) {
         _name = [name copy];
         
-        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", TMCachePrefix, self];
+        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
         _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
         
-        _diskCache = [[TMDiskCache alloc] initWithName:_name rootPath:rootPath];
-        _memoryCache = [[TMMemoryCache alloc] init];
+        _diskCache = [[PINDiskCache alloc] initWithName:_name rootPath:rootPath];
+        _memoryCache = [[PINMemoryCache alloc] init];
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [[NSString alloc] initWithFormat:@"%@.%@.%p", TMCachePrefix, _name, self];
+    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINCachePrefix, _name, self];
 }
 
 + (instancetype)sharedCache
@@ -56,7 +56,7 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
     static dispatch_once_t predicate;
     
     dispatch_once(&predicate, ^{
-        cache = [[self alloc] initWithName:TMCacheSharedName];
+        cache = [[self alloc] initWithName:PINCacheSharedName];
     });
     
     return cache;
@@ -64,14 +64,14 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)objectForKey:(NSString *)key block:(TMCacheObjectBlock)block
+- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
     if (!key || !block)
         return;
     
-    __weak TMCache *weakSelf = self;
+    __weak PINCache *weakSelf = self;
     dispatch_async(_asyncQueue, ^{
-        TMCache *strongSelf = weakSelf;
+        PINCache *strongSelf = weakSelf;
         id object = [strongSelf objectForKey:key];
         
         if (block)
@@ -79,14 +79,14 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
     });
 }
 
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(TMCacheObjectBlock)block
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
     if (!key || !object)
         return;
     
-    __weak TMCache *weakSelf = self;
+    __weak PINCache *weakSelf = self;
     dispatch_async(_asyncQueue, ^{
-        TMCache *strongSelf = weakSelf;
+        PINCache *strongSelf = weakSelf;
         [strongSelf setObject:object forKey:key];
         
         if (block)
@@ -94,14 +94,14 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
     });
 }
 
-- (void)removeObjectForKey:(NSString *)key block:(TMCacheObjectBlock)block
+- (void)removeObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
     if (!key)
         return;
     
-    __weak TMCache *weakSelf = self;
+    __weak PINCache *weakSelf = self;
     dispatch_async(_asyncQueue, ^{
-        TMCache *strongSelf = weakSelf;
+        PINCache *strongSelf = weakSelf;
         [strongSelf removeObjectForKey:key];
         
         if (block)
@@ -109,11 +109,11 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
     });
 }
 
-- (void)removeAllObjects:(TMCacheBlock)block
+- (void)removeAllObjects:(PINCacheBlock)block
 {
-    __weak TMCache *weakSelf = self;
+    __weak PINCache *weakSelf = self;
     dispatch_async(_asyncQueue, ^{
-        TMCache *strongSelf = weakSelf;
+        PINCache *strongSelf = weakSelf;
         [strongSelf removeAllObjects];
         
         if (block)
@@ -121,14 +121,14 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
     });
 }
 
-- (void)trimToDate:(NSDate *)date block:(TMCacheBlock)block
+- (void)trimToDate:(NSDate *)date block:(PINCacheBlock)block
 {
     if (!date)
         return;
 
-    __weak TMCache *weakSelf = self;
+    __weak PINCache *weakSelf = self;
     dispatch_async(_asyncQueue, ^{
-        TMCache *strongSelf = weakSelf;
+        PINCache *strongSelf = weakSelf;
         [strongSelf trimToDate:date];
         
         if (block)
@@ -142,7 +142,7 @@ NSString * const TMCacheSharedName = @"TMCacheShared";
 {
     __block NSUInteger byteCount = 0;
     
-    dispatch_sync([TMDiskCache sharedQueue], ^{
+    dispatch_sync([PINDiskCache sharedQueue], ^{
         byteCount = self.diskCache.byteCount;
     });
     

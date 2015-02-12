@@ -1,14 +1,14 @@
-#import "TMCacheTests.h"
-#import "TMCache.h"
+#import "PINCacheTests.h"
+#import "PINCache.h"
 
-NSString * const TMCacheTestName = @"TMCacheTest";
-NSTimeInterval TMCacheTestBlockTimeout = 5.0;
+NSString * const PINCacheTestName = @"PINCacheTest";
+NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
-@interface TMCacheTests ()
-@property (strong, nonatomic) TMCache *cache;
+@interface PINCacheTests ()
+@property (strong, nonatomic) PINCache *cache;
 @end
 
-@implementation TMCacheTests
+@implementation PINCacheTests
 
 #pragma mark - SenTestCase -
 
@@ -16,7 +16,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 {
     [super setUp];
     
-    self.cache = [[TMCache alloc] initWithName:TMCacheTestName];
+    self.cache = [[PINCache alloc] initWithName:PINCacheTestName];
     
     STAssertNotNil(self.cache, @"test cache does not exist");
 }
@@ -54,14 +54,14 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 
 - (dispatch_time_t)timeout
 {
-    return dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TMCacheTestBlockTimeout * NSEC_PER_SEC));
+    return dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PINCacheTestBlockTimeout * NSEC_PER_SEC));
 }
 
 #pragma mark - Tests -
 
 - (void)testCoreProperties
 {
-    STAssertTrue([self.cache.name isEqualToString:TMCacheTestName], @"wrong name");
+    STAssertTrue([self.cache.name isEqualToString:PINCacheTestName], @"wrong name");
     STAssertNotNil(self.cache.memoryCache, @"memory cache does not exist");
     STAssertNotNil(self.cache.diskCache, @"disk cache doe not exist");
 }
@@ -81,7 +81,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     __block UIImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
-    [self.cache setObject:[self image] forKey:key block:^(TMCache *cache, NSString *key, id object) {
+    [self.cache setObject:[self image] forKey:key block:^(PINCache *cache, NSString *key, id object) {
         image = (UIImage *)object;
         dispatch_semaphore_signal(semaphore);
     }];
@@ -99,7 +99,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     
     [self.cache setObject:[self image] forKey:key];
     
-    [self.cache objectForKey:key block:^(TMCache *cache, NSString *key, id object) {
+    [self.cache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
         image = (UIImage *)object;
         dispatch_semaphore_signal(semaphore);
     }];
@@ -116,7 +116,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     
     [self.cache setObject:[self image] forKey:key];
     
-    [self.cache removeObjectForKey:key block:^(TMCache *cache, NSString *key, id object) {
+    [self.cache removeObjectForKey:key block:^(PINCache *cache, NSString *key, id object) {
         dispatch_semaphore_signal(semaphore);
     }];
     
@@ -192,7 +192,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
     for (NSUInteger i = 0; i < max; i++) {
         NSString *key = [[NSString alloc] initWithFormat:@"key %lu", (unsigned long)i];
         
-        [self.cache objectForKey:key block:^(TMCache *cache, NSString *key, id object) {
+        [self.cache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
             dispatch_async(queue, ^{
                 NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
                 STAssertTrue([object isEqualToString:obj] == YES, @"object returned was not object set");
@@ -213,7 +213,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 
     __block BOOL blockDidExecute = NO;
 
-    self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(TMMemoryCache *cache) {
+    self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(PINMemoryCache *cache) {
         blockDidExecute = YES;
         dispatch_semaphore_signal(semaphore);
     };
@@ -232,14 +232,28 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 
     __block BOOL blockDidExecute = NO;
 
-    self.cache.memoryCache.didEnterBackgroundBlock = ^(TMMemoryCache *cache) {
+    self.cache.memoryCache.didEnterBackgroundBlock = ^(PINMemoryCache *cache) {
         blockDidExecute = YES;
         dispatch_semaphore_signal(semaphore);
     };
+    
+    BOOL isiOS8OrGreater = NO;
+    NSString *reqSysVer = @"8";
+    NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
+    if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
+        isiOS8OrGreater = YES;
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidEnterBackgroundNotification
-                                                        object:[UIApplication sharedApplication]];
+    if (isiOS8OrGreater) {
+        //sending didEnterBackgroundNotification causes crash on iOS 8.
+        NSNotification *notification = [NSNotification notificationWithName:UIApplicationDidEnterBackgroundNotification object:nil];
+        [self.cache.memoryCache performSelector:@selector(didObserveApocalypticNotification:) withObject:notification];
+        
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidEnterBackgroundNotification
+                                                            object:[UIApplication sharedApplication]];
 
+    }
+    
     dispatch_semaphore_wait(semaphore, [self timeout]);
 
     STAssertTrue(blockDidExecute, @"app background block did not execute");
@@ -255,7 +269,7 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 
     __block id object = nil;
     
-    self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(TMMemoryCache *cache) {
+    self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(PINMemoryCache *cache) {
         object = [cache objectForKey:@"object"];
         dispatch_semaphore_signal(semaphore);
     };
@@ -284,10 +298,10 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 
     __block NSUInteger enumCount = 0;
 
-    self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(TMMemoryCache *cache) {
-        [cache enumerateObjectsWithBlock:^(TMMemoryCache *cache, NSString *key, id object) {
+    self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(PINMemoryCache *cache) {
+        [cache enumerateObjectsWithBlock:^(PINMemoryCache *cache, NSString *key, id object) {
             enumCount++;
-        } completionBlock:^(TMMemoryCache *cache) {
+        } completionBlock:^(PINMemoryCache *cache) {
             dispatch_semaphore_signal(semaphore);
         }];
     };
@@ -314,9 +328,9 @@ NSTimeInterval TMCacheTestBlockTimeout = 5.0;
 
     __block NSUInteger enumCount = 0;
 
-    [self.cache.diskCache enumerateObjectsWithBlock:^(TMDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
+    [self.cache.diskCache enumerateObjectsWithBlock:^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
         enumCount++;
-    } completionBlock:^(TMDiskCache *cache) {
+    } completionBlock:^(PINDiskCache *cache) {
         dispatch_semaphore_signal(semaphore);
     }];
 

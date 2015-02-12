@@ -7,35 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		662900351A66B724009C10BD /* TMCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83A171DF0AF0041E777 /* TMCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662900361A66B727009C10BD /* TMCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83A171DF0AF0041E777 /* TMCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6629003B1A66B76B009C10BD /* TMCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* TMCache.m */; };
-		6629003C1A66B76B009C10BD /* TMDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* TMDiskCache.m */; };
-		6629003D1A66B76B009C10BD /* TMMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* TMMemoryCache.m */; };
-		662900401A66B79B009C10BD /* TMCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* TMCache.m */; };
-		662900411A66B79B009C10BD /* TMDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* TMDiskCache.m */; };
-		662900421A66B79B009C10BD /* TMMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* TMMemoryCache.m */; };
-		662900451A66B830009C10BD /* TMDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83C171DF0AF0041E777 /* TMDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662900461A66B830009C10BD /* TMMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* TMMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662900471A66B831009C10BD /* TMDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83C171DF0AF0041E777 /* TMDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		662900481A66B831009C10BD /* TMMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* TMMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662900351A66B724009C10BD /* PINCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83A171DF0AF0041E777 /* PINCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662900361A66B727009C10BD /* PINCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83A171DF0AF0041E777 /* PINCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6629003B1A66B76B009C10BD /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* PINCache.m */; };
+		6629003C1A66B76B009C10BD /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */; };
+		6629003D1A66B76B009C10BD /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
+		662900401A66B79B009C10BD /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* PINCache.m */; };
+		662900411A66B79B009C10BD /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */; };
+		662900421A66B79B009C10BD /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
+		662900451A66B830009C10BD /* PINDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662900461A66B830009C10BD /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662900471A66B831009C10BD /* PINDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		662900481A66B831009C10BD /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D07F1EB6171AFB7A001DBA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB5171AFB7A001DBA02 /* UIKit.framework */; };
 		D07F1EB8171AFB7A001DBA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB7171AFB7A001DBA02 /* Foundation.framework */; };
 		D07F1EBA171AFB7A001DBA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB9171AFB7A001DBA02 /* CoreGraphics.framework */; };
 		D07F1EC2171AFB7A001DBA02 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EC1171AFB7A001DBA02 /* main.m */; };
-		D07F1EC6171AFB7A001DBA02 /* TMAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EC5171AFB7A001DBA02 /* TMAppDelegate.m */; };
+		D07F1EC6171AFB7A001DBA02 /* PINAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EC5171AFB7A001DBA02 /* PINAppDelegate.m */; };
 		D07F1ECC171AFB7A001DBA02 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D07F1ECB171AFB7A001DBA02 /* Default-568h@2x.png */; };
 		D07F1ED4171AFB7A001DBA02 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1ED3171AFB7A001DBA02 /* SenTestingKit.framework */; };
 		D07F1ED5171AFB7A001DBA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB5171AFB7A001DBA02 /* UIKit.framework */; };
 		D07F1ED6171AFB7A001DBA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB7171AFB7A001DBA02 /* Foundation.framework */; };
-		D07F1EE1171AFB7A001DBA02 /* TMCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EE0171AFB7A001DBA02 /* TMCacheTests.m */; };
-		D0E5D840171DF0AF0041E777 /* TMCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* TMCache.m */; };
-		D0E5D841171DF0AF0041E777 /* TMCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* TMCache.m */; };
-		D0E5D842171DF0AF0041E777 /* TMDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* TMDiskCache.m */; };
-		D0E5D843171DF0AF0041E777 /* TMDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* TMDiskCache.m */; };
-		D0E5D844171DF0AF0041E777 /* TMMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* TMMemoryCache.m */; };
-		D0E5D845171DF0AF0041E777 /* TMMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* TMMemoryCache.m */; };
-		D0E5D848171DF0FA0041E777 /* TMExampleView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D847171DF0FA0041E777 /* TMExampleView.m */; };
+		D07F1EE1171AFB7A001DBA02 /* PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */; };
+		D0E5D840171DF0AF0041E777 /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* PINCache.m */; };
+		D0E5D841171DF0AF0041E777 /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* PINCache.m */; };
+		D0E5D842171DF0AF0041E777 /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */; };
+		D0E5D843171DF0AF0041E777 /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */; };
+		D0E5D844171DF0AF0041E777 /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
+		D0E5D845171DF0AF0041E777 /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
+		D0E5D848171DF0FA0041E777 /* PINExampleView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D847171DF0FA0041E777 /* PINExampleView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,33 +62,33 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		662900111A66B60D009C10BD /* TMCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TMCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		662900111A66B60D009C10BD /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		662900141A66B60D009C10BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6629FFED1A66B512009C10BD /* TMCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TMCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6629FFED1A66B512009C10BD /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6629FFF01A66B512009C10BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D07F1EB2171AFB7A001DBA02 /* TMCache.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TMCache.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D07F1EB2171AFB7A001DBA02 /* PINCache.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PINCache.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07F1EB5171AFB7A001DBA02 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D07F1EB7171AFB7A001DBA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D07F1EB9171AFB7A001DBA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		D07F1EBD171AFB7A001DBA02 /* TMCache-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TMCache-Info.plist"; sourceTree = "<group>"; };
+		D07F1EBD171AFB7A001DBA02 /* PINCache-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PINCache-Info.plist"; sourceTree = "<group>"; };
 		D07F1EC1171AFB7A001DBA02 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		D07F1EC3171AFB7A001DBA02 /* TMCache-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TMCache-Prefix.pch"; sourceTree = "<group>"; };
-		D07F1EC4171AFB7A001DBA02 /* TMAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TMAppDelegate.h; sourceTree = "<group>"; };
-		D07F1EC5171AFB7A001DBA02 /* TMAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TMAppDelegate.m; sourceTree = "<group>"; };
+		D07F1EC3171AFB7A001DBA02 /* PINCache-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PINCache-Prefix.pch"; sourceTree = "<group>"; };
+		D07F1EC4171AFB7A001DBA02 /* PINAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINAppDelegate.h; sourceTree = "<group>"; };
+		D07F1EC5171AFB7A001DBA02 /* PINAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PINAppDelegate.m; sourceTree = "<group>"; };
 		D07F1ECB171AFB7A001DBA02 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		D07F1ED2171AFB7A001DBA02 /* TMCacheTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TMCacheTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D07F1ED2171AFB7A001DBA02 /* PINCacheTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PINCacheTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07F1ED3171AFB7A001DBA02 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		D07F1EDB171AFB7A001DBA02 /* TMCacheTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TMCacheTests-Info.plist"; sourceTree = "<group>"; };
-		D07F1EDF171AFB7A001DBA02 /* TMCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TMCacheTests.h; sourceTree = "<group>"; };
-		D07F1EE0171AFB7A001DBA02 /* TMCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TMCacheTests.m; sourceTree = "<group>"; };
-		D0E5D83A171DF0AF0041E777 /* TMCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMCache.h; sourceTree = "<group>"; };
-		D0E5D83B171DF0AF0041E777 /* TMCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMCache.m; sourceTree = "<group>"; };
-		D0E5D83C171DF0AF0041E777 /* TMDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMDiskCache.h; sourceTree = "<group>"; };
-		D0E5D83D171DF0AF0041E777 /* TMDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = TMDiskCache.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		D0E5D83E171DF0AF0041E777 /* TMMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMMemoryCache.h; sourceTree = "<group>"; };
-		D0E5D83F171DF0AF0041E777 /* TMMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMMemoryCache.m; sourceTree = "<group>"; };
-		D0E5D846171DF0FA0041E777 /* TMExampleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMExampleView.h; sourceTree = "<group>"; };
-		D0E5D847171DF0FA0041E777 /* TMExampleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMExampleView.m; sourceTree = "<group>"; };
+		D07F1EDB171AFB7A001DBA02 /* PINCacheTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PINCacheTests-Info.plist"; sourceTree = "<group>"; };
+		D07F1EDF171AFB7A001DBA02 /* PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheTests.h; sourceTree = "<group>"; };
+		D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PINCacheTests.m; sourceTree = "<group>"; };
+		D0E5D83A171DF0AF0041E777 /* PINCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCache.h; sourceTree = "<group>"; };
+		D0E5D83B171DF0AF0041E777 /* PINCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINCache.m; sourceTree = "<group>"; };
+		D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINDiskCache.h; sourceTree = "<group>"; };
+		D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINDiskCache.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINMemoryCache.h; sourceTree = "<group>"; };
+		D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINMemoryCache.m; sourceTree = "<group>"; };
+		D0E5D846171DF0FA0041E777 /* PINExampleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINExampleView.h; sourceTree = "<group>"; };
+		D0E5D847171DF0FA0041E777 /* PINExampleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINExampleView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,9 +164,9 @@
 		D07F1EA9171AFB7A001DBA02 = {
 			isa = PBXGroup;
 			children = (
-				D07F1EBB171AFB7A001DBA02 /* TMCache */,
-				D0E5D839171DF0AF0041E777 /* TMCache */,
-				D07F1ED9171AFB7A001DBA02 /* TMCacheTests */,
+				D07F1EBB171AFB7A001DBA02 /* PINCache */,
+				D0E5D839171DF0AF0041E777 /* PINCache */,
+				D07F1ED9171AFB7A001DBA02 /* PINCacheTests */,
 				D07F1EBC171AFB7A001DBA02 /* Supporting Files */,
 				6629FFEE1A66B512009C10BD /* iOS */,
 				662900121A66B60D009C10BD /* OS X */,
@@ -178,10 +178,10 @@
 		D07F1EB3171AFB7A001DBA02 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D07F1EB2171AFB7A001DBA02 /* TMCache.app */,
-				D07F1ED2171AFB7A001DBA02 /* TMCacheTests.octest */,
-				6629FFED1A66B512009C10BD /* TMCache.framework */,
-				662900111A66B60D009C10BD /* TMCache.framework */,
+				D07F1EB2171AFB7A001DBA02 /* PINCache.app */,
+				D07F1ED2171AFB7A001DBA02 /* PINCacheTests.octest */,
+				6629FFED1A66B512009C10BD /* PINCache.framework */,
+				662900111A66B60D009C10BD /* PINCache.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -197,15 +197,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		D07F1EBB171AFB7A001DBA02 /* TMCache */ = {
+		D07F1EBB171AFB7A001DBA02 /* PINCache */ = {
 			isa = PBXGroup;
 			children = (
-				D07F1EC4171AFB7A001DBA02 /* TMAppDelegate.h */,
-				D07F1EC5171AFB7A001DBA02 /* TMAppDelegate.m */,
-				D0E5D846171DF0FA0041E777 /* TMExampleView.h */,
-				D0E5D847171DF0FA0041E777 /* TMExampleView.m */,
+				D07F1EC4171AFB7A001DBA02 /* PINAppDelegate.h */,
+				D07F1EC5171AFB7A001DBA02 /* PINAppDelegate.m */,
+				D0E5D846171DF0FA0041E777 /* PINExampleView.h */,
+				D0E5D847171DF0FA0041E777 /* PINExampleView.m */,
 			);
-			path = TMCache;
+			path = PINCache;
 			sourceTree = "<group>";
 		};
 		D07F1EBC171AFB7A001DBA02 /* Supporting Files */ = {
@@ -213,35 +213,35 @@
 			children = (
 				D07F1ECB171AFB7A001DBA02 /* Default-568h@2x.png */,
 				D07F1EC1171AFB7A001DBA02 /* main.m */,
-				D07F1EBD171AFB7A001DBA02 /* TMCache-Info.plist */,
-				D07F1EC3171AFB7A001DBA02 /* TMCache-Prefix.pch */,
+				D07F1EBD171AFB7A001DBA02 /* PINCache-Info.plist */,
+				D07F1EC3171AFB7A001DBA02 /* PINCache-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			path = TMCache;
+			path = PINCache;
 			sourceTree = "<group>";
 		};
-		D07F1ED9171AFB7A001DBA02 /* TMCacheTests */ = {
+		D07F1ED9171AFB7A001DBA02 /* PINCacheTests */ = {
 			isa = PBXGroup;
 			children = (
-				D07F1EDB171AFB7A001DBA02 /* TMCacheTests-Info.plist */,
-				D07F1EDF171AFB7A001DBA02 /* TMCacheTests.h */,
-				D07F1EE0171AFB7A001DBA02 /* TMCacheTests.m */,
+				D07F1EDB171AFB7A001DBA02 /* PINCacheTests-Info.plist */,
+				D07F1EDF171AFB7A001DBA02 /* PINCacheTests.h */,
+				D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */,
 			);
-			path = TMCacheTests;
+			path = PINCacheTests;
 			sourceTree = "<group>";
 		};
-		D0E5D839171DF0AF0041E777 /* TMCache */ = {
+		D0E5D839171DF0AF0041E777 /* PINCache */ = {
 			isa = PBXGroup;
 			children = (
-				D0E5D83A171DF0AF0041E777 /* TMCache.h */,
-				D0E5D83B171DF0AF0041E777 /* TMCache.m */,
-				D0E5D83C171DF0AF0041E777 /* TMDiskCache.h */,
-				D0E5D83D171DF0AF0041E777 /* TMDiskCache.m */,
-				D0E5D83E171DF0AF0041E777 /* TMMemoryCache.h */,
-				D0E5D83F171DF0AF0041E777 /* TMMemoryCache.m */,
+				D0E5D83A171DF0AF0041E777 /* PINCache.h */,
+				D0E5D83B171DF0AF0041E777 /* PINCache.m */,
+				D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */,
+				D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */,
+				D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */,
+				D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */,
 			);
-			name = TMCache;
-			path = ../TMCache;
+			name = PINCache;
+			path = ../PINCache;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -251,9 +251,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				662900361A66B727009C10BD /* TMCache.h in Headers */,
-				662900481A66B831009C10BD /* TMMemoryCache.h in Headers */,
-				662900471A66B831009C10BD /* TMDiskCache.h in Headers */,
+				662900361A66B727009C10BD /* PINCache.h in Headers */,
+				662900481A66B831009C10BD /* PINMemoryCache.h in Headers */,
+				662900471A66B831009C10BD /* PINDiskCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,9 +261,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				662900351A66B724009C10BD /* TMCache.h in Headers */,
-				662900461A66B830009C10BD /* TMMemoryCache.h in Headers */,
-				662900451A66B830009C10BD /* TMDiskCache.h in Headers */,
+				662900351A66B724009C10BD /* PINCache.h in Headers */,
+				662900461A66B830009C10BD /* PINMemoryCache.h in Headers */,
+				662900451A66B830009C10BD /* PINDiskCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +285,7 @@
 			);
 			name = "OS X";
 			productName = "OS X";
-			productReference = 662900111A66B60D009C10BD /* TMCache.framework */;
+			productReference = 662900111A66B60D009C10BD /* PINCache.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		6629FFEC1A66B512009C10BD /* iOS */ = {
@@ -303,12 +303,12 @@
 			);
 			name = iOS;
 			productName = iOS;
-			productReference = 6629FFED1A66B512009C10BD /* TMCache.framework */;
+			productReference = 6629FFED1A66B512009C10BD /* PINCache.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		D07F1EB1171AFB7A001DBA02 /* TMCache */ = {
+		D07F1EB1171AFB7A001DBA02 /* PINCache */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D07F1EE4171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "TMCache" */;
+			buildConfigurationList = D07F1EE4171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "PINCache" */;
 			buildPhases = (
 				D07F1EAE171AFB7A001DBA02 /* Sources */,
 				D07F1EAF171AFB7A001DBA02 /* Frameworks */,
@@ -319,14 +319,14 @@
 			);
 			dependencies = (
 			);
-			name = TMCache;
+			name = PINCache;
 			productName = TMCache;
-			productReference = D07F1EB2171AFB7A001DBA02 /* TMCache.app */;
+			productReference = D07F1EB2171AFB7A001DBA02 /* PINCache.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D07F1ED1171AFB7A001DBA02 /* TMCacheTests */ = {
+		D07F1ED1171AFB7A001DBA02 /* PINCacheTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D07F1EE7171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "TMCacheTests" */;
+			buildConfigurationList = D07F1EE7171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "PINCacheTests" */;
 			buildPhases = (
 				D07F1ECD171AFB7A001DBA02 /* Sources */,
 				D07F1ECE171AFB7A001DBA02 /* Frameworks */,
@@ -338,9 +338,9 @@
 			dependencies = (
 				D07F1ED8171AFB7A001DBA02 /* PBXTargetDependency */,
 			);
-			name = TMCacheTests;
+			name = PINCacheTests;
 			productName = TMCacheTests;
-			productReference = D07F1ED2171AFB7A001DBA02 /* TMCacheTests.octest */;
+			productReference = D07F1ED2171AFB7A001DBA02 /* PINCacheTests.octest */;
 			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 /* End PBXNativeTarget section */
@@ -362,7 +362,7 @@
 					};
 				};
 			};
-			buildConfigurationList = D07F1EAD171AFB7A001DBA02 /* Build configuration list for PBXProject "TMCache" */;
+			buildConfigurationList = D07F1EAD171AFB7A001DBA02 /* Build configuration list for PBXProject "PINCache" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -374,8 +374,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D07F1EB1171AFB7A001DBA02 /* TMCache */,
-				D07F1ED1171AFB7A001DBA02 /* TMCacheTests */,
+				D07F1EB1171AFB7A001DBA02 /* PINCache */,
+				D07F1ED1171AFB7A001DBA02 /* PINCacheTests */,
 				6629FFEC1A66B512009C10BD /* iOS */,
 				662900101A66B60D009C10BD /* OS X */,
 			);
@@ -435,9 +435,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				662900401A66B79B009C10BD /* TMCache.m in Sources */,
-				662900411A66B79B009C10BD /* TMDiskCache.m in Sources */,
-				662900421A66B79B009C10BD /* TMMemoryCache.m in Sources */,
+				662900401A66B79B009C10BD /* PINCache.m in Sources */,
+				662900411A66B79B009C10BD /* PINDiskCache.m in Sources */,
+				662900421A66B79B009C10BD /* PINMemoryCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,9 +445,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6629003B1A66B76B009C10BD /* TMCache.m in Sources */,
-				6629003C1A66B76B009C10BD /* TMDiskCache.m in Sources */,
-				6629003D1A66B76B009C10BD /* TMMemoryCache.m in Sources */,
+				6629003B1A66B76B009C10BD /* PINCache.m in Sources */,
+				6629003C1A66B76B009C10BD /* PINDiskCache.m in Sources */,
+				6629003D1A66B76B009C10BD /* PINMemoryCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,11 +456,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D07F1EC2171AFB7A001DBA02 /* main.m in Sources */,
-				D07F1EC6171AFB7A001DBA02 /* TMAppDelegate.m in Sources */,
-				D0E5D840171DF0AF0041E777 /* TMCache.m in Sources */,
-				D0E5D842171DF0AF0041E777 /* TMDiskCache.m in Sources */,
-				D0E5D844171DF0AF0041E777 /* TMMemoryCache.m in Sources */,
-				D0E5D848171DF0FA0041E777 /* TMExampleView.m in Sources */,
+				D07F1EC6171AFB7A001DBA02 /* PINAppDelegate.m in Sources */,
+				D0E5D840171DF0AF0041E777 /* PINCache.m in Sources */,
+				D0E5D842171DF0AF0041E777 /* PINDiskCache.m in Sources */,
+				D0E5D844171DF0AF0041E777 /* PINMemoryCache.m in Sources */,
+				D0E5D848171DF0FA0041E777 /* PINExampleView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,10 +468,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D07F1EE1171AFB7A001DBA02 /* TMCacheTests.m in Sources */,
-				D0E5D841171DF0AF0041E777 /* TMCache.m in Sources */,
-				D0E5D843171DF0AF0041E777 /* TMDiskCache.m in Sources */,
-				D0E5D845171DF0AF0041E777 /* TMMemoryCache.m in Sources */,
+				D07F1EE1171AFB7A001DBA02 /* PINCacheTests.m in Sources */,
+				D0E5D841171DF0AF0041E777 /* PINCache.m in Sources */,
+				D0E5D843171DF0AF0041E777 /* PINDiskCache.m in Sources */,
+				D0E5D845171DF0AF0041E777 /* PINMemoryCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,7 +480,7 @@
 /* Begin PBXTargetDependency section */
 		D07F1ED8171AFB7A001DBA02 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D07F1EB1171AFB7A001DBA02 /* TMCache */;
+			target = D07F1EB1171AFB7A001DBA02 /* PINCache */;
 			targetProxy = D07F1ED7171AFB7A001DBA02 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -514,7 +514,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = TMCache;
+				PRODUCT_NAME = PINCache;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -547,7 +547,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = TMCache;
+				PRODUCT_NAME = PINCache;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -584,7 +584,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = TMCache;
+				PRODUCT_NAME = PINCache;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -621,7 +621,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = TMCache;
+				PRODUCT_NAME = PINCache;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -694,12 +694,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TMCache/TMCache-Prefix.pch";
+				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
-				INFOPLIST_FILE = "TMCache/TMCache-Info.plist";
+				INFOPLIST_FILE = "PINCache/PINCache-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = PINCache;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -708,12 +708,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TMCache/TMCache-Prefix.pch";
+				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
-				INFOPLIST_FILE = "TMCache/TMCache-Info.plist";
+				INFOPLIST_FILE = "PINCache/PINCache-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = PINCache;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -721,15 +721,15 @@
 		D07F1EE8171AFB7A001DBA02 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TMCache.app/TMCache";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/PINCache.app/PINCache";
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TMCache/TMCache-Prefix.pch";
-				INFOPLIST_FILE = "TMCacheTests/TMCacheTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
+				INFOPLIST_FILE = "PINCacheTests/PINCacheTests-Info.plist";
+				PRODUCT_NAME = PINCacheTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
 				WRAPPER_EXTENSION = octest;
@@ -739,15 +739,15 @@
 		D07F1EE9171AFB7A001DBA02 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/TMCache.app/TMCache";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/PINCache.app/PINCache";
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TMCache/TMCache-Prefix.pch";
-				INFOPLIST_FILE = "TMCacheTests/TMCacheTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
+				INFOPLIST_FILE = "PINCacheTests/PINCacheTests-Info.plist";
+				PRODUCT_NAME = PINCacheTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
 				WRAPPER_EXTENSION = octest;
@@ -764,6 +764,7 @@
 				662900081A66B513009C10BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6629002A1A66B60D009C10BD /* Build configuration list for PBXNativeTarget "OS X" */ = {
 			isa = XCConfigurationList;
@@ -772,8 +773,9 @@
 				6629002C1A66B60D009C10BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		D07F1EAD171AFB7A001DBA02 /* Build configuration list for PBXProject "TMCache" */ = {
+		D07F1EAD171AFB7A001DBA02 /* Build configuration list for PBXProject "PINCache" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D07F1EE2171AFB7A001DBA02 /* Debug */,
@@ -782,7 +784,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D07F1EE4171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "TMCache" */ = {
+		D07F1EE4171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "PINCache" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D07F1EE5171AFB7A001DBA02 /* Debug */,
@@ -791,7 +793,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D07F1EE7171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "TMCacheTests" */ = {
+		D07F1EE7171AFB7A001DBA02 /* Build configuration list for PBXNativeTarget "PINCacheTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D07F1EE8171AFB7A001DBA02 /* Debug */,

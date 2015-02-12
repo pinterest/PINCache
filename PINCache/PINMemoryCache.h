@@ -1,5 +1,5 @@
 /**
- `TMMemoryCache` is a fast, thread safe key/value store similar to `NSCache`. On iOS it will clear itself
+ `PINMemoryCache` is a fast, thread safe key/value store similar to `NSCache`. On iOS it will clear itself
  automatically to reduce memory usage when the app receives a memory warning or goes into the background.
  
  Access is natively synchronous. Asynchronous variations are provided. Every asynchronous method accepts a
@@ -11,18 +11,18 @@
  Objects can optionally be set with a "cost", which could be a byte count or any other meaningful integer.
  Setting a <costLimit> will automatically keep the cache below that value with <trimToCostByDate:>.
  
- Values will not persist after application relaunch or returning from the background. See <TMCache> for
+ Values will not persist after application relaunch or returning from the background. See <PINCache> for
  a memory cache backed by a disk cache.
  */
 
 #import <Foundation/Foundation.h>
 
-@class TMMemoryCache;
+@class PINMemoryCache;
 
-typedef void (^TMMemoryCacheBlock)(TMMemoryCache *cache);
-typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id object);
+typedef void (^PINMemoryCacheBlock)(PINMemoryCache *cache);
+typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, id object);
 
-@interface TMMemoryCache : NSObject
+@interface PINMemoryCache : NSObject
 
 #pragma mark -
 /// @name Core
@@ -69,49 +69,49 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  A block to be executed just before an object is added to the cache. This block will be excuted within
  a barrier, i.e. all reads and writes are suspended for the duration of the block.
  */
-@property (copy) TMMemoryCacheObjectBlock willAddObjectBlock;
+@property (copy) PINMemoryCacheObjectBlock willAddObjectBlock;
 
 /**
  A block to be executed just before an object is removed from the cache. This block will be excuted
  within a barrier, i.e. all reads and writes are suspended for the duration of the block.
  */
-@property (copy) TMMemoryCacheObjectBlock willRemoveObjectBlock;
+@property (copy) PINMemoryCacheObjectBlock willRemoveObjectBlock;
 
 /**
  A block to be executed just before all objects are removed from the cache as a result of <removeAllObjects:>.
  This block will be excuted within a barrier, i.e. all reads and writes are suspended for the duration of the block.
  */
-@property (copy) TMMemoryCacheBlock willRemoveAllObjectsBlock;
+@property (copy) PINMemoryCacheBlock willRemoveAllObjectsBlock;
 
 /**
  A block to be executed just after an object is added to the cache. This block will be excuted within
  a barrier, i.e. all reads and writes are suspended for the duration of the block.
  */
-@property (copy) TMMemoryCacheObjectBlock didAddObjectBlock;
+@property (copy) PINMemoryCacheObjectBlock didAddObjectBlock;
 
 /**
  A block to be executed just after an object is removed from the cache. This block will be excuted
  within a barrier, i.e. all reads and writes are suspended for the duration of the block.
  */
-@property (copy) TMMemoryCacheObjectBlock didRemoveObjectBlock;
+@property (copy) PINMemoryCacheObjectBlock didRemoveObjectBlock;
 
 /**
  A block to be executed just after all objects are removed from the cache as a result of <removeAllObjects:>.
  This block will be excuted within a barrier, i.e. all reads and writes are suspended for the duration of the block.
  */
-@property (copy) TMMemoryCacheBlock didRemoveAllObjectsBlock;
+@property (copy) PINMemoryCacheBlock didRemoveAllObjectsBlock;
 
 /**
  A block to be executed upon receiving a memory warning (iOS only) potentially in parallel with other blocks on the <queue>.
  This block will be executed regardless of the value of <removeAllObjectsOnMemoryWarning>. Defaults to `nil`.
  */
-@property (copy) TMMemoryCacheBlock didReceiveMemoryWarningBlock;
+@property (copy) PINMemoryCacheBlock didReceiveMemoryWarningBlock;
 
 /**
  A block to be executed when the app enters the background (iOS only) potentially in parallel with other blocks on the <queue>.
  This block will be executed regardless of the value of <removeAllObjectsOnEnteringBackground>. Defaults to `nil`.
  */
-@property (copy) TMMemoryCacheBlock didEnterBackgroundBlock;
+@property (copy) PINMemoryCacheBlock didEnterBackgroundBlock;
 
 #pragma mark -
 /// @name Shared Cache
@@ -133,7 +133,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(TMMemoryCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -143,7 +143,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id)object forKey:(NSString *)key block:(TMMemoryCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key and the specified cost. If the cost causes the total
@@ -156,7 +156,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param cost An amount to add to the <totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(TMMemoryCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINMemoryCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -165,7 +165,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(TMMemoryCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -175,7 +175,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(TMMemoryCacheBlock)block;
+- (void)trimToDate:(NSDate *)date block:(PINMemoryCacheBlock)block;
 
 /**
  Removes objects from the cache, costliest objects first, until the <totalCost> is below the specified
@@ -185,7 +185,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToCost:(NSUInteger)cost block:(TMMemoryCacheBlock)block;
+- (void)trimToCost:(NSUInteger)cost block:(PINMemoryCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the <totalCost> is below
@@ -195,7 +195,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToCostByDate:(NSUInteger)cost block:(TMMemoryCacheBlock)block;
+- (void)trimToCostByDate:(NSUInteger)cost block:(PINMemoryCacheBlock)block;
 
 /**
  Removes all objects from the cache. This method returns immediately and executes the passed block after
@@ -203,7 +203,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  
  @param block A block to be executed concurrently after the cache has been cleared, or nil.
  */
-- (void)removeAllObjects:(TMMemoryCacheBlock)block;
+- (void)removeAllObjects:(PINMemoryCacheBlock)block;
 
 /**
  Loops through all objects in the cache with reads and writes suspended. Calling serial methods which
@@ -212,7 +212,7 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed concurrently when the enumeration is complete.
  */
-- (void)enumerateObjectsWithBlock:(TMMemoryCacheObjectBlock)block completionBlock:(TMMemoryCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(PINMemoryCacheBlock)completionBlock;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -295,6 +295,6 @@ typedef void (^TMMemoryCacheObjectBlock)(TMMemoryCache *cache, NSString *key, id
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
  
  */
-- (void)enumerateObjectsWithBlock:(TMMemoryCacheObjectBlock)block;
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block;
 
 @end

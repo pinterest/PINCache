@@ -1,11 +1,11 @@
 /**
- `TMDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
+ `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
  to the `NSCoding` protocol, which includes the basic Foundation data types and collection classes and also
  many UIKit classes, notably `UIImage`. All work is performed on a serial queue shared by all instances in
  the app, and archiving is handled by `NSKeyedArchiver`. This is a particular advantage for `UIImage` because
  it skips `UIImagePNGRepresentation()` and retains information like scale and orientation.
  
- The designated initializer for `TMDiskCache` is <initWithName:>. The <name> string is used to create a directory
+ The designated initializer for `PINDiskCache` is <initWithName:>. The <name> string is used to create a directory
  under Library/Caches that scopes disk access for any instance sharing this name. Multiple instances with the
  same name are allowed because all disk access is serialized on the <sharedQueue>. The <name> also appears in
  stack traces and return value for `description:`.
@@ -15,8 +15,8 @@
  duration of the block. In addition, the <sharedQueue> can be set to target an existing serial I/O queue, should
  your app already have one.
  
- Because this cache is bound by disk I/O it can be much slower than <TMMemoryCache>, although values stored in
- `TMDiskCache` persist after application relaunch. Using <TMCache> is recommended over using `TMDiskCache`
+ Because this cache is bound by disk I/O it can be much slower than <PINMemoryCache>, although values stored in
+ `PINDiskCache` persist after application relaunch. Using <PINCache> is recommended over using `PINDiskCache`
  by itself, as it adds a fast layer of additional memory caching while still writing to disk.
 
  All access to the cache is dated so the that the least-used objects can be trimmed first. Setting an optional
@@ -25,12 +25,12 @@
 
 #import <Foundation/Foundation.h>
 
-@class TMDiskCache;
+@class PINDiskCache;
 
-typedef void (^TMDiskCacheBlock)(TMDiskCache *cache);
-typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL);
+typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL);
 
-@interface TMDiskCache : NSObject
+@interface PINDiskCache : NSObject
 
 #pragma mark -
 /// @name Core
@@ -41,7 +41,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
 @property (readonly) NSString *name;
 
 /**
- The URL of the directory used by this cache, usually `Library/Caches/com.tumblr.TMDiskCache.(name)`
+ The URL of the directory used by this cache, usually `Library/Caches/com.pinterest.PINDiskCache.(name)`
  
  @warning Do not interact with files under this URL except on the <sharedQueue>.
  */
@@ -58,8 +58,8 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  
     // some background thread, not a block already running on the shared queue
 
-    dispatch_sync([TMDiskCache sharedQueue], ^{
-        NSLog(@"accurate, unchanging byte count: %d", [[TMDiskCache sharedCache] byteCount]);
+    dispatch_sync([PINDiskCache sharedQueue], ^{
+        NSLog(@"accurate, unchanging byte count: %d", [[PINDiskCache sharedCache] byteCount]);
     });
  */
 @property (readonly) NSUInteger byteCount;
@@ -87,34 +87,34 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
 /**
  A block to be executed just before an object is added to the cache. The queue waits during execution.
  */
-@property (copy) TMDiskCacheObjectBlock willAddObjectBlock;
+@property (copy) PINDiskCacheObjectBlock willAddObjectBlock;
 
 /**
  A block to be executed just before an object is removed from the cache. The queue waits during execution.
  */
-@property (copy) TMDiskCacheObjectBlock willRemoveObjectBlock;
+@property (copy) PINDiskCacheObjectBlock willRemoveObjectBlock;
 
 /**
  A block to be executed just before all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-@property (copy) TMDiskCacheBlock willRemoveAllObjectsBlock;
+@property (copy) PINDiskCacheBlock willRemoveAllObjectsBlock;
 
 /**
  A block to be executed just after an object is added to the cache. The queue waits during execution.
  */
-@property (copy) TMDiskCacheObjectBlock didAddObjectBlock;
+@property (copy) PINDiskCacheObjectBlock didAddObjectBlock;
 
 /**
  A block to be executed just after an object is removed from the cache. The queue waits during execution.
  */
-@property (copy) TMDiskCacheObjectBlock didRemoveObjectBlock;
+@property (copy) PINDiskCacheObjectBlock didRemoveObjectBlock;
 
 /**
  A block to be executed just after all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-@property (copy) TMDiskCacheBlock didRemoveAllObjectsBlock;
+@property (copy) PINDiskCacheBlock didRemoveAllObjectsBlock;
 
 #pragma mark -
 /// @name Initialization
@@ -173,7 +173,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(TMDiskCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block;
 
 /**
  Retrieves the fileURL for the specified key without actually reading the data from disk. This method
@@ -186,7 +186,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the file URL is available.
  */
-- (void)fileURLForKey:(NSString *)key block:(TMDiskCacheObjectBlock)block;
+- (void)fileURLForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -196,7 +196,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed serially after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(TMDiskCacheObjectBlock)block;
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINDiskCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
@@ -205,7 +205,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param key The key associated with the object to be removed.
  @param block A block to be executed serially after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(TMDiskCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -214,7 +214,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(TMDiskCacheBlock)block;
+- (void)trimToDate:(NSDate *)date block:(PINDiskCacheBlock)block;
 
 /**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the specified byteCount.
@@ -223,7 +223,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToSize:(NSUInteger)byteCount block:(TMDiskCacheBlock)block;
+- (void)trimToSize:(NSUInteger)byteCount block:(PINDiskCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the cache is equal to or smaller
@@ -233,7 +233,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToSizeByDate:(NSUInteger)byteCount block:(TMDiskCacheBlock)block;
+- (void)trimToSizeByDate:(NSUInteger)byteCount block:(PINDiskCacheBlock)block;
 
 /**
  Removes all objects from the cache. This method returns immediately and executes the passed block as soon as the
@@ -241,7 +241,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  
  @param block A block to be executed serially after the cache has been cleared, or nil.
  */
-- (void)removeAllObjects:(TMDiskCacheBlock)block;
+- (void)removeAllObjects:(PINDiskCacheBlock)block;
 
 /**
  Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually
@@ -251,7 +251,7 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed after the enumeration is complete.
  */
-- (void)enumerateObjectsWithBlock:(TMDiskCacheObjectBlock)block completionBlock:(TMDiskCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block completionBlock:(PINDiskCacheBlock)completionBlock;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -334,6 +334,6 @@ typedef void (^TMDiskCacheObjectBlock)(TMDiskCache *cache, NSString *key, id <NS
  @warning Do not call this method within the event blocks (<didRemoveObjectBlock>, etc.)
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
  */
-- (void)enumerateObjectsWithBlock:(TMDiskCacheObjectBlock)block;
+- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block;
 
 @end

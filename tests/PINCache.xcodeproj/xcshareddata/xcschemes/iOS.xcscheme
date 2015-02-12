@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "662900101A66B60D009C10BD"
+               BlueprintIdentifier = "6629FFEC1A66B512009C10BD"
                BuildableName = "TMCache.framework"
-               BlueprintName = "OS X"
-               ReferencedContainer = "container:TMCache.xcodeproj">
+               BlueprintName = "iOS"
+               ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -42,10 +42,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "662900101A66B60D009C10BD"
+            BlueprintIdentifier = "6629FFEC1A66B512009C10BD"
             BuildableName = "TMCache.framework"
-            BlueprintName = "OS X"
-            ReferencedContainer = "container:TMCache.xcodeproj">
+            BlueprintName = "iOS"
+            ReferencedContainer = "container:PINCache.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -60,10 +60,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "662900101A66B60D009C10BD"
+            BlueprintIdentifier = "6629FFEC1A66B512009C10BD"
             BuildableName = "TMCache.framework"
-            BlueprintName = "OS X"
-            ReferencedContainer = "container:TMCache.xcodeproj">
+            BlueprintName = "iOS"
+            ReferencedContainer = "container:PINCache.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

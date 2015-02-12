@@ -1,14 +1,14 @@
-#import "TMExampleView.h"
-#import "TMCache.h"
+#import "PINExampleView.h"
+#import "PINCache.h"
 
-@implementation TMExampleView
+@implementation PINExampleView
 
 - (void)setImageURL:(NSURL *)url
 {
     _imageURL = url;
 
-    [[TMCache sharedCache] objectForKey:[url absoluteString]
-                                  block:^(TMCache *cache, NSString *key, id object) {
+    [[PINCache sharedCache] objectForKey:[url absoluteString]
+                                  block:^(PINCache *cache, NSString *key, id object) {
                                       if (object) {
                                           [self setImageOnMainThread:(UIImage *)object];
                                           return;
@@ -23,7 +23,7 @@
                                       UIImage *image = [[UIImage alloc] initWithData:data scale:[[UIScreen mainScreen] scale]];
                                       [self setImageOnMainThread:image];
 
-                                      [[TMCache sharedCache] setObject:image forKey:[url absoluteString]];
+                                      [[PINCache sharedCache] setObject:image forKey:[url absoluteString]];
     }];   
 }
 

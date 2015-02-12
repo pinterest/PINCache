@@ -1,12 +1,12 @@
-#import "TMMemoryCache.h"
+#import "PINMemoryCache.h"
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 #import <UIKit/UIKit.h>
 #endif
 
-NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
+NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
-@interface TMMemoryCache ()
+@interface PINMemoryCache ()
 #if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic) dispatch_queue_t queue;
 @property (strong, nonatomic) dispatch_semaphore_t lock;
@@ -19,7 +19,7 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 @property (strong, nonatomic) NSMutableDictionary *costs;
 @end
 
-@implementation TMMemoryCache
+@implementation PINMemoryCache
 
 @synthesize ageLimit = _ageLimit;
 @synthesize costLimit = _costLimit;
@@ -50,7 +50,7 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 {
     if (self = [super init]) {
         _lock = dispatch_semaphore_create(1);
-        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", TMMemoryCachePrefix, self];
+        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINMemoryCachePrefix, self];
         _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _dictionary = [[NSMutableDictionary alloc] init];
@@ -109,15 +109,15 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
         if (self.removeAllObjectsOnMemoryWarning)
             [self removeAllObjects:nil];
 
-        __weak TMMemoryCache *weakSelf = self;
+        __weak PINMemoryCache *weakSelf = self;
 
         dispatch_async(_queue, ^{
-            TMMemoryCache *strongSelf = weakSelf;
+            PINMemoryCache *strongSelf = weakSelf;
             if (!strongSelf)
                 return;
             
             [self lockForReading];
-                TMMemoryCacheBlock didReceiveMemoryWarningBlock = strongSelf->_didReceiveMemoryWarningBlock;
+                PINMemoryCacheBlock didReceiveMemoryWarningBlock = strongSelf->_didReceiveMemoryWarningBlock;
             [self unlockForReading];
             
             if (didReceiveMemoryWarningBlock)
@@ -127,15 +127,15 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
         if (self.removeAllObjectsOnEnteringBackground)
             [self removeAllObjects:nil];
 
-        __weak TMMemoryCache *weakSelf = self;
+        __weak PINMemoryCache *weakSelf = self;
 
         dispatch_async(_queue, ^{
-            TMMemoryCache *strongSelf = weakSelf;
+            PINMemoryCache *strongSelf = weakSelf;
             if (!strongSelf)
                 return;
 
             [self lockForReading];
-                TMMemoryCacheBlock didEnterBackgroundBlock = strongSelf->_didEnterBackgroundBlock;
+                PINMemoryCacheBlock didEnterBackgroundBlock = strongSelf->_didEnterBackgroundBlock;
             [self unlockForReading];
             
             if (didEnterBackgroundBlock)
@@ -151,8 +151,8 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     [self lockForReading];
         id object = [_dictionary objectForKey:key];
         NSNumber *cost = [_costs objectForKey:key];
-        TMMemoryCacheObjectBlock willRemoveObjectBlock = _willRemoveObjectBlock;
-        TMMemoryCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
+        PINMemoryCacheObjectBlock willRemoveObjectBlock = _willRemoveObjectBlock;
+        PINMemoryCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
     [self unlockForReading];
 
     if (willRemoveObjectBlock)
@@ -248,11 +248,11 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     
     [self trimMemoryToDate:date];
     
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ageLimit * NSEC_PER_SEC));
     dispatch_after(time, _queue, ^(void){
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         if (!strongSelf)
             return;
         
@@ -262,12 +262,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)objectForKey:(NSString *)key block:(TMMemoryCacheObjectBlock)block
+- (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         id object = [self objectForKey:key];
         
         if (block)
@@ -275,17 +275,17 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)setObject:(id)object forKey:(NSString *)key block:(TMMemoryCacheObjectBlock)block
+- (void)setObject:(id)object forKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block
 {
     [self setObject:object forKey:key withCost:0 block:block];
 }
 
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(TMMemoryCacheObjectBlock)block
+- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINMemoryCacheObjectBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self setObject:object forKey:key withCost:cost];
         
         if (block)
@@ -293,12 +293,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)removeObjectForKey:(NSString *)key block:(TMMemoryCacheObjectBlock)block
+- (void)removeObjectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self removeObjectForKey:key];
         
         if (block)
@@ -306,12 +306,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)trimToDate:(NSDate *)trimDate block:(TMMemoryCacheBlock)block
+- (void)trimToDate:(NSDate *)trimDate block:(PINMemoryCacheBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self trimToDate:trimDate];
         
         if (block)
@@ -319,12 +319,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)trimToCost:(NSUInteger)cost block:(TMMemoryCacheBlock)block
+- (void)trimToCost:(NSUInteger)cost block:(PINMemoryCacheBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self trimToCost:cost];
         
         if (block)
@@ -332,12 +332,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)trimToCostByDate:(NSUInteger)cost block:(TMMemoryCacheBlock)block
+- (void)trimToCostByDate:(NSUInteger)cost block:(PINMemoryCacheBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self trimToCostByDate:cost];
         
         if (block)
@@ -345,12 +345,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)removeAllObjects:(TMMemoryCacheBlock)block
+- (void)removeAllObjects:(PINMemoryCacheBlock)block
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self removeAllObjects];
         
         if (block)
@@ -358,12 +358,12 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     });
 }
 
-- (void)enumerateObjectsWithBlock:(TMMemoryCacheObjectBlock)block completionBlock:(TMMemoryCacheBlock)completionBlock
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(PINMemoryCacheBlock)completionBlock
 {
-    __weak TMMemoryCache *weakSelf = self;
+    __weak PINMemoryCache *weakSelf = self;
     
     dispatch_async(_queue, ^{
-        TMMemoryCache *strongSelf = weakSelf;
+        PINMemoryCache *strongSelf = weakSelf;
         [self enumerateObjectsWithBlock:block];
         
         if (completionBlock)
@@ -406,8 +406,8 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
         return;
     
     [self lockForReading];
-        TMMemoryCacheObjectBlock willAddObjectBlock = _willAddObjectBlock;
-        TMMemoryCacheObjectBlock didAddObjectBlock = _didAddObjectBlock;
+        PINMemoryCacheObjectBlock willAddObjectBlock = _willAddObjectBlock;
+        PINMemoryCacheObjectBlock didAddObjectBlock = _didAddObjectBlock;
         NSUInteger costLimit = _costLimit;
     [self unlockForReading];
     
@@ -463,8 +463,8 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 - (void)removeAllObjects
 {
     [self lockForReading];
-        TMMemoryCacheBlock willRemoveAllObjectsBlock = _willRemoveAllObjectsBlock;
-        TMMemoryCacheBlock didRemoveAllObjectsBlock = _didRemoveAllObjectsBlock;
+        PINMemoryCacheBlock willRemoveAllObjectsBlock = _willRemoveAllObjectsBlock;
+        PINMemoryCacheBlock didRemoveAllObjectsBlock = _didRemoveAllObjectsBlock;
     [self unlockForReading];
     
     if (willRemoveAllObjectsBlock)
@@ -483,7 +483,7 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
     
 }
 
-- (void)enumerateObjectsWithBlock:(TMMemoryCacheObjectBlock)block
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block
 {
     if (!block)
         return;
@@ -499,128 +499,128 @@ NSString * const TMMemoryCachePrefix = @"com.tumblr.TMMemoryCache";
 
 #pragma mark - Public Thread Safe Accessors -
 
-- (TMMemoryCacheObjectBlock)willAddObjectBlock
+- (PINMemoryCacheObjectBlock)willAddObjectBlock
 {
     [self lockForReading];
-        TMMemoryCacheObjectBlock block = _willAddObjectBlock;
+        PINMemoryCacheObjectBlock block = _willAddObjectBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setWillAddObjectBlock:(TMMemoryCacheObjectBlock)block
+- (void)setWillAddObjectBlock:(PINMemoryCacheObjectBlock)block
 {
     [self lockForWriting];
         _willAddObjectBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheObjectBlock)willRemoveObjectBlock
+- (PINMemoryCacheObjectBlock)willRemoveObjectBlock
 {
     [self lockForReading];
-        TMMemoryCacheObjectBlock block = _willRemoveObjectBlock;
+        PINMemoryCacheObjectBlock block = _willRemoveObjectBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setWillRemoveObjectBlock:(TMMemoryCacheObjectBlock)block
+- (void)setWillRemoveObjectBlock:(PINMemoryCacheObjectBlock)block
 {
     [self lockForWriting];
         _willRemoveObjectBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheBlock)willRemoveAllObjectsBlock
+- (PINMemoryCacheBlock)willRemoveAllObjectsBlock
 {
     [self lockForReading];
-        TMMemoryCacheBlock block = _willRemoveAllObjectsBlock;
+        PINMemoryCacheBlock block = _willRemoveAllObjectsBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setWillRemoveAllObjectsBlock:(TMMemoryCacheBlock)block
+- (void)setWillRemoveAllObjectsBlock:(PINMemoryCacheBlock)block
 {
     [self lockForWriting];
         _willRemoveAllObjectsBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheObjectBlock)didAddObjectBlock
+- (PINMemoryCacheObjectBlock)didAddObjectBlock
 {
     [self lockForReading];
-        TMMemoryCacheObjectBlock block = _didAddObjectBlock;
+        PINMemoryCacheObjectBlock block = _didAddObjectBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setDidAddObjectBlock:(TMMemoryCacheObjectBlock)block
+- (void)setDidAddObjectBlock:(PINMemoryCacheObjectBlock)block
 {
     [self lockForWriting];
         _didAddObjectBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheObjectBlock)didRemoveObjectBlock
+- (PINMemoryCacheObjectBlock)didRemoveObjectBlock
 {
     [self lockForReading];
-        TMMemoryCacheObjectBlock block = _didRemoveObjectBlock;
+        PINMemoryCacheObjectBlock block = _didRemoveObjectBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setDidRemoveObjectBlock:(TMMemoryCacheObjectBlock)block
+- (void)setDidRemoveObjectBlock:(PINMemoryCacheObjectBlock)block
 {
     [self lockForWriting];
         _didRemoveObjectBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheBlock)didRemoveAllObjectsBlock
+- (PINMemoryCacheBlock)didRemoveAllObjectsBlock
 {
     [self lockForReading];
-        TMMemoryCacheBlock block = _didRemoveAllObjectsBlock;
+        PINMemoryCacheBlock block = _didRemoveAllObjectsBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setDidRemoveAllObjectsBlock:(TMMemoryCacheBlock)block
+- (void)setDidRemoveAllObjectsBlock:(PINMemoryCacheBlock)block
 {
     [self lockForWriting];
         _didRemoveAllObjectsBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheBlock)didReceiveMemoryWarningBlock
+- (PINMemoryCacheBlock)didReceiveMemoryWarningBlock
 {
     [self lockForReading];
-        TMMemoryCacheBlock block = _didReceiveMemoryWarningBlock;
+        PINMemoryCacheBlock block = _didReceiveMemoryWarningBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setDidReceiveMemoryWarningBlock:(TMMemoryCacheBlock)block
+- (void)setDidReceiveMemoryWarningBlock:(PINMemoryCacheBlock)block
 {
     [self lockForWriting];
         _didReceiveMemoryWarningBlock = [block copy];
     [self unlockForWriting];
 }
 
-- (TMMemoryCacheBlock)didEnterBackgroundBlock
+- (PINMemoryCacheBlock)didEnterBackgroundBlock
 {
     [self lockForReading];
-        TMMemoryCacheBlock block = _didEnterBackgroundBlock;
+        PINMemoryCacheBlock block = _didEnterBackgroundBlock;
     [self unlockForReading];
 
     return block;
 }
 
-- (void)setDidEnterBackgroundBlock:(TMMemoryCacheBlock)block
+- (void)setDidEnterBackgroundBlock:(PINMemoryCacheBlock)block
 {
     [self lockForWriting];
         _didEnterBackgroundBlock = [block copy];
