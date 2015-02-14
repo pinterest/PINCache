@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "662900101A66B60D009C10BD"
-               BuildableName = "TMCache.framework"
+               BuildableName = "PINCache.framework"
                BlueprintName = "OS X"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "662900101A66B60D009C10BD"
-            BuildableName = "TMCache.framework"
+            BuildableName = "PINCache.framework"
             BlueprintName = "OS X"
             ReferencedContainer = "container:PINCache.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "662900101A66B60D009C10BD"
-            BuildableName = "TMCache.framework"
+            BuildableName = "PINCache.framework"
             BlueprintName = "OS X"
             ReferencedContainer = "container:PINCache.xcodeproj">
          </BuildableReference>

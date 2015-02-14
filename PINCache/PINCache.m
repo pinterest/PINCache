@@ -5,9 +5,9 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
 @interface PINCache ()
 #if OS_OBJECT_USE_OBJC
-@property (strong, nonatomic) dispatch_queue_t asyncQueue;
+@property (strong, nonatomic) dispatch_queue_t concurrentQueue;
 #else
-@property (assign, nonatomic) dispatch_queue_t asyncQueue;
+@property (assign, nonatomic) dispatch_queue_t concurrentQueue;
 #endif
 @end
 
@@ -18,26 +18,32 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 #if !OS_OBJECT_USE_OBJC
 - (void)dealloc
 {
-    dispatch_release(_asyncQueue);
-    _asyncQueue = nil;
+    dispatch_release(_concurrentQueue);
+    _concurrentQueue = nil;
 }
 #endif
 
 - (instancetype)initWithName:(NSString *)name
 {
-    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject]];
 }
 
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
+{
+    return [self initWithName:name rootPath:rootPath timeout:DISPATCH_TIME_FOREVER];
+}
+
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath timeout:(dispatch_time_t)timeout
 {
     if (!name)
         return nil;
     
     if (self = [super init]) {
         _name = [name copy];
+        _timeout = timeout;
         
         NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
-        _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
+        _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
         
         _diskCache = [[PINDiskCache alloc] initWithName:_name rootPath:rootPath];
         _memoryCache = [[PINMemoryCache alloc] init];
@@ -70,7 +76,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     __weak PINCache *weakSelf = self;
-    dispatch_async(_asyncQueue, ^{
+    dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
         id object = [strongSelf objectForKey:key];
         
@@ -85,7 +91,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     __weak PINCache *weakSelf = self;
-    dispatch_async(_asyncQueue, ^{
+    dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
         [strongSelf setObject:object forKey:key];
         
@@ -100,7 +106,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     __weak PINCache *weakSelf = self;
-    dispatch_async(_asyncQueue, ^{
+    dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
         [strongSelf removeObjectForKey:key];
         
@@ -112,7 +118,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 - (void)removeAllObjects:(PINCacheBlock)block
 {
     __weak PINCache *weakSelf = self;
-    dispatch_async(_asyncQueue, ^{
+    dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
         [strongSelf removeAllObjects];
         
@@ -127,7 +133,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
 
     __weak PINCache *weakSelf = self;
-    dispatch_async(_asyncQueue, ^{
+    dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
         [strongSelf trimToDate:date];
         
@@ -149,24 +155,30 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
     return byteCount;
 }
 
-#pragma mark - Public Synchronous Methods -
-
 - (id)objectForKey:(NSString *)key
 {
     if (!key)
         return nil;
     
-    id object = nil;
+    __block id object = nil;
 
-    object = [self->_memoryCache objectForKey:key];
+    object = [_memoryCache objectForKey:key];
     
     if (object) {
         // update the access time on disk
-        [self->_diskCache fileURLForKey:key];
+        [_diskCache fileURLForKey:key block:NULL];
     } else {
-        object = [self->_diskCache objectForKey:key];
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        [_diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> diskObject, NSURL *fileURL) {
+            object = diskObject;
+            dispatch_semaphore_signal(semaphore);
+        }];
+        dispatch_semaphore_wait(semaphore, self.timeout);
+#if !OS_OBJECT_USE_OBJC
+        dispatch_release(semaphore);
+#endif
         
-        [self->_memoryCache setObject:object forKey:key];
+        [_memoryCache setObject:object forKey:key];
     }
     
     return object;
@@ -178,7 +190,14 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     [_memoryCache setObject:object forKey:key];
-    [_diskCache setObject:object forKey:key];
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    [_diskCache setObject:object forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, self.timeout);
+#if !OS_OBJECT_USE_OBJC
+    dispatch_release(semaphore);
+#endif
 }
 
 - (void)removeObjectForKey:(NSString *)key
@@ -187,7 +206,14 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     [_memoryCache removeObjectForKey:key];
-    [_diskCache removeObjectForKey:key];
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    [_diskCache removeObjectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, self.timeout);
+#if !OS_OBJECT_USE_OBJC
+    dispatch_release(semaphore);
+#endif
 }
 
 - (void)trimToDate:(NSDate *)date
@@ -196,13 +222,27 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     [_memoryCache trimToDate:date];
-    [_diskCache trimToDate:date];
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    [_diskCache trimToDate:date block:^(PINDiskCache *cache) {
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, self.timeout);
+#if !OS_OBJECT_USE_OBJC
+    dispatch_release(semaphore);
+#endif
 }
 
 - (void)removeAllObjects
 {
     [_memoryCache removeAllObjects];
-    [_diskCache removeAllObjects];
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    [_diskCache removeAllObjects:^(PINDiskCache *cache) {
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, self.timeout);
+#if !OS_OBJECT_USE_OBJC
+    dispatch_release(semaphore);
+#endif
 }
 
 @end

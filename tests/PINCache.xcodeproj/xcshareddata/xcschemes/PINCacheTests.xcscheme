@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D07F1ED1171AFB7A001DBA02"
-               BuildableName = "PINCacheTests.octest"
+               BuildableName = "PINCacheTests.xctest"
                BlueprintName = "PINCacheTests"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
@@ -43,8 +43,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6629FFAD1A66B433009C10BD"
-               BuildableName = "TMCache iOSTests.xctest"
-               BlueprintName = "TMCache iOSTests"
+               BuildableName = "PINCache iOSTests.xctest"
+               BlueprintName = "PINCache iOSTests"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -57,8 +57,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6629FFD21A66B465009C10BD"
-               BuildableName = "TMCache_iOSTests.xctest"
-               BlueprintName = "TMCache_iOSTests"
+               BuildableName = "PINCache_iOSTests.xctest"
+               BlueprintName = "PINCache_iOSTests"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -103,7 +103,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D07F1ED1171AFB7A001DBA02"
-               BuildableName = "PINCacheTests.octest"
+               BuildableName = "PINCacheTests.xctest"
                BlueprintName = "PINCacheTests"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
@@ -113,8 +113,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6629FFAD1A66B433009C10BD"
-               BuildableName = "TMCache iOSTests.xctest"
-               BlueprintName = "TMCache iOSTests"
+               BuildableName = "PINCache iOSTests.xctest"
+               BlueprintName = "PINCache iOSTests"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -123,8 +123,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6629FFD21A66B465009C10BD"
-               BuildableName = "TMCache_iOSTests.xctest"
-               BlueprintName = "TMCache_iOSTests"
+               BuildableName = "PINCache_iOSTests.xctest"
+               BlueprintName = "PINCache_iOSTests"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </TestableReference>

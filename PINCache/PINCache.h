@@ -36,7 +36,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 /**
  A concurrent queue on which blocks passed to the asynchronous access methods are run.
  */
-@property (readonly) dispatch_queue_t asyncQueue;
+@property (readonly) dispatch_queue_t concurrentQueue;
 
 /**
  Synchronously retrieves the total byte count of the <diskCache> on the shared disk queue.
@@ -52,6 +52,11 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  The underlying memory cache, see <PINMemoryCache> for additional configuration and trimming options.
  */
 @property (readonly) PINMemoryCache *memoryCache;
+
+/**
+ Timeout for dispatch semaphores which wrap disk synchronous methods. Default is DISPATCH_TIME_FOREVER.
+ */
+@property (readonly) dispatch_time_t timeout;
 
 #pragma mark -
 /// @name Initialization
@@ -74,7 +79,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 - (instancetype)initWithName:(NSString *)name;
 
 /**
- The designated initializer. Multiple instances with the same name are allowed and can safely access
+ Multiple instances with the same name are allowed and can safely access
  the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
  
  @see name
@@ -84,12 +89,24 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  */
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath;
 
+/**
+ The designated initializer. Multiple instances with the same name are allowed and can safely access
+ the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache on disk.
+ @param timeout for synchronous access to disk cache. Default is DISPATCH_TIME_FOREVER.
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath timeout:(dispatch_time_t)timeout NS_DESIGNATED_INITIALIZER;
+
 #pragma mark -
 /// @name Asynchronous Methods
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
- block after the object is available, potentially in parallel with other blocks on the <queue>.
+ block after the object is available, potentially in parallel with other blocks on the <concurrentQueue>.
  
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
@@ -98,7 +115,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
- passed block after the object has been stored, potentially in parallel with other blocks on the <queue>.
+ passed block after the object has been stored, potentially in parallel with other blocks on the <concurrentQueue>.
  
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
@@ -108,7 +125,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
- block after the object has been removed, potentially in parallel with other blocks on the <queue>.
+ block after the object has been removed, potentially in parallel with other blocks on the <concurrentQueue>.
  
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
@@ -117,7 +134,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Removes all objects from the cache that have not been used since the specified date. This method returns immediately and
- executes the passed block after the cache has been trimmed, potentially in parallel with other blocks on the <queue>.
+ executes the passed block after the cache has been trimmed, potentially in parallel with other blocks on the <concurrentQueue>.
  
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
@@ -126,7 +143,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
- cache has been cleared, potentially in parallel with other blocks on the <queue>.
+ cache has been cleared, potentially in parallel with other blocks on the <concurrentQueue>.
  
  @param block A block to be executed concurrently after the cache has been cleared, or nil.
  */
@@ -137,6 +154,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Retrieves the object for the specified key. This method blocks the calling thread until the object is available.
+ Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
  
  @see objectForKey:block:
  @param key The key associated with the object.
@@ -146,6 +164,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
+ Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
  
  @see setObject:forKey:block:
  @param object An object to store in the cache.
@@ -156,6 +175,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
  has been removed.
+ Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
  
  @param key The key associated with the object to be removed.
  */
@@ -164,6 +184,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 /**
  Removes all objects from the cache that have not been used since the specified date.
  This method blocks the calling thread until the cache has been trimmed.
+ Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
  
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
@@ -171,6 +192,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
+ Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
  */
 - (void)removeAllObjects;
 

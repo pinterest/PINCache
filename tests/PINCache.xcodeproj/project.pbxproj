@@ -44,7 +44,7 @@
 			containerPortal = D07F1EAA171AFB7A001DBA02 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = D07F1EB1171AFB7A001DBA02;
-			remoteInfo = TMCache;
+			remoteInfo = PINCache;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -76,17 +76,17 @@
 		D07F1EC4171AFB7A001DBA02 /* PINAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINAppDelegate.h; sourceTree = "<group>"; };
 		D07F1EC5171AFB7A001DBA02 /* PINAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PINAppDelegate.m; sourceTree = "<group>"; };
 		D07F1ECB171AFB7A001DBA02 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		D07F1ED2171AFB7A001DBA02 /* PINCacheTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PINCacheTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D07F1ED2171AFB7A001DBA02 /* PINCacheTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PINCacheTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07F1ED3171AFB7A001DBA02 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		D07F1EDB171AFB7A001DBA02 /* PINCacheTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PINCacheTests-Info.plist"; sourceTree = "<group>"; };
 		D07F1EDF171AFB7A001DBA02 /* PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheTests.h; sourceTree = "<group>"; };
-		D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PINCacheTests.m; sourceTree = "<group>"; };
+		D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINCacheTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		D0E5D83A171DF0AF0041E777 /* PINCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCache.h; sourceTree = "<group>"; };
-		D0E5D83B171DF0AF0041E777 /* PINCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINCache.m; sourceTree = "<group>"; };
-		D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINDiskCache.h; sourceTree = "<group>"; };
+		D0E5D83B171DF0AF0041E777 /* PINCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINCache.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PINDiskCache.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINDiskCache.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINMemoryCache.h; sourceTree = "<group>"; };
-		D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINMemoryCache.m; sourceTree = "<group>"; };
+		D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = PINMemoryCache.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINMemoryCache.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		D0E5D846171DF0FA0041E777 /* PINExampleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINExampleView.h; sourceTree = "<group>"; };
 		D0E5D847171DF0FA0041E777 /* PINExampleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINExampleView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,7 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				D07F1EB2171AFB7A001DBA02 /* PINCache.app */,
-				D07F1ED2171AFB7A001DBA02 /* PINCacheTests.octest */,
+				D07F1ED2171AFB7A001DBA02 /* PINCacheTests.xctest */,
 				6629FFED1A66B512009C10BD /* PINCache.framework */,
 				662900111A66B60D009C10BD /* PINCache.framework */,
 			);
@@ -320,7 +320,7 @@
 			dependencies = (
 			);
 			name = PINCache;
-			productName = TMCache;
+			productName = PINCache;
 			productReference = D07F1EB2171AFB7A001DBA02 /* PINCache.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -331,7 +331,6 @@
 				D07F1ECD171AFB7A001DBA02 /* Sources */,
 				D07F1ECE171AFB7A001DBA02 /* Frameworks */,
 				D07F1ECF171AFB7A001DBA02 /* Resources */,
-				D07F1ED0171AFB7A001DBA02 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -339,9 +338,9 @@
 				D07F1ED8171AFB7A001DBA02 /* PBXTargetDependency */,
 			);
 			name = PINCacheTests;
-			productName = TMCacheTests;
-			productReference = D07F1ED2171AFB7A001DBA02 /* PINCacheTests.octest */;
-			productType = "com.apple.product-type.bundle.ocunit-test";
+			productName = PINCacheTests;
+			productReference = D07F1ED2171AFB7A001DBA02 /* PINCacheTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -350,7 +349,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = TM;
-				LastTestingUpgradeCheck = 0610;
+				LastTestingUpgradeCheck = 0620;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = Tumblr;
 				TargetAttributes = {
@@ -413,22 +412,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		D07F1ED0171AFB7A001DBA02 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6629000C1A66B60D009C10BD /* Sources */ = {
@@ -722,9 +705,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/PINCache.app/PINCache";
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
@@ -732,7 +717,7 @@
 				PRODUCT_NAME = PINCacheTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
@@ -740,9 +725,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/PINCache.app/PINCache";
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
 					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
@@ -750,7 +737,7 @@
 				PRODUCT_NAME = PINCacheTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				VALID_ARCHS = "arm64 armv7 armv7s i386 x86_64";
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
 		};
