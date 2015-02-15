@@ -22,7 +22,7 @@ taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHan
 #define PINCacheEndBackgroundTask()
 #endif
 
-NSString * const PINDiskCachePrefix = @"com.tumblr.PINDiskCache";
+NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @interface PINDiskCache () {
