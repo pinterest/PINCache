@@ -1,3 +1,7 @@
+//  PINCache is a modified version of TMCache
+//  Modifications by Garrett Moon
+//  Copyright (c) 2015 Pinterest. All rights reserved.
+
 /**
  `PINMemoryCache` is a fast, thread safe key/value store similar to `NSCache`. On iOS it will clear itself
  automatically to reduce memory usage when the app receives a memory warning or goes into the background.

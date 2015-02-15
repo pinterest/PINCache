@@ -1,3 +1,7 @@
+//  PINCache is a modified version of TMCache
+//  Modifications by Garrett Moon
+//  Copyright (c) 2015 Pinterest. All rights reserved.
+
 /**
  `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
  to the `NSCoding` protocol, which includes the basic Foundation data types and collection classes and also

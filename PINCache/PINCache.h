@@ -1,3 +1,7 @@
+//  PINCache is a modified version of TMCache
+//  Modifications by Garrett Moon
+//  Copyright (c) 2015 Pinterest. All rights reserved.
+
 /**
  `PINCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
  reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar

@@ -1,3 +1,7 @@
+//  PINCache is a modified version of TMCache
+//  Modifications by Garrett Moon
+//  Copyright (c) 2015 Pinterest. All rights reserved.
+
 #import "PINMemoryCache.h"
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
