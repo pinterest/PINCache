@@ -1,4 +1,4 @@
-//  PINCache is a modified version of TMCache
+//  PINCache is a modified version of PINCache
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
@@ -74,18 +74,58 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
 #pragma mark - Public Asynchronous Methods -
 
+
 - (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
     if (!key || !block)
         return;
     
     __weak PINCache *weakSelf = self;
+    
     dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
-        id object = [strongSelf objectForKey:key];
+        if (!strongSelf)
+            return;
         
-        if (block)
-            block(strongSelf, key, object);
+        __weak PINCache *weakSelf = strongSelf;
+        
+        [strongSelf->_memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+            PINCache *strongSelf = weakSelf;
+            if (!strongSelf)
+                return;
+            
+            if (object) {
+                [strongSelf->_diskCache fileURLForKey:key block:^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
+                    // update the access time on disk
+                }];
+                
+                __weak PINCache *weakSelf = strongSelf;
+                
+                dispatch_async(strongSelf->_concurrentQueue, ^{
+                    PINCache *strongSelf = weakSelf;
+                    if (strongSelf)
+                        block(strongSelf, key, object);
+                });
+            } else {
+                __weak PINCache *weakSelf = strongSelf;
+                
+                [strongSelf->_diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
+                    PINCache *strongSelf = weakSelf;
+                    if (!strongSelf)
+                        return;
+                    
+                    [strongSelf->_memoryCache setObject:object forKey:key block:nil];
+                    
+                    __weak PINCache *weakSelf = strongSelf;
+                    
+                    dispatch_async(strongSelf->_concurrentQueue, ^{
+                        PINCache *strongSelf = weakSelf;
+                        if (strongSelf)
+                            block(strongSelf, key, object);
+                    });
+                }];
+            }
+        }];
     });
 }
 
@@ -94,14 +134,39 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
     if (!key || !object)
         return;
     
-    __weak PINCache *weakSelf = self;
-    dispatch_async(_concurrentQueue, ^{
-        PINCache *strongSelf = weakSelf;
-        [strongSelf setObject:object forKey:key];
+    dispatch_group_t group = nil;
+    PINMemoryCacheObjectBlock memBlock = nil;
+    PINDiskCacheObjectBlock diskBlock = nil;
+    
+    if (block) {
+        group = dispatch_group_create();
+        dispatch_group_enter(group);
+        dispatch_group_enter(group);
         
-        if (block)
-            block(strongSelf, key, object);
-    });
+        memBlock = ^(PINMemoryCache *cache, NSString *key, id object) {
+            dispatch_group_leave(group);
+        };
+        
+        diskBlock = ^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
+            dispatch_group_leave(group);
+        };
+    }
+    
+    [_memoryCache setObject:object forKey:key block:memBlock];
+    [_diskCache setObject:object forKey:key block:diskBlock];
+    
+    if (group) {
+        __weak PINCache *weakSelf = self;
+        dispatch_group_notify(group, _concurrentQueue, ^{
+            PINCache *strongSelf = weakSelf;
+            if (strongSelf)
+                block(strongSelf, key, object);
+        });
+        
+#if !OS_OBJECT_USE_OBJC
+        dispatch_release(group);
+#endif
+    }
 }
 
 - (void)removeObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block
@@ -109,41 +174,116 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
     if (!key)
         return;
     
-    __weak PINCache *weakSelf = self;
-    dispatch_async(_concurrentQueue, ^{
-        PINCache *strongSelf = weakSelf;
-        [strongSelf removeObjectForKey:key];
+    dispatch_group_t group = nil;
+    PINMemoryCacheObjectBlock memBlock = nil;
+    PINDiskCacheObjectBlock diskBlock = nil;
+    
+    if (block) {
+        group = dispatch_group_create();
+        dispatch_group_enter(group);
+        dispatch_group_enter(group);
         
-        if (block)
-            block(strongSelf, key, nil);
-    });
+        memBlock = ^(PINMemoryCache *cache, NSString *key, id object) {
+            dispatch_group_leave(group);
+        };
+        
+        diskBlock = ^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
+            dispatch_group_leave(group);
+        };
+    }
+    
+    [_memoryCache removeObjectForKey:key block:memBlock];
+    [_diskCache removeObjectForKey:key block:diskBlock];
+    
+    if (group) {
+        __weak PINCache *weakSelf = self;
+        dispatch_group_notify(group, _concurrentQueue, ^{
+            PINCache *strongSelf = weakSelf;
+            if (strongSelf)
+                block(strongSelf, key, nil);
+        });
+        
+#if !OS_OBJECT_USE_OBJC
+        dispatch_release(group);
+#endif
+    }
 }
 
 - (void)removeAllObjects:(PINCacheBlock)block
 {
-    __weak PINCache *weakSelf = self;
-    dispatch_async(_concurrentQueue, ^{
-        PINCache *strongSelf = weakSelf;
-        [strongSelf removeAllObjects];
+    dispatch_group_t group = nil;
+    PINMemoryCacheBlock memBlock = nil;
+    PINDiskCacheBlock diskBlock = nil;
+    
+    if (block) {
+        group = dispatch_group_create();
+        dispatch_group_enter(group);
+        dispatch_group_enter(group);
         
-        if (block)
-            block(strongSelf);
-    });
+        memBlock = ^(PINMemoryCache *cache) {
+            dispatch_group_leave(group);
+        };
+        
+        diskBlock = ^(PINDiskCache *cache) {
+            dispatch_group_leave(group);
+        };
+    }
+    
+    [_memoryCache removeAllObjects:memBlock];
+    [_diskCache removeAllObjects:diskBlock];
+    
+    if (group) {
+        __weak PINCache *weakSelf = self;
+        dispatch_group_notify(group, _concurrentQueue, ^{
+            PINCache *strongSelf = weakSelf;
+            if (strongSelf)
+                block(strongSelf);
+        });
+        
+#if !OS_OBJECT_USE_OBJC
+        dispatch_release(group);
+#endif
+    }
 }
 
 - (void)trimToDate:(NSDate *)date block:(PINCacheBlock)block
 {
     if (!date)
         return;
-
-    __weak PINCache *weakSelf = self;
-    dispatch_async(_concurrentQueue, ^{
-        PINCache *strongSelf = weakSelf;
-        [strongSelf trimToDate:date];
+    
+    dispatch_group_t group = nil;
+    PINMemoryCacheBlock memBlock = nil;
+    PINDiskCacheBlock diskBlock = nil;
+    
+    if (block) {
+        group = dispatch_group_create();
+        dispatch_group_enter(group);
+        dispatch_group_enter(group);
         
-        if (block)
-            block(strongSelf);
-    });
+        memBlock = ^(PINMemoryCache *cache) {
+            dispatch_group_leave(group);
+        };
+        
+        diskBlock = ^(PINDiskCache *cache) {
+            dispatch_group_leave(group);
+        };
+    }
+    
+    [_memoryCache trimToDate:date block:memBlock];
+    [_diskCache trimToDate:date block:diskBlock];
+    
+    if (group) {
+        __weak PINCache *weakSelf = self;
+        dispatch_group_notify(group, _concurrentQueue, ^{
+            PINCache *strongSelf = weakSelf;
+            if (strongSelf)
+                block(strongSelf);
+        });
+        
+#if !OS_OBJECT_USE_OBJC
+        dispatch_release(group);
+#endif
+    }
 }
 
 #pragma mark - Public Synchronous Accessors -
@@ -250,5 +390,3 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 }
 
 @end
-
-// HC SVNT DRACONES
