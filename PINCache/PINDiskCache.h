@@ -162,7 +162,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  
  @param block A block to be executed when a lock is available.
  */
-- (void)lockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block;
+- (void)lockFileAccessWhileExecutingBlock:(PINDiskCacheBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -263,7 +263,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  
  @param block A block to be executed when a lock is available.
  */
-- (void)synchronouslyLockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block;
+- (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINDiskCacheBlock)block;
 
 /**
  Retrieves the object for the specified key. This method blocks the calling thread until the
