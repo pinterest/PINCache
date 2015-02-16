@@ -34,17 +34,11 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
 {
-    return [self initWithName:name rootPath:rootPath timeout:DISPATCH_TIME_FOREVER];
-}
-
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath timeout:(dispatch_time_t)timeout
-{
     if (!name)
         return nil;
     
     if (self = [super init]) {
         _name = [name copy];
-        _timeout = timeout;
         
         NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
         _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
@@ -292,9 +286,9 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 {
     __block NSUInteger byteCount = 0;
     
-    dispatch_sync([PINDiskCache sharedQueue], ^{
-        byteCount = self.diskCache.byteCount;
-    });
+    [_diskCache synchronouslyLockFileAccessWhileExecutingBlock:^(PINDiskCache *diskCache) {
+        byteCount = diskCache.byteCount;
+    }];
     
     return byteCount;
 }
@@ -312,16 +306,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         // update the access time on disk
         [_diskCache fileURLForKey:key block:NULL];
     } else {
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        [_diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> diskObject, NSURL *fileURL) {
-            object = diskObject;
-            dispatch_semaphore_signal(semaphore);
-        }];
-        dispatch_semaphore_wait(semaphore, self.timeout);
-#if !OS_OBJECT_USE_OBJC
-        dispatch_release(semaphore);
-#endif
-        
+        object = [_diskCache objectForKey:key];
         [_memoryCache setObject:object forKey:key];
     }
     
@@ -334,14 +319,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     [_memoryCache setObject:object forKey:key];
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    [_diskCache setObject:object forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
-        dispatch_semaphore_signal(semaphore);
-    }];
-    dispatch_semaphore_wait(semaphore, self.timeout);
-#if !OS_OBJECT_USE_OBJC
-    dispatch_release(semaphore);
-#endif
+    [_diskCache setObject:object forKey:key];
 }
 
 - (void)removeObjectForKey:(NSString *)key
@@ -350,14 +328,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     [_memoryCache removeObjectForKey:key];
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    [_diskCache removeObjectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
-        dispatch_semaphore_signal(semaphore);
-    }];
-    dispatch_semaphore_wait(semaphore, self.timeout);
-#if !OS_OBJECT_USE_OBJC
-    dispatch_release(semaphore);
-#endif
+    [_diskCache removeObjectForKey:key];
 }
 
 - (void)trimToDate:(NSDate *)date
@@ -366,27 +337,13 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
         return;
     
     [_memoryCache trimToDate:date];
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    [_diskCache trimToDate:date block:^(PINDiskCache *cache) {
-        dispatch_semaphore_signal(semaphore);
-    }];
-    dispatch_semaphore_wait(semaphore, self.timeout);
-#if !OS_OBJECT_USE_OBJC
-    dispatch_release(semaphore);
-#endif
+    [_diskCache trimToDate:date];
 }
 
 - (void)removeAllObjects
 {
     [_memoryCache removeAllObjects];
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    [_diskCache removeAllObjects:^(PINDiskCache *cache) {
-        dispatch_semaphore_signal(semaphore);
-    }];
-    dispatch_semaphore_wait(semaphore, self.timeout);
-#if !OS_OBJECT_USE_OBJC
-    dispatch_release(semaphore);
-#endif
+    [_diskCache removeAllObjects];
 }
 
 @end

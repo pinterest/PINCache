@@ -57,11 +57,6 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  */
 @property (readonly) PINMemoryCache *memoryCache;
 
-/**
- Timeout for dispatch semaphores which wrap disk synchronous methods. Default is DISPATCH_TIME_FOREVER.
- */
-@property (readonly) dispatch_time_t timeout;
-
 #pragma mark -
 /// @name Initialization
 
@@ -91,19 +86,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  @param rootPath The path of the cache on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath;
-
-/**
- The designated initializer. Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
- 
- @see name
- @param name The name of the cache.
- @param rootPath The path of the cache on disk.
- @param timeout for synchronous access to disk cache. Default is DISPATCH_TIME_FOREVER.
- @result A new cache with the specified name.
- */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath timeout:(dispatch_time_t)timeout NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods
@@ -158,7 +141,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Retrieves the object for the specified key. This method blocks the calling thread until the object is available.
- Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
+ Uses a semaphore to achieve synchronicity on the disk cache.
  
  @see objectForKey:block:
  @param key The key associated with the object.
@@ -168,7 +151,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
- Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
+ Uses a semaphore to achieve synchronicity on the disk cache.
  
  @see setObject:forKey:block:
  @param object An object to store in the cache.
@@ -179,7 +162,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
  has been removed.
- Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
+ Uses a semaphore to achieve synchronicity on the disk cache.
  
  @param key The key associated with the object to be removed.
  */
@@ -188,7 +171,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 /**
  Removes all objects from the cache that have not been used since the specified date.
  This method blocks the calling thread until the cache has been trimmed.
- Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
+ Uses a semaphore to achieve synchronicity on the disk cache.
  
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
@@ -196,7 +179,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 /**
  Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
- Uses a semaphore to achieve synchronicity on the disk cache. This will timeout if <timeout> is reached.
+ Uses a semaphore to achieve synchronicity on the disk cache.
  */
 - (void)removeAllObjects;
 

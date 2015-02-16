@@ -10,14 +10,12 @@
  it skips `UIImagePNGRepresentation()` and retains information like scale and orientation.
  
  The designated initializer for `PINDiskCache` is <initWithName:>. The <name> string is used to create a directory
- under Library/Caches that scopes disk access for any instance sharing this name. Multiple instances with the
- same name are allowed because all disk access is serialized on the <sharedQueue>. The <name> also appears in
- stack traces and return value for `description:`.
+ under Library/Caches that scopes disk access for this instance. Multiple instances with the same name are *not* 
+ allowed as they would conflict with each other.
  
  Unless otherwise noted, all properties and methods are safe to access from any thread at any time. All blocks
  will cause the queue to wait, making it safe to access and manipulate the actual cache files on disk for the
- duration of the block. In addition, the <sharedQueue> can be set to target an existing serial I/O queue, should
- your app already have one.
+ duration of the block.
  
  Because this cache is bound by disk I/O it can be much slower than <PINMemoryCache>, although values stored in
  `PINDiskCache` persist after application relaunch. Using <PINCache> is recommended over using `PINDiskCache`
@@ -73,7 +71,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  size exceeds the limit a trim call is queued. Defaults to `0.0`, meaning no practical limit.
  
  */
-- (void)setByteLimit:(NSUInteger)byteLimit;
+@property (assign) NSUInteger byteLimit;
 
 /**
  The maximum number of seconds an object is allowed to exist in the cache. Setting this to a value
@@ -81,7 +79,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  Setting it back to `0.0` will stop the timer. Defaults to `0.0`, meaning no limit.
  
  */
-- (void)setAgeLimit:(NSTimeInterval)ageLimit;
+@property (assign) NSTimeInterval ageLimit;
 
 #pragma mark -
 /// @name Event Blocks
@@ -89,34 +87,34 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 /**
  A block to be executed just before an object is added to the cache. The queue waits during execution.
  */
-- (void)setWillAddObjectBlock:(PINDiskCacheObjectBlock)willAddObjectBlock;
+@property (copy) PINDiskCacheObjectBlock willAddObjectBlock;
 
 /**
  A block to be executed just before an object is removed from the cache. The queue waits during execution.
  */
-- (void)setWillRemoveObjectBlock:(PINDiskCacheObjectBlock)willRemoveObjectBlock;
+@property (copy) PINDiskCacheObjectBlock willRemoveObjectBlock;
 
 /**
  A block to be executed just before all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-- (void)setWillRemoveAllObjectsBlock:(PINDiskCacheBlock)willRemoveAllObjectsBlock;
+@property (copy) PINDiskCacheBlock willRemoveAllObjectsBlock;
 
 /**
  A block to be executed just after an object is added to the cache. The queue waits during execution.
  */
-- (void)setDidAddObjectBlock:(PINDiskCacheObjectBlock)didAddObjectBlock;
+@property (copy) PINDiskCacheObjectBlock didAddObjectBlock;
 
 /**
  A block to be executed just after an object is removed from the cache. The queue waits during execution.
  */
-- (void)setDidRemoveObjectBlock:(PINDiskCacheObjectBlock)didRemoveObjectBlock;
+@property (copy) PINDiskCacheObjectBlock didRemoveObjectBlock;
 
 /**
  A block to be executed just after all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-- (void)setDidRemoveAllObjectsBlock:(PINDiskCacheBlock)didRemoveAllObjectsBlock;
+@property (copy) PINDiskCacheBlock didRemoveAllObjectsBlock;
 
 #pragma mark -
 /// @name Initialization
@@ -129,15 +127,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 + (instancetype)sharedCache;
 
 /**
- A shared serial queue, used by all instances of this class. Use `dispatch_set_target_queue` to integrate
- this queue with an exisiting serial I/O queue.
- 
- @result The shared singleton queue instance.
- */
-+ (dispatch_queue_t)sharedQueue;
-
-/**
- Empties the trash with `DISPATCH_QUEUE_PRIORITY_BACKGROUND`. Does not block the <sharedQueue>.
+ Empties the trash with `DISPATCH_QUEUE_PRIORITY_BACKGROUND`. Does not use lock.
  */
 + (void)emptyTrash;
 
@@ -165,10 +155,18 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 
 #pragma mark -
 /// @name Asynchronous Methods
+/**
+ Locks access to ivars and allows safe interaction with files on disk. This method returns immediately.
+ 
+ @warning Calling synchronous methods on the diskCache inside this block will likely cause a deadlock.
+ 
+ @param block A block to be executed when a lock is available.
+ */
+- (void)lockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
- block as soon as the object is available on the serial <sharedQueue>.
+ block as soon as the object is available.
  
  @warning The fileURL is only valid for the duration of this block, do not use it after the block ends.
  
@@ -179,11 +177,10 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 
 /**
  Retrieves the fileURL for the specified key without actually reading the data from disk. This method
- returns immediately and executes the passed block as soon as the object is available on the serial
- <sharedQueue>.
+ returns immediately and executes the passed block as soon as the object is available.
  
  @warning Access is protected for the duration of the block, but to maintain safe disk access do not
- access this fileURL after the block has ended. Do all work on the <sharedQueue>.
+ access this fileURL after the block has ended.
  
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the file URL is available.
@@ -254,5 +251,94 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param completionBlock An optional block to be executed after the enumeration is complete.
  */
 - (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block completionBlock:(PINDiskCacheBlock)completionBlock;
+
+#pragma mark -
+/// @name Synchronous Methods
+
+/**
+ Locks access to ivars and allows safe interaction with files on disk. This method only returns once the block
+ has been run.
+ 
+ @warning Calling synchronous methods on the diskCache inside this block will likely cause a deadlock.
+ 
+ @param block A block to be executed when a lock is available.
+ */
+- (void)synchronouslyLockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block;
+
+/**
+ Retrieves the object for the specified key. This method blocks the calling thread until the
+ object is available.
+ 
+ @see objectForKey:block:
+ @param key The key associated with the object.
+ @result The object for the specified key.
+ */
+- (id <NSCoding>)objectForKey:(NSString *)key;
+
+/**
+ Retrieves the file URL for the specified key. This method blocks the calling thread until the
+ url is available. Do not use this URL anywhere except with <lockFileAccessWhileExecutingBlock:>. This method probably
+ shouldn't even exist, just use the asynchronous one.
+ 
+ @see fileURLForKey:block:
+ @param key The key associated with the object.
+ @result The file URL for the specified key.
+ */
+- (NSURL *)fileURLForKey:(NSString *)key;
+
+/**
+ Stores an object in the cache for the specified key. This method blocks the calling thread until
+ the object has been stored.
+ 
+ @see setObject:forKey:block:
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ */
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+
+/**
+ Removes the object for the specified key. This method blocks the calling thread until the object
+ has been removed.
+ 
+ @param key The key associated with the object to be removed.
+ */
+- (void)removeObjectForKey:(NSString *)key;
+
+/**
+ Removes all objects from the cache that have not been used since the specified date.
+ This method blocks the calling thread until the cache has been trimmed.
+ @param date Objects that haven't been accessed since this date are removed from the cache.
+ */
+- (void)trimToDate:(NSDate *)date;
+
+/**
+ Removes objects from the cache, largest first, until the cache is equal to or smaller than the
+ specified byteCount. This method blocks the calling thread until the cache has been trimmed.
+ 
+ @param byteCount The cache will be trimmed equal to or smaller than this size.
+ */
+- (void)trimToSize:(NSUInteger)byteCount;
+
+/**
+ Removes objects from the cache, ordered by date (least recently used first), until the cache is equal to or
+ smaller than the specified byteCount. This method blocks the calling thread until the cache has been trimmed.
+ @param byteCount The cache will be trimmed equal to or smaller than this size.
+ */
+- (void)trimToSizeByDate:(NSUInteger)byteCount;
+
+/**
+ Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
+ */
+- (void)removeAllObjects;
+
+/**
+ Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually
+ read from disk, the `object` parameter of the block will be `nil` but the `fileURL` will be available.
+ This method blocks the calling thread until all objects have been enumerated.
+ @param block A block to be executed for every object in the cache.
+ @warning Do not call this method within the event blocks (<didRemoveObjectBlock>, etc.)
+ Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
+ */
+- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block;
 
 @end
