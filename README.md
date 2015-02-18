@@ -21,7 +21,7 @@ Get them back out like this:
                               }];
 ```
                                   
-`PINMemoryCache` allows for concurrent reads and serialized writes, while `PINDiskCache` serializes disk access across all instances in the app to increase performance and prevent file contention. `PINCache` coordinates them so that objects added to memory are available immediately to other threads while being written to disk safely in the background. Both caches are public properties of `PINCache`, so it's easy to manipulate one or the other separately if necessary.
+Both `PINMemoryCache` and PINDiskCache use locks to protect reads and writes. `PINCache` coordinates them so that objects added to memory are available immediately to other threads while being written to disk safely in the background. Both caches are public properties of `PINCache`, so it's easy to manipulate one or the other separately if necessary.
 
 Collections work too. Thanks to the magic of `NSKeyedArchiver`, objects repeated in a collection only occupy the space of one on disk:
 
