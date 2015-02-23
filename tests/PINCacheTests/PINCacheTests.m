@@ -376,4 +376,57 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertTrue(objectCount == enumCount, @"was not able to fetch 1000 objects, possibly due to deadlock.");
 }
 
+- (void)testAgeLimit
+{
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    [self.cache setObject:[self image] forKey:key];
+    [self.cache.memoryCache setAgeLimit:60];
+    [self.cache.diskCache setAgeLimit:60];
+    
+    dispatch_group_t group = dispatch_group_create();
+    
+    __block id memObj = nil;
+    __block id diskObj = nil;
+    
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        diskObj = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    
+    XCTAssert(memObj != nil, @"should still be in memory cache");
+    XCTAssert(diskObj != nil, @"should still be in disk cache");
+    
+    sleep(2);
+    
+    [self.cache.memoryCache setAgeLimit:1];
+    [self.cache.diskCache setAgeLimit:1];
+    
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        diskObj = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    
+    XCTAssert(memObj == nil, @"should not be in memory cache");
+    XCTAssert(diskObj == nil, @"should not be in disk cache");
+}
+
 @end

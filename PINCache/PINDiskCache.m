@@ -390,7 +390,7 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 - (void)trimToAgeLimitRecursively
 {
     [self lock];
-        NSUInteger ageLimit = _ageLimit;
+        NSTimeInterval ageLimit = _ageLimit;
     [self unlock];
     if (ageLimit == 0.0)
         return;
