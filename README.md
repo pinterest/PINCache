@@ -1,6 +1,6 @@
 # PINCache
 
-## Fast parallel object cache for iOS and OS X.
+## Fast, non-deadlocking parallel object cache for iOS and OS X.
 
 [PINCache](PINCache/PINCache.h) is a key/value store designed for persisting temporary objects that are expensive to reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar stores, one in memory ([PINMemoryCache](PINCache/PINMemoryCache.h)) and one on disk ([PINDiskCache](PINCache/PINDiskCache.h)), all backed by GCD and safe to access from multiple threads simultaneously. On iOS, `PINMemoryCache` will clear itself when the app receives a memory warning or goes into the background. Objects stored in `PINDiskCache` remain until you trim the cache yourself, either manually or by setting a byte or age limit.
 
