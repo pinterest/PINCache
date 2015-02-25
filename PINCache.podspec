@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name          = 'PINCache'
-  s.version       = '1.2.3'
+  s.version       = '2.0'
   s.source_files  = 'PINCache/*.{h,m}'
   s.homepage      = 'https://github.com/pinterest/PINCache'
   s.summary       = 'Fast, thread safe, parallel object cache for iOS and OS X.'
   s.authors       = { 'Garrett Moon' => 'garrett@pinterest.com', 'Justin Ouellette' => 'jstn@tumblr.com' }
-  s.source        = { :git => 'https://github.com/tumblr/TMCache.git', :tag => "#{s.version}" }
+  s.source        = { :git => 'https://github.com/pinterest/PINCache.git', :tag => "#{s.version}" }
   s.license       = { :type => 'Apache 2.0', :file => 'LICENSE.txt' }
   s.requires_arc  = true
   s.frameworks    = 'Foundation'
