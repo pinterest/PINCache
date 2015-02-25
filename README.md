@@ -2,7 +2,7 @@
 
 ## Fast, non-deadlocking parallel object cache for iOS and OS X.
 
-[PINCache](PINCache/PINCache.h) is a key/value store designed for persisting temporary objects that are expensive to reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar stores, one in memory ([PINMemoryCache](PINCache/PINMemoryCache.h)) and one on disk ([PINDiskCache](PINCache/PINDiskCache.h)), all backed by GCD and safe to access from multiple threads simultaneously. On iOS, `PINMemoryCache` will clear itself when the app receives a memory warning or goes into the background. Objects stored in `PINDiskCache` remain until you trim the cache yourself, either manually or by setting a byte or age limit.
+[PINCache](PINCache/PINCache.h) is a fork of [TMCache](https://github.com/tumblr/TMCache) re-architected to fix issues with deadlocking caused by heavy use. It is a key/value store designed for persisting temporary objects that are expensive to reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar stores, one in memory ([PINMemoryCache](PINCache/PINMemoryCache.h)) and one on disk ([PINDiskCache](PINCache/PINDiskCache.h)), all backed by GCD and safe to access from multiple threads simultaneously. On iOS, `PINMemoryCache` will clear itself when the app receives a memory warning or goes into the background. Objects stored in `PINDiskCache` remain until you trim the cache yourself, either manually or by setting a byte or age limit.
 
 `PINCache` and `PINDiskCache` accept any object conforming to [NSCoding](https://developer.apple.com/library/ios/#documentation/Cocoa/Reference/Foundation/Protocols/NSCoding_Protocol/Reference/Reference.html). Put things in like this:
 
