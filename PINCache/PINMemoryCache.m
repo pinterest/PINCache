@@ -15,7 +15,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 @property (strong, nonatomic) dispatch_queue_t concurrentQueue;
 @property (strong, nonatomic) dispatch_semaphore_t lockSemaphore;
 #else
-@property (assign, nonatomic) dispatch_queue_t queue;
+@property (assign, nonatomic) dispatch_queue_t concurrentQueue;
 @property (assign, nonatomic) dispatch_semaphore_t lockSemaphore;
 #endif
 @property (strong, nonatomic) NSMutableDictionary *dictionary;
