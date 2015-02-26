@@ -117,6 +117,9 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
         dispatch_async(_concurrentQueue, ^{
             PINMemoryCache *strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
+            }
             
             [strongSelf lock];
                 PINMemoryCacheBlock didReceiveMemoryWarningBlock = strongSelf->_didReceiveMemoryWarningBlock;
@@ -133,6 +136,9 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
         dispatch_async(_concurrentQueue, ^{
             PINMemoryCache *strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
+            }
 
             [strongSelf lock];
                 PINMemoryCacheBlock didEnterBackgroundBlock = strongSelf->_didEnterBackgroundBlock;
@@ -266,7 +272,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        id object = [self objectForKey:key];
+        id object = [strongSelf objectForKey:key];
         
         if (block)
             block(strongSelf, key, object);
@@ -284,7 +290,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self setObject:object forKey:key withCost:cost];
+        [strongSelf setObject:object forKey:key withCost:cost];
         
         if (block)
             block(strongSelf, key, object);
@@ -297,7 +303,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self removeObjectForKey:key];
+        [strongSelf removeObjectForKey:key];
         
         if (block)
             block(strongSelf, key, nil);
@@ -310,7 +316,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self trimToDate:trimDate];
+        [strongSelf trimToDate:trimDate];
         
         if (block)
             block(strongSelf);
@@ -323,7 +329,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self trimToCost:cost];
+        [strongSelf trimToCost:cost];
         
         if (block)
             block(strongSelf);
@@ -336,7 +342,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self trimToCostByDate:cost];
+        [strongSelf trimToCostByDate:cost];
         
         if (block)
             block(strongSelf);
@@ -349,7 +355,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self removeAllObjects];
+        [strongSelf removeAllObjects];
         
         if (block)
             block(strongSelf);
@@ -362,7 +368,7 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
-        [self enumerateObjectsWithBlock:block];
+        [strongSelf enumerateObjectsWithBlock:block];
         
         if (completionBlock)
             completionBlock(strongSelf);
