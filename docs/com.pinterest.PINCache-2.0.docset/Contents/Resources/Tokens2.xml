@@ -501,7 +501,7 @@ the same data on disk thanks to the magic of seriality.</Abstract>
 			<Abstract type="html">Locks access to ivars and allows safe interaction with files on disk. This method returns immediately.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)lockFileAccessWhileExecutingBlock:(void ( ^ ) ( PINDiskCache *diskCache ))block</Declaration>
+			<Declaration>- (void)lockFileAccessWhileExecutingBlock:(PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -710,7 +710,7 @@ This method returns immediately.</Abstract>
 has been run.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)synchronouslyLockFileAccessWhileExecutingBlock:(void ( ^ ) ( PINDiskCache *diskCache ))block</Declaration>
+			<Declaration>- (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>

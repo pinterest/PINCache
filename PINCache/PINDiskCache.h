@@ -45,24 +45,26 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 /**
  The URL of the directory used by this cache, usually `Library/Caches/com.pinterest.PINDiskCache.(name)`
  
- @warning Do not interact with files under this URL except on the <sharedQueue>.
+ @warning Do not interact with files under this URL except in <lockFileAccessWhileExecutingBlock:> or
+ <synchronouslyLockFileAccessWhileExecutingBlock:>.
  */
 @property (readonly) NSURL *cacheURL;
 
 /**
  The total number of bytes used on disk, as reported by `NSURLTotalFileAllocatedSizeKey`.
  
- @warning This property is technically safe to access from any thread, but it reflects the value *right now*,
- not taking into account any pending operations. In most cases this value should only be read from a block on the
- <sharedQueue>, which will ensure its accuracy and prevent it from changing during the lifetime of the block.
+ @warning This property should only be read from a call to <synchronouslyLockFileAccessWhileExecutingBlock:> or
+ its asynchronous equivolent <lockFileAccessWhileExecutingBlock:>
  
  For example:
  
-    // some background thread, not a block already running on the shared queue
+    // some background thread
 
-    dispatch_sync([PINDiskCache sharedQueue], ^{
-        NSLog(@"accurate, unchanging byte count: %d", [[PINDiskCache sharedCache] byteCount]);
-    });
+    __block NSUInteger byteCount = 0;
+ 
+    [_diskCache synchronouslyLockFileAccessWhileExecutingBlock:^(PINDiskCache *diskCache) {
+        byteCount = diskCache.byteCount;
+    }];
  */
 @property (readonly) NSUInteger byteCount;
 
