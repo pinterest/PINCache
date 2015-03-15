@@ -4,7 +4,11 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/cl/PINDiskCache</TokenIdentifier>
-			<Abstract type="html"></Abstract>
+			<Abstract type="html">PINDiskCache is a thread safe key/value store backed by the file system. It accepts any object conforming
+to the NSCoding protocol, which includes the basic Foundation data types and collection classes and also
+many UIKit classes, notably UIImage. All work is performed on a serial queue shared by all instances in
+the app, and archiving is handled by NSKeyedArchiver. This is a particular advantage for UIImage because
+it skips UIImagePNGRepresentation() and retains information like scale and orientation.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
             
 			

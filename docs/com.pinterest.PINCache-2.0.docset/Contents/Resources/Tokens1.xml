@@ -4,7 +4,9 @@
 		
 		<Token>
 			<TokenIdentifier>//apple_ref/occ/cl/PINCache</TokenIdentifier>
-			<Abstract type="html"></Abstract>
+			<Abstract type="html">PINCache is a thread safe key/value store designed for persisting temporary objects that are expensive to
+reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar
+stores, one in memory (PINMemoryCache and one on disk (PINDiskCache.</Abstract>
 			<DeclaredIn>PINCache.h</DeclaredIn>
             
 			

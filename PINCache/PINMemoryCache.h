@@ -2,6 +2,21 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
+#import <Foundation/Foundation.h>
+
+@class PINMemoryCache;
+
+/**
+ A callback block which provides only the cache as an argument
+ */
+
+typedef void (^PINMemoryCacheBlock)(PINMemoryCache *cache);
+
+/**
+ A callback block which provides the cache, key and object as arguments
+ */
+typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, id object);
+
 /**
  `PINMemoryCache` is a fast, thread safe key/value store similar to `NSCache`. On iOS it will clear itself
  automatically to reduce memory usage when the app receives a memory warning or goes into the background.
@@ -18,13 +33,6 @@
  Values will not persist after application relaunch or returning from the background. See <PINCache> for
  a memory cache backed by a disk cache.
  */
-
-#import <Foundation/Foundation.h>
-
-@class PINMemoryCache;
-
-typedef void (^PINMemoryCacheBlock)(PINMemoryCache *cache);
-typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, id object);
 
 @interface PINMemoryCache : NSObject
 

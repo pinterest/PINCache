@@ -2,6 +2,22 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
+#import <Foundation/Foundation.h>
+
+@class PINDiskCache;
+
+/**
+ A callback block which provides only the cache as an argument
+ */
+
+typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
+
+/**
+ A callback block which provides the cache, key and object as arguments
+ */
+
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL);
+
 /**
  `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
  to the `NSCoding` protocol, which includes the basic Foundation data types and collection classes and also
@@ -24,13 +40,6 @@
  All access to the cache is dated so the that the least-used objects can be trimmed first. Setting an optional
  <ageLimit> will trigger a GCD timer to periodically to trim the cache with <trimToDate:>.
  */
-
-#import <Foundation/Foundation.h>
-
-@class PINDiskCache;
-
-typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL);
 
 @interface PINDiskCache : NSObject
 

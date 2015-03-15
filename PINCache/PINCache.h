@@ -2,6 +2,25 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
+#import <Foundation/Foundation.h>
+
+#import "PINDiskCache.h"
+#import "PINMemoryCache.h"
+
+@class PINCache;
+
+/**
+ A callback block which provides only the cache as an argument
+ */
+
+typedef void (^PINCacheBlock)(PINCache *cache);
+
+/**
+ A callback block which provides the cache, key and object as arguments
+ */
+
+typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
+
 /**
  `PINCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
  reproduce, such as downloaded data or the results of slow processing. It is comprised of two self-similar
@@ -16,16 +35,6 @@
  The parallel caches are accessible as public properties (<memoryCache> and <diskCache>) and can be manipulated
  separately if necessary. See the docs for <PINMemoryCache> and <PINDiskCache> for more details.
  */
-
-#import <Foundation/Foundation.h>
-
-#import "PINDiskCache.h"
-#import "PINMemoryCache.h"
-
-@class PINCache;
-
-typedef void (^PINCacheBlock)(PINCache *cache);
-typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 
 @interface PINCache : NSObject
 
