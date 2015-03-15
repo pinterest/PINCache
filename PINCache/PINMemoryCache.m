@@ -84,7 +84,11 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
             [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(didObserveApocalypticNotification:)
                                                          name:name
+#if !defined(PIN_APP_EXTENSIONS)
                                                        object:[UIApplication sharedApplication]];
+#else
+                                                       object:nil];
+#endif
         }
         #endif
     }
