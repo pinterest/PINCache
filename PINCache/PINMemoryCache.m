@@ -44,9 +44,9 @@ NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     #if !OS_OBJECT_USE_OBJC
-    dispatch_release(_queue);
+    dispatch_release(_concurrentQueue);
     dispatch_release(_lockSemaphore);
-    _queue = nil;
+    _concurrentQueue = nil;
     #endif
 }
 
