@@ -1,3 +1,7 @@
+### 2.0 -- 2015 February 25 ###
+
+- [fix] PINCache redesign to avoid deadlocks
+
 ### 1.2.3 -- 2014 December 13 ###
 
 - [fix] TMDiskCache/TMMemoryCache: import `UIKit` to facilitate Swift usage (thanks [digabriel](https://github.com/tumblr/TMCache/pull/57)!)
