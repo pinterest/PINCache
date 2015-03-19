@@ -7,6 +7,8 @@
 #import "PINDiskCache.h"
 #import "PINMemoryCache.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class PINCache;
 
 /**
@@ -19,7 +21,7 @@ typedef void (^PINCacheBlock)(PINCache *cache);
  A callback block which provides the cache, key and object as arguments
  */
 
-typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
+typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullable object);
 
 /**
  `PINCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
@@ -195,3 +197,5 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 - (void)removeAllObjects;
 
 @end
+
+NS_ASSUME_NONNULL_END
