@@ -3,7 +3,6 @@
 //  PINCache
 //
 //  Created by CHEN Xian’an on 3/19/15.
-//  Copyright (c) 2015 Tumblr. All rights reserved.
 //
 
 #ifndef PINCache_nullability_h
