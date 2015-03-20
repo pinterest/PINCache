@@ -7,6 +7,8 @@
 #import "PINDiskCache.h"
 #import "PINMemoryCache.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class PINCache;
 
 /**
@@ -19,7 +21,7 @@ typedef void (^PINCacheBlock)(PINCache *cache);
  A callback block which provides the cache, key and object as arguments
  */
 
-typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
+typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullable object);
 
 /**
  `PINCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
@@ -119,7 +121,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINCacheObjectBlock)block;
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -128,7 +130,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date. This method returns immediately and
@@ -137,7 +139,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(PINCacheBlock)block;
+- (void)trimToDate:(NSDate *)date block:(nullable PINCacheBlock)block;
 
 /**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
@@ -145,7 +147,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
  
  @param block A block to be executed concurrently after the cache has been cleared, or nil.
  */
-- (void)removeAllObjects:(PINCacheBlock)block;
+- (void)removeAllObjects:(nullable PINCacheBlock)block;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -195,3 +197,5 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id object);
 - (void)removeAllObjects;
 
 @end
+
+NS_ASSUME_NONNULL_END
