@@ -3,7 +3,7 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import <Foundation/Foundation.h>
-#import "nullability.h"
+#import "Nullability.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
