@@ -1,9 +1,6 @@
-//
-//  nullability.h
-//  PINCache
-//
-//  Created by CHEN Xian’an on 3/19/15.
-//
+//  PINCache is a modified version of TMCache
+//  Modifications by Garrett Moon
+//  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #ifndef PINCache_nullability_h
 #define PINCache_nullability_h
