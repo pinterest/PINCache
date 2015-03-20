@@ -154,7 +154,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -177,7 +177,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param cost An amount to add to the <totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINMemoryCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINMemoryCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -186,7 +186,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -196,7 +196,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(PINMemoryCacheBlock)block;
+- (void)trimToDate:(NSDate *)date block:(nullable PINMemoryCacheBlock)block;
 
 /**
  Removes objects from the cache, costliest objects first, until the <totalCost> is below the specified
@@ -206,7 +206,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToCost:(NSUInteger)cost block:(PINMemoryCacheBlock)block;
+- (void)trimToCost:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the <totalCost> is below
@@ -216,7 +216,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToCostByDate:(NSUInteger)cost block:(PINMemoryCacheBlock)block;
+- (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block;
 
 /**
  Removes all objects from the cache. This method returns immediately and executes the passed block after
@@ -233,7 +233,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed concurrently when the enumeration is complete.
  */
-- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(PINMemoryCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -246,7 +246,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param key The key associated with the object.
  @result The object for the specified key.
  */
-- (id)objectForKey:(NSString *)key;
+- (id)objectForKey:(nullable NSString *)key;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object
@@ -267,7 +267,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  @param key A key to associate with the object. This string will be copied.
  @param cost An amount to add to the <totalCost>.
  */
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost;
+- (void)setObject:(nullable id)object forKey:(nullable NSString *)key withCost:(NSUInteger)cost;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
@@ -275,7 +275,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  
  @param key The key associated with the object to be removed.
  */
-- (void)removeObjectForKey:(NSString *)key;
+- (void)removeObjectForKey:(nullable NSString *)key;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -283,7 +283,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
-- (void)trimToDate:(NSDate *)date;
+- (void)trimToDate:(nullable NSDate *)date;
 
 /**
  Removes objects from the cache, costliest objects first, until the <totalCost> is below the specified
@@ -317,7 +317,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
  
  */
-- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block;
+- (void)enumerateObjectsWithBlock:(nullable PINMemoryCacheObjectBlock)block;
 
 @end
 
