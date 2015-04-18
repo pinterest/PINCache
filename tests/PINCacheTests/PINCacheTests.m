@@ -95,6 +95,28 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertNotNil(image, @"object was not set");
 }
 
+- (void)testObjectSetWithDuplicateKey
+{
+    NSString *key = @"key";
+    NSString *value1 = @"value1";
+    NSString *value2 = @"value2";
+    __block NSString *cachedValue = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    [self.cache setObject:value1 forKey:key];
+    [self.cache setObject:value2 forKey:key];
+    
+    [self.cache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
+        cachedValue = (NSString *)object;
+        dispatch_semaphore_signal(semaphore);
+    }];
+    
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertEqual(cachedValue, value2, @"set did not overwrite previous object with same key");
+}
+
+
 - (void)testObjectGet
 {
     NSString *key = @"key";
@@ -113,6 +135,25 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertNotNil(image, @"object was not got");
 }
 
+- (void)testObjectGetWithInvalidKey
+{
+    NSString *key = @"key";
+    NSString *invalidKey = @"invalid";
+    __block UIImage *image = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+
+    [self.cache setObject:[self image] forKey:key];
+
+    [self.cache objectForKey:invalidKey block:^(PINCache *cache, NSString *key, id object) {
+        image = (UIImage *)object;
+        dispatch_semaphore_signal(semaphore);
+    }];
+
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertNil(image, @"object with non-existant key was not nil");
+}
+
 - (void)testObjectRemove
 {
     NSString *key = @"key";
@@ -129,6 +170,30 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     id object = [self.cache objectForKey:key];
     
     XCTAssertNil(object, @"object was not removed");
+}
+
+- (void)testObjectRemoveAll
+{
+    NSString *key1 = @"key1";
+    NSString *key2 = @"key2";
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    [self.cache setObject:key1 forKey:key1];
+    [self.cache setObject:key2 forKey:key2];
+    
+    [self.cache removeAllObjects:^(PINCache *cache) {
+        dispatch_semaphore_signal(semaphore);
+    }];
+    
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    id object1 = [self.cache objectForKey:key1];
+    id object2 = [self.cache objectForKey:key2];
+    
+    XCTAssertNil(object1, @"not all objects were removed");
+    XCTAssertNil(object2, @"not all objects were removed");
+    XCTAssertTrue(self.cache.memoryCache.totalCost == 0, @"memory cache cost was not 0 after removing all objects");
+    XCTAssertTrue(self.cache.diskByteCount == 0, @"disk cache byte count was not 0 after removing all objects");
 }
 
 - (void)testMemoryCost
@@ -427,6 +492,32 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     
     XCTAssert(memObj == nil, @"should not be in memory cache");
     XCTAssert(diskObj == nil, @"should not be in disk cache");
+}
+
+- (void)testCachesWithSameName
+{
+    PINCache* otherCache = [[PINCache alloc] initWithName:PINCacheTestName];
+
+    NSString *key = @"key";
+    __block UIImage *image = nil;
+    __block UIImage *otherImage = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    [self.cache setObject:[self image] forKey:key block:^(PINCache *cache, NSString *key, id object) {
+        image = (UIImage *)object;
+        dispatch_semaphore_signal(semaphore);
+    }];
+    
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    [otherCache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
+        otherImage = (UIImage *)object;
+        dispatch_semaphore_signal(semaphore);
+    }];
+
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+
+    XCTAssertNotNil(otherImage, @"object set in cache was not available in another cache with the same name");
 }
 
 @end
