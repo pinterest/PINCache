@@ -71,30 +71,35 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
+    [self objectForKey:key readBlock:nil block:block];
+}
+
+- (void)objectForKey:(NSString *)key readBlock:(PINCacheReadBlock)readBlock block:(PINCacheObjectBlock)block
+{
     if (!key || !block)
         return;
-    
+
     __weak PINCache *weakSelf = self;
-    
+
     dispatch_async(_concurrentQueue, ^{
         PINCache *strongSelf = weakSelf;
         if (!strongSelf)
             return;
-        
+
         __weak PINCache *weakSelf = strongSelf;
-        
+
         [strongSelf->_memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
             PINCache *strongSelf = weakSelf;
             if (!strongSelf)
                 return;
-            
+
             if (object) {
                 [strongSelf->_diskCache fileURLForKey:key block:^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
                     // update the access time on disk
                 }];
-                
+
                 __weak PINCache *weakSelf = strongSelf;
-                
+
                 dispatch_async(strongSelf->_concurrentQueue, ^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
@@ -102,16 +107,23 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
                 });
             } else {
                 __weak PINCache *weakSelf = strongSelf;
-                
-                [strongSelf->_diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
+
+                PINDiskCacheReadBlock diskReadBlock = nil;
+                if (readBlock) {
+                    diskReadBlock = ^id (PINDiskCache *cache, NSString *key, NSURL *fileURL){
+                        return readBlock(self, key, fileURL);
+                    };
+                }
+
+                [strongSelf->_diskCache objectForKey:key readBlock:diskReadBlock block:^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
                     PINCache *strongSelf = weakSelf;
                     if (!strongSelf)
                         return;
-                    
+
                     [strongSelf->_memoryCache setObject:object forKey:key block:nil];
-                    
+
                     __weak PINCache *weakSelf = strongSelf;
-                    
+
                     dispatch_async(strongSelf->_concurrentQueue, ^{
                         PINCache *strongSelf = weakSelf;
                         if (strongSelf)
@@ -125,30 +137,43 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
+    [self setObject:object forKey:key writeBlock:nil block:block];
+}
+
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(PINCacheWriteBlock)writeBlock block:(PINCacheObjectBlock)block
+{
     if (!key || !object)
         return;
-    
+
     dispatch_group_t group = nil;
     PINMemoryCacheObjectBlock memBlock = nil;
     PINDiskCacheObjectBlock diskBlock = nil;
-    
+
     if (block) {
         group = dispatch_group_create();
         dispatch_group_enter(group);
         dispatch_group_enter(group);
-        
+
         memBlock = ^(PINMemoryCache *cache, NSString *key, id object) {
             dispatch_group_leave(group);
         };
-        
+
         diskBlock = ^(PINDiskCache *cache, NSString *key, id <NSCoding> object, NSURL *fileURL) {
             dispatch_group_leave(group);
         };
     }
-    
+
     [_memoryCache setObject:object forKey:key block:memBlock];
-    [_diskCache setObject:object forKey:key block:diskBlock];
-    
+
+    PINDiskCacheWriteBlock diskWriteBlock = nil;
+    if (writeBlock) {
+        diskWriteBlock = ^BOOL (PINDiskCache *cache, NSString *key, NSURL *fileURL, id object){
+            return writeBlock(self, key, fileURL, object);
+        };
+    }
+
+    [_diskCache setObject:object forKey:key writeBlock:diskWriteBlock block:diskBlock];
+
     if (group) {
         __weak PINCache *weakSelf = self;
         dispatch_group_notify(group, _concurrentQueue, ^{
@@ -156,7 +181,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
             if (strongSelf)
                 block(strongSelf, key, object);
         });
-        
+
 #if !OS_OBJECT_USE_OBJC
         dispatch_release(group);
 #endif
@@ -295,31 +320,55 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (id)objectForKey:(NSString *)key
 {
+    return [self objectForKey:key readBlock:nil];
+}
+
+- (id)objectForKey:(NSString *)key readBlock:(PINCacheReadBlock)readBlock
+{
     if (!key)
         return nil;
-    
+
     __block id object = nil;
 
     object = [_memoryCache objectForKey:key];
-    
+
     if (object) {
         // update the access time on disk
         [_diskCache fileURLForKey:key block:NULL];
     } else {
-        object = [_diskCache objectForKey:key];
+        PINDiskCacheReadBlock diskReadBlock = nil;
+        if (readBlock) {
+            diskReadBlock = ^id (PINDiskCache *cache, NSString *diskKey, NSURL *fileURL){
+                return readBlock(self, key, fileURL);
+            };
+        }
+
+        object = [_diskCache objectForKey:key readBlock:diskReadBlock];
         [_memoryCache setObject:object forKey:key];
     }
-    
+
     return object;
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key
 {
+    [self setObject:object forKey:key writeBlock:nil];
+}
+
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(PINCacheWriteBlock)writeBlock
+{
     if (!key || !object)
         return;
-    
+
     [_memoryCache setObject:object forKey:key];
-    [_diskCache setObject:object forKey:key];
+
+    PINDiskCacheWriteBlock diskWriteBlock = nil;
+    if (writeBlock) {
+        diskWriteBlock = ^BOOL (PINDiskCache *cache, NSString *diskKey, NSURL *fileURL, id diskObject){
+            return writeBlock(self, key, fileURL, object);
+        };
+    }
+    [_diskCache setObject:object forKey:key writeBlock:diskWriteBlock];
 }
 
 - (void)removeObjectForKey:(NSString *)key
