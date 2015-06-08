@@ -28,7 +28,26 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D07F1ED1171AFB7A001DBA02"
+               BuildableName = "PINCacheTests.xctest"
+               BlueprintName = "PINCacheTests"
+               ReferencedContainer = "container:PINCache.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "6629FFEC1A66B512009C10BD"
+            BuildableName = "PINCache.framework"
+            BlueprintName = "iOS"
+            ReferencedContainer = "container:PINCache.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
