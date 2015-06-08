@@ -21,6 +21,10 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 
 typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object, NSURL *fileURL);
 
+typedef BOOL (^PINDiskCacheWriteBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL, id object);
+typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL);
+
+
 /**
  `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
  to the `NSCoding` protocol, which includes the basic Foundation data types and collection classes and also
@@ -190,6 +194,8 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param block A block to be executed serially when the object is available.
  */
 - (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key readBlock:(nonnull PINDiskCacheReadBlock)readBlock block:(nonnull PINCacheObjectBlock)block;
+
 
 /**
  Retrieves the fileURL for the specified key without actually reading the data from disk. This method
@@ -212,6 +218,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param block A block to be executed serially after the object has been stored, or nil.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINDiskCacheWriteBlock)writeBlock block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
@@ -290,6 +297,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @result The object for the specified key.
  */
 - (id <NSCoding>)objectForKey:(NSString *)key;
+- (id)objectForKey:(NSString *)key readBlock:(nonnull PINDiskCacheReadBlock)readBlock;
 
 /**
  Retrieves the file URL for the specified key. This method blocks the calling thread until the
@@ -311,6 +319,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINDiskCacheWriteBlock)writeBlock;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
