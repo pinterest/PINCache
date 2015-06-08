@@ -218,7 +218,7 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param block A block to be executed serially after the object has been stored, or nil.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
-- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINDiskCacheWriteBlock)writeBlock block:(nullable PINDiskCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINDiskCacheWriteBlock)writeBlock block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
@@ -297,7 +297,7 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @result The object for the specified key.
  */
 - (id <NSCoding>)objectForKey:(NSString *)key;
-- (id)objectForKey:(NSString *)key readBlock:(nonnull PINDiskCacheReadBlock)readBlock;
+- (id)objectForKey:(NSString *)key readBlock:(nullable PINDiskCacheReadBlock)readBlock;
 
 /**
  Retrieves the file URL for the specified key. This method blocks the calling thread until the
@@ -319,7 +319,7 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
-- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINDiskCacheWriteBlock)writeBlock;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINDiskCacheWriteBlock)writeBlock;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
