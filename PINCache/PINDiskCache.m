@@ -598,6 +598,11 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return [self objectForKey:key fileURL:nil readBlock:nil];
 }
 
+- (id)objectForKey:(NSString *)key readBlock:(PINDiskCacheReadBlock)readBlock
+{
+    return [self objectForKey:key fileURL:nil readBlock:readBlock];
+}
+
 - (id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL readBlock:(PINDiskCacheReadBlock)readBlock
 {
     NSDate *now = [[NSDate alloc] init];
@@ -661,6 +666,11 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key
 {
     [self setObject:object forKey:key fileURL:nil writeBlock:nil];
+}
+
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(PINDiskCacheWriteBlock)writeBlock
+{
+    [self setObject:object forKey:key fileURL:nil writeBlock:writeBlock];
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL writeBlock:(PINDiskCacheWriteBlock)writeBlock {
