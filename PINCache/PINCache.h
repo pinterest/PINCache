@@ -116,7 +116,7 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @param block A block to be executed concurrently when the object is available.
  */
 - (void)objectForKey:(NSString *)key block:(nonnull PINCacheObjectBlock)block;
-- (void)objectForKey:(NSString *)key readBlock:(nonnull PINCacheReadBlock)readBlock block:(nonnull PINCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key readBlock:(nullable PINCacheReadBlock)readBlock block:(nonnull PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -127,7 +127,7 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
-- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINCacheWriteBlock)writeBlock block:(nullable PINCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINCacheWriteBlock)writeBlock block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -167,7 +167,7 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @result The object for the specified key.
  */
 - (id)objectForKey:(NSString *)key;
-- (id)objectForKey:(NSString *)key readBlock:(nonnull PINCacheReadBlock)readBlock;
+- (id)objectForKey:(NSString *)key readBlock:(nullable PINCacheReadBlock)readBlock;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
@@ -178,7 +178,7 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
-- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINCacheWriteBlock)writeBlock;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINCacheWriteBlock)writeBlock;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
