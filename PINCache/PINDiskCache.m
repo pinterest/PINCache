@@ -425,21 +425,26 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     });
 }
 
-- (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+- (void)objectForKey:(NSString *)key readBlock:(PINDiskCacheReadBlock)readBlock block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
-    
+
     dispatch_async(_asyncQueue, ^{
         PINDiskCache *strongSelf = weakSelf;
         NSURL *fileURL = nil;
-        id <NSCoding> object = [strongSelf objectForKey:key fileURL:&fileURL];
-        
+        id object = [strongSelf objectForKey:key fileURL:&fileURL readBlock:readBlock];
+
         if (block) {
             [strongSelf lock];
                 block(strongSelf, key, object, fileURL);
             [strongSelf unlock];
         }
     });
+}
+
+- (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+{
+    [self objectForKey:key readBlock:NULL block:block];
 }
 
 - (void)fileURLForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
@@ -585,10 +590,10 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (id <NSCoding>)objectForKey:(NSString *)key
 {
-    return [self objectForKey:key fileURL:nil];
+    return [self objectForKey:key fileURL:nil readBlock:nil];
 }
 
-- (id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL readBlock:(PINDiskCacheReadBlock)readBlock
 {
     NSDate *now = [[NSDate alloc] init];
     
@@ -604,7 +609,11 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             @try {
-                object = [NSKeyedUnarchiver unarchiveObjectWithFile:[fileURL path]];
+                if (readBlock) {
+                    object = readBlock(self, key, fileURL);
+                } else {
+                    object = [NSKeyedUnarchiver unarchiveObjectWithFile:[fileURL path]];
+                }
             }
             @catch (NSException *exception) {
                 NSError *error = nil;

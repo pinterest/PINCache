@@ -19,7 +19,7 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
  A callback block which provides the cache, key and object as arguments
  */
 
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object, NSURL *fileURL);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id __nullable object, NSURL *fileURL);
 
 typedef BOOL (^PINDiskCacheWriteBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL, id object);
 typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL);
@@ -193,8 +193,8 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
-- (void)objectForKey:(NSString *)key readBlock:(nonnull PINDiskCacheReadBlock)readBlock block:(nonnull PINCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(nonnull PINDiskCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key readBlock:(nullable PINDiskCacheReadBlock)readBlock block:(nonnull PINDiskCacheObjectBlock)block;
 
 
 /**
@@ -218,7 +218,7 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param block A block to be executed serially after the object has been stored, or nil.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
-- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINDiskCacheWriteBlock)writeBlock block:(nullable PINCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nonnull PINDiskCacheWriteBlock)writeBlock block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
