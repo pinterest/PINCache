@@ -23,8 +23,8 @@ typedef void (^PINCacheBlock)(PINCache *cache);
 
 typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullable object);
 
-typedef BOOL (^PINCacheWriteBlock)(PINCache *cache, NSString *key, NSURL *fileURL, id object);
-typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
+typedef BOOL (^PINCacheWriteBlock)(PINCache *cache, NSString *key, NSURL *fileURL, id __nonnull object);
+typedef id __nullable (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
 
 
 /**
@@ -116,6 +116,17 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @param block A block to be executed concurrently when the object is available.
  */
 - (void)objectForKey:(NSString *)key block:(nonnull PINCacheObjectBlock)block;
+
+
+/**
+ Retrieves the object for the specified key. This method returns immediately and executes the passed
+ block after the object is available, potentially in parallel with other blocks on the <concurrentQueue>.
+ The readBlock is passed on to the disk cache and used to read the object from disk.
+ 
+ @param key The key associated with the requested object.
+ @param readBlock A block to be executed to read the object from disk.
+ @param block A block to be executed concurrently when the object is available.
+ */
 - (void)objectForKey:(NSString *)key readBlock:(nullable PINCacheReadBlock)readBlock block:(nonnull PINCacheObjectBlock)block;
 
 /**
@@ -127,6 +138,17 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+
+/**
+ Stores an object in the cache for the specified key. This method returns immediately and executes the
+ passed block after the object has been stored, potentially in parallel with other blocks on the <queue>.
+ The writeBlock is passed on to the disk cache and used to write the object to disk.
+
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param writeBlock A block to be executed to write the object to disk.
+ @param block A block to be executed concurrently after the object has been stored, or nil.
+ */
 - (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINCacheWriteBlock)writeBlock block:(nullable PINCacheObjectBlock)block;
 
 /**
@@ -167,6 +189,16 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @result The object for the specified key.
  */
 - (id)objectForKey:(NSString *)key;
+
+/**
+ Retrieves the object for the specified key. This method blocks the calling thread until the object is available.
+ The readBlock is passed on to the disk cache and used to read the object from disk.
+ 
+ @see objectForKey:block:
+ @param key The key associated with the object.
+ @param readBlock A block to be executed to read the object from disk.
+ @result The object for the specified key.
+ */
 - (id)objectForKey:(NSString *)key readBlock:(nullable PINCacheReadBlock)readBlock;
 
 /**
@@ -178,6 +210,16 @@ typedef id (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL *fileURL);
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+
+/**
+ Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
+ The writeBlock is passed on to the disk cache and used to write the object to disk.
+ 
+ @see setObject:forKey:block:
+ @param object An object to store in the cache.
+ @param writeBlock A block to be executed to write the object to disk.
+ @param key A key to associate with the object. This string will be copied.
+ */
 - (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINCacheWriteBlock)writeBlock;
 
 /**

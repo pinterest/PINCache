@@ -21,8 +21,8 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 
 typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id __nullable object, NSURL *fileURL);
 
-typedef BOOL (^PINDiskCacheWriteBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL, id object);
-typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL);
+typedef BOOL (^PINDiskCacheWriteBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL, id __nonnull object);
+typedef id __nullable (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *fileURL);
 
 
 /**
@@ -194,6 +194,18 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param block A block to be executed serially when the object is available.
  */
 - (void)objectForKey:(NSString *)key block:(nonnull PINDiskCacheObjectBlock)block;
+
+/**
+ Retrieves the object for the specified key. This method returns immediately and executes the passed
+ block as soon as the object is available on the serial <sharedQueue>.
+ The readBlock is used to read the object from disk.
+ 
+ @warning The fileURL is only valid for the duration of this block, do not use it after the block ends.
+ 
+ @param key The key associated with the requested object.
+ @param readBlock A block to be executed to read the object from disk.
+ @param block A block to be executed serially when the object is available.
+ */
 - (void)objectForKey:(NSString *)key readBlock:(nullable PINDiskCacheReadBlock)readBlock block:(nonnull PINDiskCacheObjectBlock)block;
 
 
@@ -218,6 +230,17 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param block A block to be executed serially after the object has been stored, or nil.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+
+/**
+ Stores an object in the cache for the specified key. This method returns immediately and executes the
+ passed block as soon as the object has been stored.
+ The writeBlock is used to write the object to disk.
+ 
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param writeBlock A block to be executed to write the object to disk.
+ @param block A block to be executed serially after the object has been stored, or nil.
+ */
 - (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINDiskCacheWriteBlock)writeBlock block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
@@ -297,6 +320,17 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @result The object for the specified key.
  */
 - (id <NSCoding>)objectForKey:(NSString *)key;
+
+/**
+ Retrieves the object for the specified key. This method blocks the calling thread until the
+ object is available.
+ The readBlock is passed on to the disk cache and used to read the object from disk.
+
+ @see objectForKey:block:
+ @param key The key associated with the object.
+ @param readBlock A block to be executed to read the object from disk.
+ @result The object for the specified key.
+ */
 - (id)objectForKey:(NSString *)key readBlock:(nullable PINDiskCacheReadBlock)readBlock;
 
 /**
@@ -319,6 +353,17 @@ typedef id (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *key, NSURL *f
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+
+/**
+ Stores an object in the cache for the specified key. This method blocks the calling thread until
+ the object has been stored.
+ The writeBlock is passed on to the disk cache and used to write the object to disk.
+ 
+ @see setObject:forKey:block:
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param writeBlock A block to be executed to write the object to disk.
+ */
 - (void)setObject:(id)object forKey:(NSString *)key writeBlock:(nullable PINDiskCacheWriteBlock)writeBlock;
 
 /**
