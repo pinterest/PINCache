@@ -115,7 +115,7 @@ typedef id __nullable (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(nonnull PINCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
 
 
 /**
@@ -127,7 +127,7 @@ typedef id __nullable (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL
  @param readBlock A block to be executed to read the object from disk.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key readBlock:(nullable PINCacheReadBlock)readBlock block:(nonnull PINCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key readBlock:(nullable PINCacheReadBlock)readBlock block:(PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the

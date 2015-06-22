@@ -193,7 +193,7 @@ typedef id __nullable (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *ke
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(nonnull PINDiskCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -206,7 +206,7 @@ typedef id __nullable (^PINDiskCacheReadBlock)(PINDiskCache *cache, NSString *ke
  @param readBlock A block to be executed to read the object from disk.
  @param block A block to be executed serially when the object is available.
  */
-- (void)objectForKey:(NSString *)key readBlock:(nullable PINDiskCacheReadBlock)readBlock block:(nonnull PINDiskCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key readBlock:(nullable PINDiskCacheReadBlock)readBlock block:(nullable PINDiskCacheObjectBlock)block;
 
 
 /**
