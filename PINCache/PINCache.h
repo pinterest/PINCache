@@ -141,7 +141,7 @@ typedef id __nullable (^PINCacheReadBlock)(PINCache *cache, NSString *key, NSURL
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
- passed block after the object has been stored, potentially in parallel with other blocks on the <queue>.
+ passed block after the object has been stored, potentially in parallel with other blocks on the <concurrentQueue>.
  The writeBlock is passed on to the disk cache and used to write the object to disk.
 
  @param object An object to store in the cache.

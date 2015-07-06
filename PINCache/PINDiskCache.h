@@ -17,6 +17,7 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 
 /**
  A callback block which provides the cache, key and object as arguments
+ Important: when read/write blocks not used object should conform to NSCoding.
  */
 
 typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id __nullable object, NSURL *fileURL);

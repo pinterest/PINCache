@@ -338,7 +338,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
     } else {
         PINDiskCacheReadBlock diskReadBlock = nil;
         if (readBlock) {
-            diskReadBlock = ^id (PINDiskCache *cache, NSString *diskKey, NSURL *fileURL){
+            diskReadBlock = ^id (PINDiskCache *cache, NSString *key, NSURL *fileURL){
                 return readBlock(self, key, fileURL);
             };
         }
@@ -364,7 +364,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 
     PINDiskCacheWriteBlock diskWriteBlock = nil;
     if (writeBlock) {
-        diskWriteBlock = ^BOOL (PINDiskCache *cache, NSString *diskKey, NSURL *fileURL, id diskObject){
+        diskWriteBlock = ^BOOL (PINDiskCache *cache, NSString *key, NSURL *fileURL, id diskObject){
             return writeBlock(self, key, fileURL, object);
         };
     }
