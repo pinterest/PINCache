@@ -425,21 +425,26 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     });
 }
 
-- (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+- (void)objectForKey:(NSString *)key readBlock:(PINDiskCacheReadBlock)readBlock block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
-    
+
     dispatch_async(_asyncQueue, ^{
         PINDiskCache *strongSelf = weakSelf;
         NSURL *fileURL = nil;
-        id <NSCoding> object = [strongSelf objectForKey:key fileURL:&fileURL];
-        
+        id object = [strongSelf objectForKey:key fileURL:&fileURL readBlock:readBlock];
+
         if (block) {
             [strongSelf lock];
                 block(strongSelf, key, object, fileURL);
             [strongSelf unlock];
         }
     });
+}
+
+- (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+{
+    [self objectForKey:key readBlock:NULL block:block];
 }
 
 - (void)fileURLForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
@@ -458,21 +463,26 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     });
 }
 
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(PINDiskCacheWriteBlock)writeBlock block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
-    
+
     dispatch_async(_asyncQueue, ^{
         PINDiskCache *strongSelf = weakSelf;
         NSURL *fileURL = nil;
-        [strongSelf setObject:object forKey:key fileURL:&fileURL];
-        
+        [strongSelf setObject:object forKey:key fileURL:&fileURL writeBlock:writeBlock];
+
         if (block) {
             [strongSelf lock];
-                block(strongSelf, key, object, fileURL);
+            block(strongSelf, key, object, fileURL);
             [strongSelf unlock];
         }
     });
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+{
+    [self setObject:object forKey:key writeBlock:nil block:block];
 }
 
 - (void)removeObjectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
@@ -585,10 +595,15 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (id <NSCoding>)objectForKey:(NSString *)key
 {
-    return [self objectForKey:key fileURL:nil];
+    return [self objectForKey:key fileURL:nil readBlock:nil];
 }
 
-- (id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (id)objectForKey:(NSString *)key readBlock:(PINDiskCacheReadBlock)readBlock
+{
+    return [self objectForKey:key fileURL:nil readBlock:readBlock];
+}
+
+- (id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL readBlock:(PINDiskCacheReadBlock)readBlock
 {
     NSDate *now = [[NSDate alloc] init];
     
@@ -604,7 +619,11 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             @try {
-                object = [NSKeyedUnarchiver unarchiveObjectWithFile:[fileURL path]];
+                if (readBlock) {
+                    object = readBlock(self, key, fileURL);
+                } else {
+                    object = [NSKeyedUnarchiver unarchiveObjectWithFile:[fileURL path]];
+                }
             }
             @catch (NSException *exception) {
                 NSError *error = nil;
@@ -646,11 +665,15 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key
 {
-    [self setObject:object forKey:key fileURL:nil];
+    [self setObject:object forKey:key fileURL:nil writeBlock:nil];
 }
 
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (void)setObject:(id)object forKey:(NSString *)key writeBlock:(PINDiskCacheWriteBlock)writeBlock
 {
+    [self setObject:object forKey:key fileURL:nil writeBlock:writeBlock];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL writeBlock:(PINDiskCacheWriteBlock)writeBlock {
     NSDate *now = [[NSDate alloc] init];
     
     if (!key || !object)
@@ -665,8 +688,13 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         
         if (self->_willAddObjectBlock)
             self->_willAddObjectBlock(self, key, object, fileURL);
-        
-        BOOL written = [NSKeyedArchiver archiveRootObject:object toFile:[fileURL path]];
+
+        BOOL written = NO;
+        if (writeBlock) {
+            written = writeBlock(self, key, fileURL, object);
+        } else {
+            written = [NSKeyedArchiver archiveRootObject:object toFile:[fileURL path]];
+        }
         
         if (written) {
             [self setFileModificationDate:now forURL:fileURL];

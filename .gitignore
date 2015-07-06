@@ -8,6 +8,20 @@
 *.perspectivev3
 *.xcworkspace
 xcuserdata
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+
+# AppCode
+.idea/
 
 #Ignore textmate build errors
 *.tm_build_errors
