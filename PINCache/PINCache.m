@@ -293,7 +293,7 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
     return byteCount;
 }
 
-- (id)objectForKey:(NSString *)key
+- (__nullable id)objectForKey:(NSString *)key
 {
     if (!key)
         return nil;
