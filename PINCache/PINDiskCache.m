@@ -583,12 +583,12 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     }
 }
 
-- (id <NSCoding>)objectForKey:(NSString *)key
+- (__nullable id<NSCoding>)objectForKey:(NSString *)key
 {
     return [self objectForKey:key fileURL:nil];
 }
 
-- (id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (__nullable id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
 {
     NSDate *now = [[NSDate alloc] init];
     
