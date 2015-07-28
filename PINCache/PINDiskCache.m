@@ -13,9 +13,9 @@
 __LINE__, [error localizedDescription]); }
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !defined(PIN_APP_EXTENSIONS)
-#define PINCacheStartBackgroundTask() UIBackgroundTaskIdentifier taskID = UIBackgroundTaskInvalid; \
+#define PINCacheStartBackgroundTask() __block UIBackgroundTaskIdentifier taskID = UIBackgroundTaskInvalid; \
 taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{ \
-[[UIApplication sharedApplication] endBackgroundTask:taskID]; }];
+[[UIApplication sharedApplication] endBackgroundTask:taskID]; taskID = UIBackgroundTaskInvalid; }];
 #define PINCacheEndBackgroundTask() [[UIApplication sharedApplication] endBackgroundTask:taskID];
 #else
 #define PINCacheStartBackgroundTask()
