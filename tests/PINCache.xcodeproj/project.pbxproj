@@ -25,7 +25,6 @@
 		D07F1EC2171AFB7A001DBA02 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EC1171AFB7A001DBA02 /* main.m */; };
 		D07F1EC6171AFB7A001DBA02 /* PINAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EC5171AFB7A001DBA02 /* PINAppDelegate.m */; };
 		D07F1ECC171AFB7A001DBA02 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = D07F1ECB171AFB7A001DBA02 /* Default-568h@2x.png */; };
-		D07F1ED4171AFB7A001DBA02 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1ED3171AFB7A001DBA02 /* SenTestingKit.framework */; };
 		D07F1ED5171AFB7A001DBA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB5171AFB7A001DBA02 /* UIKit.framework */; };
 		D07F1ED6171AFB7A001DBA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB7171AFB7A001DBA02 /* Foundation.framework */; };
 		D07F1EE1171AFB7A001DBA02 /* PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */; };
@@ -79,7 +78,6 @@
 		D07F1EC5171AFB7A001DBA02 /* PINAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PINAppDelegate.m; sourceTree = "<group>"; };
 		D07F1ECB171AFB7A001DBA02 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		D07F1ED2171AFB7A001DBA02 /* PINCacheTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PINCacheTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D07F1ED3171AFB7A001DBA02 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		D07F1EDB171AFB7A001DBA02 /* PINCacheTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PINCacheTests-Info.plist"; sourceTree = "<group>"; };
 		D07F1EDF171AFB7A001DBA02 /* PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheTests.h; sourceTree = "<group>"; };
 		D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINCacheTests.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -123,7 +121,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D07F1ED4171AFB7A001DBA02 /* SenTestingKit.framework in Frameworks */,
 				D07F1ED5171AFB7A001DBA02 /* UIKit.framework in Frameworks */,
 				D07F1ED6171AFB7A001DBA02 /* Foundation.framework in Frameworks */,
 			);
@@ -195,7 +192,6 @@
 				D07F1EB5171AFB7A001DBA02 /* UIKit.framework */,
 				D07F1EB7171AFB7A001DBA02 /* Foundation.framework */,
 				D07F1EB9171AFB7A001DBA02 /* CoreGraphics.framework */,
-				D07F1ED3171AFB7A001DBA02 /* SenTestingKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -355,7 +351,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = TM;
-				LastTestingUpgradeCheck = 0620;
+				LastTestingUpgradeCheck = 0640;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = Tumblr;
 				TargetAttributes = {
