@@ -19,8 +19,7 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 - (void)setUp
 {
     [super setUp];
-    
-    self.cache = [[PINCache alloc] initWithName:PINCacheTestName];
+    self.cache = [[PINCache alloc] initWithName:[[NSUUID UUID] UUIDString]];
     
     XCTAssertNotNil(self.cache, @"test cache does not exist");
 }
@@ -65,9 +64,10 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (void)testCoreProperties
 {
-    XCTAssertTrue([self.cache.name isEqualToString:PINCacheTestName], @"wrong name");
-    XCTAssertNotNil(self.cache.memoryCache, @"memory cache does not exist");
-    XCTAssertNotNil(self.cache.diskCache, @"disk cache doe not exist");
+    PINCache *cache = [[PINCache alloc] initWithName:PINCacheTestName];
+    XCTAssertTrue([cache.name isEqualToString:PINCacheTestName], @"wrong name");
+    XCTAssertNotNil(cache.memoryCache, @"memory cache does not exist");
+    XCTAssertNotNil(cache.diskCache, @"disk cache doe not exist");
 }
 
 - (void)testDiskCacheURL
@@ -492,32 +492,6 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     
     XCTAssert(memObj == nil, @"should not be in memory cache");
     XCTAssert(diskObj == nil, @"should not be in disk cache");
-}
-
-- (void)testCachesWithSameName
-{
-    PINCache* otherCache = [[PINCache alloc] initWithName:PINCacheTestName];
-
-    NSString *key = @"key";
-    __block UIImage *image = nil;
-    __block UIImage *otherImage = nil;
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    
-    [self.cache setObject:[self image] forKey:key block:^(PINCache *cache, NSString *key, id object) {
-        image = (UIImage *)object;
-        dispatch_semaphore_signal(semaphore);
-    }];
-    
-    dispatch_semaphore_wait(semaphore, [self timeout]);
-    
-    [otherCache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
-        otherImage = (UIImage *)object;
-        dispatch_semaphore_signal(semaphore);
-    }];
-
-    dispatch_semaphore_wait(semaphore, [self timeout]);
-
-    XCTAssertNotNil(otherImage, @"object set in cache was not available in another cache with the same name");
 }
 
 @end
