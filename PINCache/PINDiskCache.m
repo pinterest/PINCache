@@ -16,7 +16,9 @@ NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @interface PINBackgroundTask : NSObject
+#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 @property (atomic, assign) UIBackgroundTaskIdentifier taskID;
+#endif
 + (instancetype)start;
 - (void)end;
 @end
@@ -1044,7 +1046,9 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 - (instancetype)init
 {
     if (self = [super init]) {
+#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
         _taskID = UIBackgroundTaskInvalid;
+#endif
     }
     return self;
 }
@@ -1052,7 +1056,7 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 + (instancetype)start
 {
     PINBackgroundTask *task = [[self alloc] init];
-#if !defined(PIN_APP_EXTENSIONS)
+#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
     task.taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         UIBackgroundTaskIdentifier taskID = task.taskID;
         task.taskID = UIBackgroundTaskInvalid;
@@ -1064,7 +1068,7 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)end
 {
-#if !defined(PIN_APP_EXTENSIONS)
+#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
     UIBackgroundTaskIdentifier taskID = self.taskID;
     self.taskID = UIBackgroundTaskInvalid;
     [[UIApplication sharedApplication] endBackgroundTask:taskID];
