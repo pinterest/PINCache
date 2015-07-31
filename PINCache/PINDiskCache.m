@@ -89,14 +89,10 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", PINDiskCachePrefix, _name];
         _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
         
-        __weak PINDiskCache *weakSelf = self;
-        dispatch_async(_asyncQueue, ^{
-            PINDiskCache *strongSelf = weakSelf;
-            [strongSelf lock];
-                [strongSelf createCacheDirectory];
-                [strongSelf initializeDiskProperties];
-            [strongSelf unlock];
-        });
+        [self lock];
+            [self createCacheDirectory];
+            [self initializeDiskProperties];
+        [self unlock];
     }
     return self;
 }
