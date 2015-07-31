@@ -34,20 +34,6 @@
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "681E7A841B6C04D10026CEB5"
-               BuildableName = "PINCacheTests.xctest"
-               BlueprintName = "PINCacheTests copy"
-               ReferencedContainer = "container:PINCache.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -63,16 +49,6 @@
                BlueprintIdentifier = "D07F1ED1171AFB7A001DBA02"
                BuildableName = "PINCacheTests.xctest"
                BlueprintName = "PINCacheTests"
-               ReferencedContainer = "container:PINCache.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "681E7A841B6C04D10026CEB5"
-               BuildableName = "PINCacheTests.xctest"
-               BlueprintName = "PINCacheTests copy"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -115,6 +91,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "D07F1EB1171AFB7A001DBA02"
+            BuildableName = "PINCache.app"
+            BlueprintName = "PINCache"
+            ReferencedContainer = "container:PINCache.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
