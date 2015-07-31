@@ -1,5 +1,12 @@
-language: objective-c
-script: ./build_tests.sh
+# whitelist
 branches:
   only:
     - master
+language: objective-c
+env:
+    matrix:
+    - TEST_SDK=iphonesimulator7.0
+    - TEST_SDK=iphonesimulator7.1
+    - TEST_SDK=iphonesimulator8.1
+script:
+- xctool test -test-sdk $TEST_SDK -project tests/PINCache.xcodeproj -scheme PINCacheTests ONLY_ACTIVE_ARCH=NO
