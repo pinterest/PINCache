@@ -60,6 +60,11 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 #endif
 }
 
+- (instancetype)init {
+    @throw [NSException exceptionWithName:@"Must initialize with a name" reason:@"PINDiskCache must be initialized with a name. Call initWithName: instead." userInfo:nil];
+    return [self initWithName:@""];
+}
+
 - (instancetype)initWithName:(NSString *)name
 {
     return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
