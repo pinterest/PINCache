@@ -147,6 +147,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  */
 + (void)emptyTrash;
 
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  Multiple instances with the same name are allowed and can safely access

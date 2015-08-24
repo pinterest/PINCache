@@ -80,6 +80,8 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  */
 + (instancetype)sharedCache;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 /**
  Multiple instances with the same name are allowed and can safely access
  the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
