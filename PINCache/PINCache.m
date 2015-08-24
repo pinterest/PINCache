@@ -27,7 +27,8 @@ NSString * const PINCacheSharedName = @"PINCacheShared";
 }
 #endif
 
-- (instancetype)init {
+- (instancetype)init
+{
     @throw [NSException exceptionWithName:@"Must initialize with a name" reason:@"PINCache must be initialized with a name. Call initWithName: instead." userInfo:nil];
     return [self initWithName:@""];
 }
