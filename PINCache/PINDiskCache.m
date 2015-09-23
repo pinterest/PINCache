@@ -675,6 +675,10 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
             
             NSNumber *diskFileSize = [values objectForKey:NSURLTotalFileAllocatedSizeKey];
             if (diskFileSize) {
+                NSNumber *prevDiskFileSize = [self->_sizes objectForKey:key];
+                if (prevDiskFileSize) {
+                    self.byteCount = self->_byteCount - [prevDiskFileSize unsignedIntegerValue];
+                }
                 [self->_sizes setObject:diskFileSize forKey:key];
                 self.byteCount = self->_byteCount + [diskFileSize unsignedIntegerValue]; // atomic
             }
