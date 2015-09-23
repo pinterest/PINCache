@@ -241,6 +241,19 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertTrue(self.cache.diskByteCount > 0, @"disk cache byte count was not greater than zero");
 }
 
+- (void)testDiskByteCountWithExistingKey
+{
+    [self.cache setObject:[self image] forKey:@"image"];
+    NSUInteger initialDiskByteCount = self.cache.diskByteCount;
+    [self.cache setObject:[self image] forKey:@"image"];
+
+    XCTAssertTrue(self.cache.diskByteCount == initialDiskByteCount, @"disk cache byte count should not change by adding object with existing key and size");
+
+    [self.cache setObject:[self image] forKey:@"image2"];
+
+    XCTAssertTrue(self.cache.diskByteCount > initialDiskByteCount, @"disk cache byte count should increase with new key and object added to disk cache");
+}
+
 - (void)testOneThousandAndOneWrites
 {
     NSUInteger max = 1001;
