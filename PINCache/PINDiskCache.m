@@ -143,26 +143,14 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 {
     if (![string length])
         return @"";
-    
-    CFStringRef static const charsToEscape = CFSTR(".:/");
-    CFStringRef escapedString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
-                                                                        (__bridge CFStringRef)string,
-                                                                        NULL,
-                                                                        charsToEscape,
-                                                                        kCFStringEncodingUTF8);
-    return (__bridge_transfer NSString *)escapedString;
+   return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@".:/"]];
 }
 
 - (NSString *)decodedString:(NSString *)string
 {
     if (![string length])
         return @"";
-    
-    CFStringRef unescapedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
-                                                                                          (__bridge CFStringRef)string,
-                                                                                          CFSTR(""),
-                                                                                          kCFStringEncodingUTF8);
-    return (__bridge_transfer NSString *)unescapedString;
+   return [string stringByRemovingPercentEncoding];
 }
 
 #pragma mark - Private Trash Methods -
