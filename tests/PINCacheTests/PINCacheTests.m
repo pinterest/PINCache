@@ -62,6 +62,12 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 #pragma mark - Tests -
 
+- (void)testDiskCacheStringEncoding
+{
+    NSString *string =  [@"http://www.test.de-<CoolStuff>" stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
+    XCTAssertTrue([string isEqualToString:@"http%3A%2F%2Fwww%2Etest%2Ede-<CoolStuff>"]);
+}
+
 - (void)testCoreProperties
 {
     PINCache *cache = [[PINCache alloc] initWithName:PINCacheTestName];
