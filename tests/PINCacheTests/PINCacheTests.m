@@ -8,6 +8,12 @@
 NSString * const PINCacheTestName = @"PINCacheTest";
 NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
+@interface PINDiskCache()
+
+- (NSString *)encodedString:(NSString *)string;
+
+@end
+
 @interface PINCacheTests ()
 @property (strong, nonatomic) PINCache *cache;
 @end
@@ -64,7 +70,7 @@ NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (void)testDiskCacheStringEncoding
 {
-    NSString *string =  [@"http://www.test.de-<CoolStuff>" stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
+    NSString *string = [self.cache.diskCache encodedString:@"http://www.test.de-<CoolStuff>"];
     XCTAssertTrue([string isEqualToString:@"http%3A%2F%2Fwww%2Etest%2Ede-<CoolStuff>"]);
 }
 
