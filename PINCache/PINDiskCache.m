@@ -143,7 +143,7 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 {
     if (![string length])
         return @"";
-   return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@".:/"]];
+   return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
 }
 
 - (NSString *)decodedString:(NSString *)string
