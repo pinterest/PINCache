@@ -1,6 +1,31 @@
+### 2.1.2 -- 2015 Nov 19 ###
+
+- [fix] Fix disk caching bug due to incorrect string encoding [#42](https://github.com/pinterest/PINCache/pull/42)
+
+
+### 2.1.1 -- 2015 Nov 17 ###
+
+- [new] Added `tvOS` support
+- [fixed] PINDiskCache byteCount tracking bug [#30](https://github.com/pinterest/PINCache/pull/30)
+
+
+### 2.1 -- 2015 Aug 24 ###
+
+- [new] Xcode 7 support
+- [fixed] Invalid task ID's used for expiration handler on background tasks [#13](https://github.com/pinterest/PINCache/issues/13)
+- [fixed] Support for OS X since UIBackgroundTask is only on iOS [#19](https://github.com/pinterest/PINCache/pull/19)
+
+
+### 2.0.1 -- 2015 May 1 ###
+
+- [new] Added support for using PINCache in extensions
+- [new] Adopting nullability annotations.
+
+
 ### 2.0 -- 2015 February 25 ###
 
 - [fix] PINCache redesign to avoid deadlocks
+
 
 ### 1.2.3 -- 2014 December 13 ###
 
@@ -8,15 +33,18 @@
 - [fix] TMDiskCache: add try catch to ensure an exception isn’t thrown if a file on disk is unable to be unarchived (thanks [leonskywalker](https://github.com/tumblr/TMCache/pull/62)!)
 - [fix] TMDiskCache: create trash directory asynchronously to avoid race condition (thanks [napoapo77](https://github.com/tumblr/TMCache/pull/68)!)
 
+
 ### 1.2.2 -- 2014 October 6 ###
 
 - [new] Remove deprecated `documentation` property from Podspec
+
 
 ### 1.2.1 -- 2013 July 28 ###
 
 - [new] TMDiskCache: introduced concept of "trash" for rapid wipeouts
 - [new] TMDiskCache: `nil` checks to prevent crashes
 - [new] TMCache/TMDiskCache/TMMemoryCache: import Foundation to facilitate Swift usage
+
 
 ### 1.2.0 -- 2013 May 24 ###
 
