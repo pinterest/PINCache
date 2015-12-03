@@ -4,6 +4,9 @@
 
 #import "PINDiskCache.h"
 
+#import <sys/syslimits.h>
+#import <CommonCrypto/CommonCrypto.h>
+
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 #import <UIKit/UIKit.h>
 #endif
@@ -145,8 +148,9 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         return @"";
     }
     
+    NSString *encodedString;
     if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
-        return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
+        encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
     }
     else {
         CFStringRef static const charsToEscape = CFSTR(".:/");
@@ -158,8 +162,23 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
                                                                             charsToEscape,
                                                                             kCFStringEncodingUTF8);
 #pragma clang diagnostic pop
-        return (__bridge_transfer NSString *)escapedString;
+        encodedString = (__bridge_transfer NSString *)escapedString;
     }
+    
+    const char *fileSystemRepresentation = [encodedString fileSystemRepresentation];
+    size_t length = strlen(fileSystemRepresentation);
+    
+    if (length > NAME_MAX) {
+        //encoded string name will be too long for file representation, md5 and hope for no collisions.
+        unsigned char sha1Buffer[CC_SHA1_DIGEST_LENGTH];
+        CC_SHA1(fileSystemRepresentation, (CC_LONG)length, sha1Buffer);
+        encodedString = @"";
+        for (NSUInteger idx = 0; idx < CC_SHA1_DIGEST_LENGTH; idx++) {
+            encodedString = [encodedString stringByAppendingFormat:@"%02x", sha1Buffer[idx]];
+        }
+    }
+    
+    return encodedString;
 }
 
 - (NSString *)decodedString:(NSString *)string
