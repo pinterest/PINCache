@@ -16,7 +16,7 @@ NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @interface PINBackgroundTask : NSObject
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if !defined(NS_EXTENSION_UNAVAILABLE_IOS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 @property (atomic, assign) UIBackgroundTaskIdentifier taskID;
 #endif
 + (instancetype)start;
