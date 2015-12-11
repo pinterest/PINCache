@@ -3,9 +3,7 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import <Foundation/Foundation.h>
-#import "Nullability.h"
 
-NS_ASSUME_NONNULL_BEGIN
 
 @class PINDiskCache;
 
@@ -359,5 +357,3 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 - (void)enumerateObjectsWithBlock:(nullable PINDiskCacheObjectBlock)block;
 
 @end
-
-NS_ASSUME_NONNULL_END

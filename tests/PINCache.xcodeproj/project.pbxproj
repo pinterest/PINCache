@@ -35,8 +35,6 @@
 		D0E5D844171DF0AF0041E777 /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
 		D0E5D845171DF0AF0041E777 /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
 		D0E5D848171DF0FA0041E777 /* PINExampleView.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D847171DF0FA0041E777 /* PINExampleView.m */; };
-		E0BE3BFE1ABA6BD000B516E5 /* Nullability.h in Headers */ = {isa = PBXBuildFile; fileRef = E0BE3BFD1ABA6B6900B516E5 /* Nullability.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E0BE3BFF1ABA6BD700B516E5 /* Nullability.h in Headers */ = {isa = PBXBuildFile; fileRef = E0BE3BFD1ABA6B6900B516E5 /* Nullability.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,7 +87,6 @@
 		D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = PINMemoryCache.m; sourceTree = "<group>"; };
 		D0E5D846171DF0FA0041E777 /* PINExampleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINExampleView.h; sourceTree = "<group>"; };
 		D0E5D847171DF0FA0041E777 /* PINExampleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINExampleView.m; sourceTree = "<group>"; };
-		E0BE3BFD1ABA6B6900B516E5 /* Nullability.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Nullability.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,7 +229,6 @@
 		D0E5D839171DF0AF0041E777 /* PINCache */ = {
 			isa = PBXGroup;
 			children = (
-				E0BE3BFD1ABA6B6900B516E5 /* Nullability.h */,
 				D0E5D83A171DF0AF0041E777 /* PINCache.h */,
 				D0E5D83B171DF0AF0041E777 /* PINCache.m */,
 				D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */,
@@ -254,7 +250,6 @@
 				662900361A66B727009C10BD /* PINCache.h in Headers */,
 				662900481A66B831009C10BD /* PINMemoryCache.h in Headers */,
 				662900471A66B831009C10BD /* PINDiskCache.h in Headers */,
-				E0BE3BFF1ABA6BD700B516E5 /* Nullability.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,7 +260,6 @@
 				662900351A66B724009C10BD /* PINCache.h in Headers */,
 				662900461A66B830009C10BD /* PINMemoryCache.h in Headers */,
 				662900451A66B830009C10BD /* PINDiskCache.h in Headers */,
-				E0BE3BFE1ABA6BD000B516E5 /* Nullability.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -682,7 +676,7 @@
 				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
 				INFOPLIST_FILE = "PINCache/PINCache-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = PINCache;
 				WRAPPER_EXTENSION = app;
@@ -696,7 +690,7 @@
 				GCC_PREFIX_HEADER = "PINCache/PINCache-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
 				INFOPLIST_FILE = "PINCache/PINCache-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = PINCache;
 				WRAPPER_EXTENSION = app;

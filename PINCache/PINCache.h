@@ -7,7 +7,6 @@
 #import "PINDiskCache.h"
 #import "PINMemoryCache.h"
 
-NS_ASSUME_NONNULL_BEGIN
 
 @class PINCache;
 
@@ -199,5 +198,3 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
 - (void)removeAllObjects;
 
 @end
-
-NS_ASSUME_NONNULL_END
