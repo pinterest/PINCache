@@ -11,13 +11,13 @@
  A callback block which provides only the cache as an argument
  */
 
-typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
+typedef void (^PINDiskCacheBlock)(PINDiskCache * _Nonnull cache);
 
 /**
  A callback block which provides the cache, key and object as arguments
  */
 
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object, NSURL * __nullable fileURL);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id <NSCoding>  __nullable object, NSURL * __nullable fileURL);
 
 /**
  `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
@@ -52,7 +52,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
 /**
  The name of this cache, used to create a directory under Library/Caches and also appearing in stack traces.
  */
-@property (readonly) NSString *name;
+@property (readonly, nonnull) NSString *name;
 
 /**
  The URL of the directory used by this cache, usually `Library/Caches/com.pinterest.PINDiskCache.(name)`
@@ -60,7 +60,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @warning Do not interact with files under this URL except in <lockFileAccessWhileExecutingBlock:> or
  <synchronouslyLockFileAccessWhileExecutingBlock:>.
  */
-@property (readonly) NSURL *cacheURL;
+@property (readonly, nonnull) NSURL *cacheURL;
 
 /**
  The total number of bytes used on disk, as reported by `NSURLTotalFileAllocatedSizeKey`.
@@ -138,14 +138,14 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
++ (nonnull instancetype)sharedCache;
 
 /**
  Empties the trash with `DISPATCH_QUEUE_PRIORITY_BACKGROUND`. Does not use lock.
  */
 + (void)emptyTrash;
 
-- (instancetype)init NS_UNAVAILABLE;
+- (nonnull instancetype)init NS_UNAVAILABLE;
 
 /**
  Multiple instances with the same name are allowed and can safely access
@@ -155,7 +155,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param name The name of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name;
+- (nonnull instancetype)initWithName:(nonnull NSString *)name;
 
 /**
  The designated initializer. Multiple instances with the same name are allowed and can safely access
@@ -166,7 +166,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param rootPath The path of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods
@@ -188,7 +188,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)objectForKey:(nonnull NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Retrieves the fileURL for the specified key without actually reading the data from disk. This method
@@ -210,7 +210,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed serially after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)setObject:(nonnull id <NSCoding>)object forKey:(nonnull NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
@@ -219,7 +219,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key The key associated with the object to be removed.
  @param block A block to be executed serially after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)removeObjectForKey:(nonnull NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -228,7 +228,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(nullable PINDiskCacheBlock)block;
+- (void)trimToDate:(nonnull NSDate *)date block:(nullable PINDiskCacheBlock)block;
 
 /**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the specified byteCount.
@@ -265,7 +265,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed after the enumeration is complete.
  */
-- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(nonnull PINDiskCacheObjectBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -288,7 +288,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key The key associated with the object.
  @result The object for the specified key.
  */
-- (__nullable id <NSCoding>)objectForKey:(NSString *)key;
+- (nullable id <NSCoding>)objectForKey:(nonnull NSString *)key;
 
 /**
  Retrieves the file URL for the specified key. This method blocks the calling thread until the
@@ -299,7 +299,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key The key associated with the object.
  @result The file URL for the specified key.
  */
-- (NSURL *)fileURLForKey:(nullable NSString *)key;
+- (nullable NSURL *)fileURLForKey:(nullable NSString *)key;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until
@@ -309,7 +309,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+- (void)setObject:(nonnull id <NSCoding>)object forKey:(nonnull NSString *)key;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
@@ -317,7 +317,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  
  @param key The key associated with the object to be removed.
  */
-- (void)removeObjectForKey:(NSString *)key;
+- (void)removeObjectForKey:(nonnull NSString *)key;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
