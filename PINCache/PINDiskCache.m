@@ -141,16 +141,40 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (NSString *)encodedString:(NSString *)string
 {
-    if (![string length])
+    if (![string length]) {
         return @"";
-   return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
+    }
+    
+    if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
+        return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@".:/"]];
+    }
+    else {
+        CFStringRef static const charsToEscape = CFSTR(".:/");
+        CFStringRef escapedString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                            (__bridge CFStringRef)string,
+                                                                            NULL,
+                                                                            charsToEscape,
+                                                                            kCFStringEncodingUTF8);
+        return (__bridge_transfer NSString *)escapedString;
+    }
 }
 
 - (NSString *)decodedString:(NSString *)string
 {
-    if (![string length])
+    if (![string length]) {
         return @"";
-   return [string stringByRemovingPercentEncoding];
+    }
+    
+    if ([string respondsToSelector:@selector(stringByRemovingPercentEncoding)]) {
+        return [string stringByRemovingPercentEncoding];
+    }
+    else {
+        CFStringRef unescapedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
+                                                                                              (__bridge CFStringRef)string,
+                                                                                              CFSTR(""),
+                                                                                              kCFStringEncodingUTF8);
+        return (__bridge_transfer NSString *)unescapedString;
+    }
 }
 
 #pragma mark - Private Trash Methods -
