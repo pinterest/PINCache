@@ -45,16 +45,12 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (UIImage *)image
 {
-    static UIImage *image = nil;
-    
-    if (!image) {
-        NSError *error = nil;
-        NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"Default-568h@2x" withExtension:@"png"];
-        NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
-                                                          options:NSDataReadingUncached
-                                                            error:&error];
-        image = [[UIImage alloc] initWithData:imageData scale:2.f];
-    }
+    NSError *error = nil;
+    NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"Default-568h@2x" withExtension:@"png"];
+    NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
+                                                      options:NSDataReadingUncached
+                                                        error:&error];
+    UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.f];
 
     NSAssert(image, @"test image does not exist");
 
