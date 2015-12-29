@@ -12,8 +12,8 @@
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], \
 __LINE__, [error localizedDescription]); }
 
-NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
-NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
+static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
+static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @interface PINBackgroundTask : NSObject
 #if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
