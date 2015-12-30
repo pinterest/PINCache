@@ -552,4 +552,56 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssert(diskObj == nil, @"should not be in disk cache");
 }
 
+- (void)testWeakCache
+{
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    UIImage *image = [self image];
+    [self.cache setObject:image forKey:key];
+    [self.cache.memoryCache setAgeLimit:60];
+    [self.cache.diskCache setAgeLimit:60];
+
+    dispatch_group_t group = dispatch_group_create();
+
+    __block id memObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertNotNil(memObj, @"should still be in memory cache");
+
+    [self.cache removeObjectForKey:key];
+
+    memObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertNotNil(memObj, @"should still be in memory cache (weak cache)");
+
+    [self.cache removeObjectForKey:key];
+    image = nil;
+    memObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertNil(memObj, @"should not be in memory cache");
+}
+
 @end
