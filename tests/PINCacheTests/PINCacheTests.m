@@ -497,6 +497,9 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     [self.cache.memoryCache setAgeLimit:1];
     [self.cache.diskCache setAgeLimit:1];
     
+    memObj = nil;
+    diskObj = nil;
+
     dispatch_group_enter(group);
     [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
         memObj = object;
