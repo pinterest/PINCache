@@ -184,11 +184,23 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 {
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
+
+    NSString *value1 = nil;
+    NSString *value2 = nil;
+
+    @autoreleasepool {
+        value1 = [NSString stringWithFormat:@"value for %@", key1];
+        value2 = [NSString stringWithFormat:@"value for %@", key2];
+    }
+
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    
-    [self.cache setObject:key1 forKey:key1];
-    [self.cache setObject:key2 forKey:key2];
-    
+
+    [self.cache setObject:value1 forKey:key1];
+    [self.cache setObject:value2 forKey:key2];
+
+    value1 = nil;
+    value2 = nil;
+
     [self.cache removeAllObjects:^(PINCache *cache) {
         dispatch_semaphore_signal(semaphore);
     }];
@@ -209,9 +221,20 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
 
-    [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
-    [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
-    
+    NSString *value1 = nil;
+    NSString *value2 = nil;
+
+    @autoreleasepool {
+        value1 = [NSString stringWithFormat:@"value for %@", key1];
+        value2 = [NSString stringWithFormat:@"value for %@", key2];
+    }
+
+    [self.cache.memoryCache setObject:value1 forKey:key1 withCost:1];
+    [self.cache.memoryCache setObject:value2 forKey:key2 withCost:2];
+
+    value1 = nil;
+    value2 = nil;
+
     XCTAssertTrue(self.cache.memoryCache.totalCost == 3, @"memory cache total cost was incorrect");
 
     [self.cache.memoryCache trimToCost:1];
@@ -229,8 +252,19 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
 
-    [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
-    [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
+    NSString *value1 = nil;
+    NSString *value2 = nil;
+
+    @autoreleasepool {
+        value1 = [NSString stringWithFormat:@"value for %@", key1];
+        value2 = [NSString stringWithFormat:@"value for %@", key2];
+    }
+
+    [self.cache.memoryCache setObject:value1 forKey:key1 withCost:1];
+    [self.cache.memoryCache setObject:value2 forKey:key2 withCost:2];
+
+    value1 = nil;
+    value2 = nil;
 
     [self.cache.memoryCache trimToCostByDate:1];
 
