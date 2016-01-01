@@ -5,8 +5,8 @@
 #import "PINCacheTests.h"
 #import "PINCache.h"
 
-NSString * const PINCacheTestName = @"PINCacheTest";
-NSTimeInterval PINCacheTestBlockTimeout = 5.0;
+static NSString * const PINCacheTestName = @"PINCacheTest";
+static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 @interface PINDiskCache()
 

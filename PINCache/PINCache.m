@@ -4,8 +4,8 @@
 
 #import "PINCache.h"
 
-NSString * const PINCachePrefix = @"com.pinterest.PINCache";
-NSString * const PINCacheSharedName = @"PINCacheShared";
+static NSString * const PINCachePrefix = @"com.pinterest.PINCache";
+static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 @interface PINCache ()
 #if OS_OBJECT_USE_OBJC
