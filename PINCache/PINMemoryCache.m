@@ -383,8 +383,6 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (__nullable id)objectForKey:(NSString *)key
 {
-    NSDate *now = [[NSDate alloc] init];
-    
     if (!key)
         return nil;
     
@@ -394,7 +392,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         
     if (object) {
         [self lock];
-            _dates[key] = now;
+            _dates[key] = [[NSDate alloc] init];
         [self unlock];
     }
 
@@ -408,8 +406,6 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost
 {
-    NSDate *now = [[NSDate alloc] init];
-    
     if (!key || !object)
         return;
     
@@ -424,7 +420,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     [self lock];
         _dictionary[key] = object;
-        _dates[key] = now;
+        _dates[key] = [[NSDate alloc] init];
         _costs[key] = @(cost);
         
         _totalCost += cost;
