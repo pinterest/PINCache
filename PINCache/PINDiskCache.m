@@ -141,16 +141,46 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (NSString *)encodedString:(NSString *)string
 {
-    if (![string length])
+    if (![string length]) {
         return @"";
-   return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
+    }
+    
+    if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
+        return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/"] invertedSet]];
+    }
+    else {
+        CFStringRef static const charsToEscape = CFSTR(".:/");
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        CFStringRef escapedString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                            (__bridge CFStringRef)string,
+                                                                            NULL,
+                                                                            charsToEscape,
+                                                                            kCFStringEncodingUTF8);
+#pragma clang diagnostic pop
+        return (__bridge_transfer NSString *)escapedString;
+    }
 }
 
 - (NSString *)decodedString:(NSString *)string
 {
-    if (![string length])
+    if (![string length]) {
         return @"";
-   return [string stringByRemovingPercentEncoding];
+    }
+    
+    if ([string respondsToSelector:@selector(stringByRemovingPercentEncoding)]) {
+        return [string stringByRemovingPercentEncoding];
+    }
+    else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        CFStringRef unescapedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
+                                                                                              (__bridge CFStringRef)string,
+                                                                                              CFSTR(""),
+                                                                                              kCFStringEncodingUTF8);
+#pragma clang diagnostic pop
+        return (__bridge_transfer NSString *)unescapedString;
+    }
 }
 
 #pragma mark - Private Trash Methods -
