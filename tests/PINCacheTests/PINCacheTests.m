@@ -519,4 +519,16 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssert(diskObj == nil, @"should not be in disk cache");
 }
 
+- (void)testLongKey
+{
+    [self.cache removeAllObjects];
+    NSString *longKey = @"Sweet roll icing tootsie roll cheesecake marzipan croissant apple pie jelly-o. Chocolate bar lollipop halvah. Sweet liquorice chupa chups jelly beans soufflé. Pastry danish croissant sesame snaps fruitcake. Liquorice biscuit gummi bears. Pudding icing cookie chocolate bar. Danish muffin liquorice. Pie tart carrot cake. Lemon drops lollipop danish chocolate. Wafer pudding icing muffin. Sugar plum pudding cupcake chocolate cake tart wafer. Icing lemon drops cake lollipop. Bonbon tootsie roll ice cream halvah wafer lollipop. Jelly-o brownie ice cream chocolate cake lemon drops fruitcake sweet roll.";
+    [self.cache setObject:[self image] forKey:longKey];
+    [self.cache.memoryCache removeObjectForKey:longKey];
+    
+    UIImage *diskObj = [self.cache objectForKey:longKey];
+    
+    XCTAssertNotNil(diskObj, @"object should still be in disk cache");
+}
+
 @end
