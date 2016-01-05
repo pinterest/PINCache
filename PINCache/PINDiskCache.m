@@ -238,17 +238,17 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     PINBackgroundTask *task = [PINBackgroundTask start];
     
     dispatch_async([self sharedTrashQueue], ^{
-        NSError *error = nil;
+        NSError *searchTrashedItemsError = nil;
         NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
                                                               includingPropertiesForKeys:nil
                                                                                  options:0
-                                                                                   error:&error];
-        PINDiskCacheError(error);
+                                                                                   error:&searchTrashedItemsError];
+        PINDiskCacheError(searchTrashedItemsError);
         
         for (NSURL *trashedItemURL in trashedItems) {
-            NSError *error = nil;
-            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&error];
-            PINDiskCacheError(error);
+            NSError *removeTrashedItemError = nil;
+            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
+            PINDiskCacheError(removeTrashedItemError);
         }
         
         [task end];
