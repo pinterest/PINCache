@@ -169,13 +169,17 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     size_t length = strlen(fileSystemRepresentation);
     
     if (length > NAME_MAX) {
-        //encoded string name will be too long for file representation, md5 and hope for no collisions.
+        //encoded string name will be too long for file representation, sha1 and hope for no collisions.
         unsigned char sha1Buffer[CC_SHA1_DIGEST_LENGTH];
         CC_SHA1(fileSystemRepresentation, (CC_LONG)length, sha1Buffer);
-        encodedString = @"";
+        
+        static char const *hexChars = "0123456789ABCDEF";
+        char hexString[CC_SHA1_DIGEST_LENGTH * 2];
         for (NSUInteger idx = 0; idx < CC_SHA1_DIGEST_LENGTH; idx++) {
-            encodedString = [encodedString stringByAppendingFormat:@"%02x", sha1Buffer[idx]];
+            hexString[(idx * 2)] = hexChars[(sha1Buffer[idx] & 0xF0) >> 4];
+            hexString[(idx * 2) + 1] = hexChars[sha1Buffer[idx] & 0x0F];
         }
+        encodedString = [NSString stringWithUTF8String:hexString];
     }
     
     return encodedString;
