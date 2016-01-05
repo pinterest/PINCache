@@ -203,8 +203,10 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)trimToCostLimit:(NSUInteger)limit
 {
+    NSUInteger totalCost = 0;
+    
     [self lock];
-        NSUInteger totalCost = _totalCost;
+        totalCost = _totalCost;
         NSArray *keysSortedByCost = [_costs keysSortedByValueUsingSelector:@selector(compare:)];
     [self unlock];
     
@@ -216,7 +218,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         [self removeObjectAndExecuteBlocksForKey:key];
 
         [self lock];
-            NSUInteger totalCost = _totalCost;
+            totalCost = _totalCost;
         [self unlock];
         
         if (totalCost <= limit)
@@ -226,8 +228,10 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)trimToCostLimitByDate:(NSUInteger)limit
 {
+    NSUInteger totalCost = 0;
+    
     [self lock];
-        NSUInteger totalCost = _totalCost;
+        totalCost = _totalCost;
         NSArray *keysSortedByDate = [_dates keysSortedByValueUsingSelector:@selector(compare:)];
     [self unlock];
     
@@ -238,7 +242,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         [self removeObjectAndExecuteBlocksForKey:key];
 
         [self lock];
-            NSUInteger totalCost = _totalCost;
+            totalCost = _totalCost;
         [self unlock];
         if (totalCost <= limit)
             break;
