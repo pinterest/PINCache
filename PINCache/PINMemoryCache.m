@@ -59,7 +59,9 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         _concurrentQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _dictionary = [[NSMutableDictionary alloc] init];
-        _weakMapTable = [NSMapTable strongToWeakObjectsMapTable];
+        if ([[NSMapTable class] respondsToSelector:@selector(strongToWeakObjectsMapTable)]) {
+            _weakMapTable = [NSMapTable strongToWeakObjectsMapTable];
+        }
         _dates = [[NSMutableDictionary alloc] init];
         _costs = [[NSMutableDictionary alloc] init];
 
