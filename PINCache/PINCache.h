@@ -36,8 +36,6 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  
  The parallel caches are accessible as public properties (<memoryCache> and <diskCache>) and can be manipulated
  separately if necessary. See the docs for <PINMemoryCache> and <PINDiskCache> for more details.
-
- @warning when using in extension or watch extension, define PIN_APP_EXTENSIONS=1
  */
 
 @interface PINCache : NSObject
