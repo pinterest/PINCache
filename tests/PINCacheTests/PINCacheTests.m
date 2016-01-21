@@ -70,8 +70,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (void)testDiskCacheStringEncoding
 {
-    NSString *string = [self.cache.diskCache encodedString:@"http://www.test.de-<CoolStuff>"];
-    XCTAssertTrue([string isEqualToString:@"http%3A%2F%2Fwww%2Etest%2Ede-<CoolStuff>"]);
+    NSString *string = [self.cache.diskCache encodedString:@"http://www.test.de-<CoolStuff>?%"];
+    XCTAssertTrue([string isEqualToString:@"http%3A%2F%2Fwww%2Etest%2Ede-<CoolStuff>?%25"]);
 }
 
 - (void)testCoreProperties
