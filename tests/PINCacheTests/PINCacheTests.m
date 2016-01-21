@@ -45,16 +45,12 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (UIImage *)image
 {
-    static UIImage *image = nil;
-    
-    if (!image) {
-        NSError *error = nil;
-        NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"Default-568h@2x" withExtension:@"png"];
-        NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
-                                                          options:NSDataReadingUncached
-                                                            error:&error];
-        image = [[UIImage alloc] initWithData:imageData scale:2.f];
-    }
+    NSError *error = nil;
+    NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"Default-568h@2x" withExtension:@"png"];
+    NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
+                                                      options:NSDataReadingUncached
+                                                        error:&error];
+    UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.f];
 
     NSAssert(image, @"test image does not exist");
 
@@ -188,11 +184,23 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 {
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
+
+    NSString *value1 = nil;
+    NSString *value2 = nil;
+
+    @autoreleasepool {
+        value1 = [NSString stringWithFormat:@"value for %@", key1];
+        value2 = [NSString stringWithFormat:@"value for %@", key2];
+    }
+
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    
-    [self.cache setObject:key1 forKey:key1];
-    [self.cache setObject:key2 forKey:key2];
-    
+
+    [self.cache setObject:value1 forKey:key1];
+    [self.cache setObject:value2 forKey:key2];
+
+    value1 = nil;
+    value2 = nil;
+
     [self.cache removeAllObjects:^(PINCache *cache) {
         dispatch_semaphore_signal(semaphore);
     }];
@@ -213,9 +221,20 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
 
-    [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
-    [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
-    
+    NSString *value1 = nil;
+    NSString *value2 = nil;
+
+    @autoreleasepool {
+        value1 = [NSString stringWithFormat:@"value for %@", key1];
+        value2 = [NSString stringWithFormat:@"value for %@", key2];
+    }
+
+    [self.cache.memoryCache setObject:value1 forKey:key1 withCost:1];
+    [self.cache.memoryCache setObject:value2 forKey:key2 withCost:2];
+
+    value1 = nil;
+    value2 = nil;
+
     XCTAssertTrue(self.cache.memoryCache.totalCost == 3, @"memory cache total cost was incorrect");
 
     [self.cache.memoryCache trimToCost:1];
@@ -233,8 +252,19 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
 
-    [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
-    [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
+    NSString *value1 = nil;
+    NSString *value2 = nil;
+
+    @autoreleasepool {
+        value1 = [NSString stringWithFormat:@"value for %@", key1];
+        value2 = [NSString stringWithFormat:@"value for %@", key2];
+    }
+
+    [self.cache.memoryCache setObject:value1 forKey:key1 withCost:1];
+    [self.cache.memoryCache setObject:value2 forKey:key2 withCost:2];
+
+    value1 = nil;
+    value2 = nil;
 
     [self.cache.memoryCache trimToCostByDate:1];
 
@@ -501,6 +531,9 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     [self.cache.memoryCache setAgeLimit:1];
     [self.cache.diskCache setAgeLimit:1];
     
+    memObj = nil;
+    diskObj = nil;
+
     dispatch_group_enter(group);
     [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
         memObj = object;
@@ -517,6 +550,58 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     
     XCTAssert(memObj == nil, @"should not be in memory cache");
     XCTAssert(diskObj == nil, @"should not be in disk cache");
+}
+
+- (void)testWeakCache
+{
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    UIImage *image = [self image];
+    [self.cache setObject:image forKey:key];
+    [self.cache.memoryCache setAgeLimit:60];
+    [self.cache.diskCache setAgeLimit:60];
+
+    dispatch_group_t group = dispatch_group_create();
+
+    __block id memObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertNotNil(memObj, @"should still be in memory cache");
+
+    [self.cache removeObjectForKey:key];
+
+    memObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertNotNil(memObj, @"should still be in memory cache (weak cache)");
+
+    [self.cache removeObjectForKey:key];
+    image = nil;
+    memObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    XCTAssertNil(memObj, @"should not be in memory cache");
 }
 
 @end

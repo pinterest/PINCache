@@ -19,6 +19,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 @property (assign, nonatomic) dispatch_semaphore_t lockSemaphore;
 #endif
 @property (strong, nonatomic) NSMutableDictionary *dictionary;
+@property (strong, nonatomic) NSMapTable *weakMapTable;
 @property (strong, nonatomic) NSMutableDictionary *dates;
 @property (strong, nonatomic) NSMutableDictionary *costs;
 @end
@@ -58,6 +59,9 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         _concurrentQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
         _dictionary = [[NSMutableDictionary alloc] init];
+        if ([[NSMapTable class] respondsToSelector:@selector(strongToWeakObjectsMapTable)]) {
+            _weakMapTable = [NSMapTable strongToWeakObjectsMapTable];
+        }
         _dates = [[NSMutableDictionary alloc] init];
         _costs = [[NSMutableDictionary alloc] init];
 
@@ -392,11 +396,17 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     [self lock];
         id object = _dictionary[key];
+
+        if (!object) {
+            object = [_weakMapTable objectForKey:key];
+        }
     [self unlock];
         
     if (object) {
         [self lock];
             _dates[key] = [[NSDate alloc] init];
+            _dictionary[key] = object;
+            [_weakMapTable setObject:object forKey:key];
         [self unlock];
     }
 
@@ -424,6 +434,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     [self lock];
         _dictionary[key] = object;
+        [_weakMapTable setObject:object forKey:key];
         _dates[key] = [[NSDate alloc] init];
         _costs[key] = @(cost);
         
