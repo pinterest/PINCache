@@ -12,8 +12,8 @@
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], \
 __LINE__, [error localizedDescription]); }
 
-NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
-NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
+static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
+static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @interface PINBackgroundTask : NSObject
 #if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
@@ -141,16 +141,46 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (NSString *)encodedString:(NSString *)string
 {
-    if (![string length])
+    if (![string length]) {
         return @"";
-   return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@".:/"]];
+    }
+    
+    if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
+        return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
+    }
+    else {
+        CFStringRef static const charsToEscape = CFSTR(".:/%");
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        CFStringRef escapedString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                            (__bridge CFStringRef)string,
+                                                                            NULL,
+                                                                            charsToEscape,
+                                                                            kCFStringEncodingUTF8);
+#pragma clang diagnostic pop
+        return (__bridge_transfer NSString *)escapedString;
+    }
 }
 
 - (NSString *)decodedString:(NSString *)string
 {
-    if (![string length])
+    if (![string length]) {
         return @"";
-   return [string stringByRemovingPercentEncoding];
+    }
+    
+    if ([string respondsToSelector:@selector(stringByRemovingPercentEncoding)]) {
+        return [string stringByRemovingPercentEncoding];
+    }
+    else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        CFStringRef unescapedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
+                                                                                              (__bridge CFStringRef)string,
+                                                                                              CFSTR(""),
+                                                                                              kCFStringEncodingUTF8);
+#pragma clang diagnostic pop
+        return (__bridge_transfer NSString *)unescapedString;
+    }
 }
 
 #pragma mark - Private Trash Methods -
@@ -208,17 +238,17 @@ NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     PINBackgroundTask *task = [PINBackgroundTask start];
     
     dispatch_async([self sharedTrashQueue], ^{
-        NSError *error = nil;
+        NSError *searchTrashedItemsError = nil;
         NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
                                                               includingPropertiesForKeys:nil
                                                                                  options:0
-                                                                                   error:&error];
-        PINDiskCacheError(error);
+                                                                                   error:&searchTrashedItemsError];
+        PINDiskCacheError(searchTrashedItemsError);
         
         for (NSURL *trashedItemURL in trashedItems) {
-            NSError *error = nil;
-            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&error];
-            PINDiskCacheError(error);
+            NSError *removeTrashedItemError = nil;
+            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
+            PINDiskCacheError(removeTrashedItemError);
         }
         
         [task end];

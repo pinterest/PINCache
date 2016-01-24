@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'PINCache'
-  s.version       = '2.1'
+  s.version       = '2.1.2'
   s.source_files  = 'PINCache/*.{h,m}'
   s.homepage      = 'https://github.com/pinterest/PINCache'
   s.summary       = 'Fast, thread safe, parallel object cache for iOS and OS X.'
@@ -13,4 +13,6 @@ Pod::Spec.new do |s|
   s.osx.weak_frameworks   = 'AppKit'
   s.ios.deployment_target = '5.0'
   s.osx.deployment_target = '10.7'
+  s.tvos.deployment_target = '9.0'
+  s.watchos.deployment_target = '2.0'
 end
