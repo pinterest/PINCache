@@ -1059,6 +1059,16 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     });
 }
 
+- (BOOL)isTTLCache {
+    BOOL isTTLCache;
+    
+    [self lock];
+        isTTLCache = _ttlCache;
+    [self unlock];
+  
+    return isTTLCache;
+}
+
 - (void)lock
 {
     dispatch_semaphore_wait(_lockSemaphore, DISPATCH_TIME_FOREVER);

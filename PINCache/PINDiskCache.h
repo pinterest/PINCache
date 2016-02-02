@@ -105,7 +105,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
       the cache will behave as if the object does not exist
  
  */
-@property (assign, getter=isTTLCache) BOOL ttlCache;
+@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache;
 
 #pragma mark -
 /// @name Event Blocks

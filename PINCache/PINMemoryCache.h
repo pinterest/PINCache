@@ -73,7 +73,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  the cache will behave as if the object does not exist
  
  */
-@property (assign, getter=isTTLCache) BOOL ttlCache;
+@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache;
 
 /**
  When `YES` on iOS the cache will remove all objects when the app receives a memory warning.
