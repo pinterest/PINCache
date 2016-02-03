@@ -97,8 +97,15 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", PINDiskCachePrefix, _name];
         _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
         
-        [self createCacheDirectory];
-        [self initializeDiskProperties];
+        //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
+        //this is only safe because we use a dispatch_semaphore as a lock. If we switch to an NSLock or posix locks, this will *no longer be safe*.
+        [self lock];
+        dispatch_async(_asyncQueue, ^{
+            [self createCacheDirectory];
+            [self initializeDiskProperties];
+
+            [self unlock];
+        });
     }
     return self;
 }
