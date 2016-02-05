@@ -48,6 +48,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 @synthesize didRemoveAllObjectsBlock = _didRemoveAllObjectsBlock;
 @synthesize byteLimit = _byteLimit;
 @synthesize ageLimit = _ageLimit;
+@synthesize ttlCache = _ttlCache;
 
 #pragma mark - Initialization -
 
@@ -1067,6 +1068,20 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     [self unlock];
   
     return isTTLCache;
+}
+
+- (void)setTtlCache:(BOOL)ttlCache {
+    __weak PINDiskCache *weakSelf = self;
+
+    dispatch_async(_asyncQueue, ^{
+        PINDiskCache *strongSelf = weakSelf;
+        if (!strongSelf)
+            return;
+
+        [strongSelf lock];
+            strongSelf->_ttlCache = ttlCache;
+        [strongSelf unlock];
+    });
 }
 
 - (void)lock

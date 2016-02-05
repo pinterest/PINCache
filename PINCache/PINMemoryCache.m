@@ -28,6 +28,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 @synthesize ageLimit = _ageLimit;
 @synthesize costLimit = _costLimit;
 @synthesize totalCost = _totalCost;
+@synthesize ttlCache = _ttlCache;
 @synthesize willAddObjectBlock = _willAddObjectBlock;
 @synthesize willRemoveObjectBlock = _willRemoveObjectBlock;
 @synthesize willRemoveAllObjectsBlock = _willRemoveAllObjectsBlock;
@@ -699,6 +700,13 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     return isTTLCache;
 }
+
+- (void)setTtlCache:(BOOL)ttlCache {
+    [self lock];
+        _ttlCache = ttlCache;
+    [self unlock];
+}
+
 
 - (void)lock
 {
