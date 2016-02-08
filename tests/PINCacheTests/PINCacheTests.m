@@ -519,4 +519,123 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssert(diskObj == nil, @"should not be in disk cache");
 }
 
+- (void)testTTLCacheObjectAccess {
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    [self.cache.memoryCache setAgeLimit:2];
+    [self.cache.diskCache setAgeLimit:2];
+
+
+    // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cach clearing
+    sleep(1);
+    [self.cache setObject:[self image] forKey:key];
+
+    // Wait until time 3 so that we know the object should be expired, the 1st cache clearing has happened, and the 2nd cache clearing hasn't happened yet
+    sleep(2);
+
+    [self.cache.diskCache setTtlCache:YES];
+    [self.cache.memoryCache setTtlCache:YES];
+
+    dispatch_group_t group = dispatch_group_create();
+
+    __block id memObj = nil;
+    __block id diskObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        diskObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    // If the cache is supposed to behave like a TTL cache, then the object shouldn't appear to be in the cache
+    XCTAssertNil(memObj, @"should not be in memory cache");
+    XCTAssertNil(diskObj, @"should not be in disk cache");
+
+    [self.cache.diskCache setTtlCache:NO];
+    [self.cache.memoryCache setTtlCache:NO];
+
+    memObj = nil;
+    diskObj = nil;
+
+    dispatch_group_enter(group);
+    [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        diskObj = object;
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+     // If the cache is NOT supposed to behave like a TTL cache, then the object should appear to be in the cache because it hasn't been cleared yet
+    XCTAssertNotNil(memObj, @"should still be in memory cache");
+    XCTAssertNotNil(diskObj, @"should still be in disk cache");
+}
+
+- (void)testTTLCacheObjectEnumeration {
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    [self.cache.memoryCache setAgeLimit:2];
+    [self.cache.diskCache setAgeLimit:2];
+
+
+    // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cach clearing
+    sleep(1);
+    [self.cache setObject:[self image] forKey:key];
+
+    // Wait until time 3 so that we know the object should be expired, the 1st cache clearing has happened, and the 2nd cache clearing hasn't happened yet
+    sleep(2);
+
+    [self.cache.diskCache setTtlCache:YES];
+    [self.cache.memoryCache setTtlCache:YES];
+
+    // With the TTL cache enabled, we expect enumerating over the caches to yield 0 objects
+    NSUInteger expectedObjCount = 0;
+    __block NSUInteger objCount = 0;
+    [self.cache.diskCache enumerateObjectsWithBlock:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL * _Nullable fileURL) {
+      objCount++;
+    }];
+
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+
+    objCount = 0;
+    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      objCount++;
+    }];
+
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+
+    [self.cache.diskCache setTtlCache:NO];
+    [self.cache.memoryCache setTtlCache:NO];
+
+
+    // With the TTL cache disabled, we expect enumerating over the caches to yield 1 object each, since the 2nd cache clearing hasn't happened yet
+    expectedObjCount = 1;
+    objCount = 0;
+    [self.cache.diskCache enumerateObjectsWithBlock:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL * _Nullable fileURL) {
+      objCount++;
+    }];
+
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+
+    objCount = 0;
+    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      objCount++;
+    }];
+
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+}
+
+
 @end

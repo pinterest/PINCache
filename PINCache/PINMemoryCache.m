@@ -28,6 +28,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 @synthesize ageLimit = _ageLimit;
 @synthesize costLimit = _costLimit;
 @synthesize totalCost = _totalCost;
+@synthesize ttlCache = _ttlCache;
 @synthesize willAddObjectBlock = _willAddObjectBlock;
 @synthesize willRemoveObjectBlock = _willRemoveObjectBlock;
 @synthesize willRemoveAllObjectsBlock = _willRemoveAllObjectsBlock;
@@ -390,13 +391,18 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     if (!key)
         return nil;
     
+    NSDate *now = [[NSDate alloc] init];
     [self lock];
-        id object = _dictionary[key];
+        id object = nil;
+        // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
+        if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
+            object = _dictionary[key];
+        }
     [self unlock];
         
     if (object) {
         [self lock];
-            _dates[key] = [[NSDate alloc] init];
+            _dates[key] = now;
         [self unlock];
     }
 
@@ -497,10 +503,14 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         return;
     
     [self lock];
+        NSDate *now = [[NSDate alloc] init];
         NSArray *keysSortedByDate = [_dates keysSortedByValueUsingSelector:@selector(compare:)];
         
         for (NSString *key in keysSortedByDate) {
-            block(self, key, _dictionary[key]);
+            // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
+            if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
+                block(self, key, _dictionary[key]);
+            }
         }
     [self unlock];
 }
@@ -680,6 +690,23 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     
     return cost;
 }
+
+- (BOOL)isTTLCache {
+    BOOL isTTLCache;
+    
+    [self lock];
+        isTTLCache = _ttlCache;
+    [self unlock];
+    
+    return isTTLCache;
+}
+
+- (void)setTtlCache:(BOOL)ttlCache {
+    [self lock];
+        _ttlCache = ttlCache;
+    [self unlock];
+}
+
 
 - (void)lock
 {

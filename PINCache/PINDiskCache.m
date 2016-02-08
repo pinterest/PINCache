@@ -48,6 +48,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 @synthesize didRemoveAllObjectsBlock = _didRemoveAllObjectsBlock;
 @synthesize byteLimit = _byteLimit;
 @synthesize ageLimit = _ageLimit;
+@synthesize ttlCache = _ttlCache;
 
 #pragma mark - Initialization -
 
@@ -625,7 +626,9 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         fileURL = [self encodedFileURLForKey:key];
         object = nil;
         
-        if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]] &&
+            // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
+            (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit)) {
             @try {
                 object = [NSKeyedUnarchiver unarchiveObjectWithFile:[fileURL path]];
             }
@@ -634,8 +637,9 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
                 [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
                 PINDiskCacheError(error);
             }
-            
+          if (!self->_ttlCache) {
             [self setFileModificationDate:now forURL:fileURL];
+          }
         }
     [self unlock];
     
@@ -834,11 +838,15 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     PINBackgroundTask *task = [PINBackgroundTask start];
     
     [self lock];
+        NSDate *now = [NSDate date];
         NSArray *keysSortedByDate = [self->_dates keysSortedByValueUsingSelector:@selector(compare:)];
         
         for (NSString *key in keysSortedByDate) {
             NSURL *fileURL = [self encodedFileURLForKey:key];
-            block(self, key, nil, fileURL);
+            // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
+            if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
+                block(self, key, nil, fileURL);
+            }
         }
     [self unlock];
     
@@ -1056,6 +1064,30 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         [strongSelf unlock];
         
         [strongSelf trimToAgeLimitRecursively];
+    });
+}
+
+- (BOOL)isTTLCache {
+    BOOL isTTLCache;
+    
+    [self lock];
+        isTTLCache = _ttlCache;
+    [self unlock];
+  
+    return isTTLCache;
+}
+
+- (void)setTtlCache:(BOOL)ttlCache {
+    __weak PINDiskCache *weakSelf = self;
+
+    dispatch_async(_asyncQueue, ^{
+        PINDiskCache *strongSelf = weakSelf;
+        if (!strongSelf)
+            return;
+
+        [strongSelf lock];
+            strongSelf->_ttlCache = ttlCache;
+        [strongSelf unlock];
     });
 }
 
