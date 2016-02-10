@@ -1,3 +1,7 @@
+### 2.2 -- 2016 Feb 10 ###
+
+- [new] Allow caches to behave like a TTLCache [#66](https://github.com/pinterest/PINCache/pull/66)
+
 ### 2.1.2 -- 2015 Nov 19 ###
 
 - [fix] Fix disk caching bug due to incorrect string encoding [#42](https://github.com/pinterest/PINCache/pull/42)
