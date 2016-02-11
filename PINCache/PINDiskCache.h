@@ -169,8 +169,22 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  */
 - (instancetype)initWithName:(NSString *)name;
 
+#if !TARGET_OS_WATCH
 /**
- The designated initializer. Multiple instances with the same name are allowed and can safely access
+ Multiple instances with the same name are allowed and can safely access
+ the same data on disk thanks to the magic of seriality.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache.
+ @result A new cache with the specified name.
+ @note Using this initializer will cause the disk cache to create UIApplication background tasks during critical operations. This behavior is not available in extensions or watchOS
+ */
+- (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER NS_EXTENSION_UNAVAILABLE_IOS("Use initWithName:rootPath: instead.");
+#endif
+
+/**
+ Multiple instances with the same name are allowed and can safely access
  the same data on disk thanks to the magic of seriality.
  
  @see name

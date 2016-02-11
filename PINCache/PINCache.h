@@ -37,7 +37,6 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  The parallel caches are accessible as public properties (<memoryCache> and <diskCache>) and can be manipulated
  separately if necessary. See the docs for <PINMemoryCache> and <PINDiskCache> for more details.
 
- @warning when using in extension or watch extension, define PIN_APP_EXTENSIONS=1
  */
 
 @interface PINCache : NSObject
@@ -102,6 +101,20 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @result A new cache with the specified name.
  */
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
+
+#if !TARGET_OS_WATCH
+/**
+ Multiple instances with the same name are allowed and can safely access
+ the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache on disk.
+ @result A new cache with the specified name.
+ @note This method initializes the receiver's internal PINDiskCache using intiWithBackgroundTasksWithName:rootPath:. See the PINDiskCache initializer for more info.
+ */
+- (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER NS_EXTENSION_UNAVAILABLE_IOS("Use initWithName:rootPath: instead.");
+#endif
 
 #pragma mark -
 /// @name Asynchronous Methods

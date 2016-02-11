@@ -3,6 +3,8 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import "PINDiskCache.h"
+#import "PINBackgroundTask.h"
+#import "PINApplicationBackgroundTask.h"
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 #import <UIKit/UIKit.h>
@@ -14,14 +16,7 @@ __LINE__, [error localizedDescription]); }
 
 static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
-
-@interface PINBackgroundTask : NSObject
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-@property (atomic, assign) UIBackgroundTaskIdentifier taskID;
-#endif
-+ (instancetype)start;
-- (void)end;
-@end
+static Class gBackgroundTaskClass = nil;
 
 @interface PINDiskCache ()
 
@@ -72,44 +67,32 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
-{
-    if (!name)
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath {
+    if (!name) {
         return nil;
-    
+    }
     if (self = [super init]) {
-        _name = [name copy];
-        _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", PINDiskCachePrefix] UTF8String], DISPATCH_QUEUE_CONCURRENT);
-        _lockSemaphore = dispatch_semaphore_create(1);
-        _willAddObjectBlock = nil;
-        _willRemoveObjectBlock = nil;
-        _willRemoveAllObjectsBlock = nil;
-        _didAddObjectBlock = nil;
-        _didRemoveObjectBlock = nil;
-        _didRemoveAllObjectsBlock = nil;
-        
-        _byteCount = 0;
-        _byteLimit = 0;
-        _ageLimit = 0.0;
-        
-        _dates = [[NSMutableDictionary alloc] init];
-        _sizes = [[NSMutableDictionary alloc] init];
-        
-        NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", PINDiskCachePrefix, _name];
-        _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
-        
-        //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
-        //this is only safe because we use a dispatch_semaphore as a lock. If we switch to an NSLock or posix locks, this will *no longer be safe*.
-        [self lock];
-        dispatch_async(_asyncQueue, ^{
-            [self createCacheDirectory];
-            [self initializeDiskProperties];
-
-            [self unlock];
-        });
+        [self prepareCacheWithName:name rootPath:rootPath];
     }
     return self;
 }
+
+#if !TARGET_OS_WATCH
+- (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath {
+    if (!name) {
+      return nil;
+    }
+    
+    if (self = [super init]) {
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            gBackgroundTaskClass = [PINApplicationBackgroundTask class];
+        });
+        [self prepareCacheWithName:name rootPath:rootPath];
+    }
+    return self;
+}
+#endif
 
 - (NSString *)description
 {
@@ -130,11 +113,48 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 #pragma mark - Private Methods -
 
++ (id<PINBackgroundTask>)startBackgroundTask {
+  return [gBackgroundTaskClass start];
+}
+
+//! This method should only be called from an initializer
+- (void)prepareCacheWithName:(NSString *)name rootPath:(NSString *)rootPath {
+    _name = [name copy];
+    _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", PINDiskCachePrefix] UTF8String], DISPATCH_QUEUE_CONCURRENT);
+    _lockSemaphore = dispatch_semaphore_create(1);
+    _willAddObjectBlock = nil;
+    _willRemoveObjectBlock = nil;
+    _willRemoveAllObjectsBlock = nil;
+    _didAddObjectBlock = nil;
+    _didRemoveObjectBlock = nil;
+    _didRemoveAllObjectsBlock = nil;
+    
+    _byteCount = 0;
+    _byteLimit = 0;
+    _ageLimit = 0.0;
+    
+    _dates = [[NSMutableDictionary alloc] init];
+    _sizes = [[NSMutableDictionary alloc] init];
+    
+    NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", PINDiskCachePrefix, _name];
+    _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
+    
+    //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
+    //this is only safe because we use a dispatch_semaphore as a lock. If we switch to an NSLock or posix locks, this will *no longer be safe*.
+    [self lock];
+    dispatch_async(_asyncQueue, ^{
+        [self createCacheDirectory];
+        [self initializeDiskProperties];
+        
+        [self unlock];
+    });
+}
+
 - (NSURL *)encodedFileURLForKey:(NSString *)key
 {
     if (![key length])
         return nil;
-    
+  
     return [_cacheURL URLByAppendingPathComponent:[self encodedString:key]];
 }
 
@@ -243,8 +263,8 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 + (void)emptyTrash
 {
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
+    id<PINBackgroundTask> task = [self startBackgroundTask];
+  
     dispatch_async([self sharedTrashQueue], ^{
         NSError *searchTrashedItemsError = nil;
         NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
@@ -686,7 +706,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     if (!key || !object)
         return;
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     NSURL *fileURL = nil;
     
@@ -742,7 +762,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     if (!key)
         return;
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     NSURL *fileURL = nil;
     
@@ -765,7 +785,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         return;
     }
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     [self lock];
         [self trimDiskToSize:trimByteCount];
@@ -784,7 +804,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         return;
     }
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     [self lock];
         [self trimDiskToDate:trimDate];
@@ -800,7 +820,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         return;
     }
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     [self lock];
         [self trimDiskToSizeByDate:trimByteCount];
@@ -811,7 +831,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)removeAllObjects
 {
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     [self lock];
         if (self->_willRemoveAllObjectsBlock)
@@ -838,7 +858,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     if (!block)
         return;
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
+    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
     
     [self lock];
         NSDate *now = [NSDate date];
@@ -1102,41 +1122,6 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 - (void)unlock
 {
     dispatch_semaphore_signal(_lockSemaphore);
-}
-
-@end
-
-@implementation PINBackgroundTask
-- (instancetype)init
-{
-    if (self = [super init]) {
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-        _taskID = UIBackgroundTaskInvalid;
-#endif
-    }
-    return self;
-}
-
-+ (instancetype)start
-{
-    PINBackgroundTask *task = [[self alloc] init];
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-    task.taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-        UIBackgroundTaskIdentifier taskID = task.taskID;
-        task.taskID = UIBackgroundTaskInvalid;
-        [[UIApplication sharedApplication] endBackgroundTask:taskID];
-    }];
-#endif
-    return task;
-}
-
-- (void)end
-{
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-    UIBackgroundTaskIdentifier taskID = self.taskID;
-    self.taskID = UIBackgroundTaskInvalid;
-    [[UIApplication sharedApplication] endBackgroundTask:taskID];
-#endif
 }
 
 @end
