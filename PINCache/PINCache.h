@@ -77,7 +77,15 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
++ (instancetype)sharedCache NS_EXTENSION_UNAVAILABLE_IOS("Use sharedCacheForExtensions instead.");
+
+/**
+ A shared cache.
+ 
+ @result The shared singleton cache instance.
+ @note Uses a shared PINDiskCache that is created using an extension-safe initializer
+ */
++ (instancetype)sharedCacheForExtensions;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -89,7 +97,19 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param name The name of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name;
+- (instancetype)initWithName:(NSString *)name NS_EXTENSION_UNAVAILABLE_IOS("Use initForExtensionsWithName:rootPath: instead.");
+
+/**
+ Multiple instances with the same name are allowed and can safely access
+ the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache on disk.
+ @result A new cache with the specified name.
+ @note By default, PINDiskCache will create UIApplication background tasks during critical operations. This behavior is not available in extensions
+ */
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_EXTENSION_UNAVAILABLE_IOS("Use initForExtensionsWithName:rootPath: instead.") NS_DESIGNATED_INITIALIZER;
 
 /**
  Multiple instances with the same name are allowed and can safely access
@@ -100,21 +120,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param rootPath The path of the cache on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
-
-#if !TARGET_OS_WATCH
-/**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
- 
- @see name
- @param name The name of the cache.
- @param rootPath The path of the cache on disk.
- @result A new cache with the specified name.
- @note This method initializes the receiver's internal PINDiskCache using intiWithBackgroundTasksWithName:rootPath:. See the PINDiskCache initializer for more info.
- */
-- (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER NS_EXTENSION_UNAVAILABLE_IOS("Use initWithName:rootPath: instead.");
-#endif
+- (instancetype)initForExtensionsWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods

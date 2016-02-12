@@ -16,7 +16,6 @@ __LINE__, [error localizedDescription]); }
 
 static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
-static Class gBackgroundTaskClass = nil;
 
 @interface PINDiskCache ()
 
@@ -31,6 +30,7 @@ static Class gBackgroundTaskClass = nil;
 #endif
 @property (strong, nonatomic) NSMutableDictionary *dates;
 @property (strong, nonatomic) NSMutableDictionary *sizes;
+@property (strong, nonatomic) Class backgroundTaskClass;
 @end
 
 @implementation PINDiskCache
@@ -72,27 +72,22 @@ static Class gBackgroundTaskClass = nil;
         return nil;
     }
     if (self = [super init]) {
+        _backgroundTaskClass = [PINApplicationBackgroundTask class];
         [self prepareCacheWithName:name rootPath:rootPath];
     }
     return self;
 }
 
-#if !TARGET_OS_WATCH
-- (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath {
+- (instancetype)initForExtensionsWithName:(NSString *)name rootPath:(NSString *)rootPath {
     if (!name) {
       return nil;
     }
     
     if (self = [super init]) {
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            gBackgroundTaskClass = [PINApplicationBackgroundTask class];
-        });
         [self prepareCacheWithName:name rootPath:rootPath];
     }
     return self;
 }
-#endif
 
 - (NSString *)description
 {
@@ -111,10 +106,21 @@ static Class gBackgroundTaskClass = nil;
     return cache;
 }
 
++ (instancetype)sharedCacheForExtensions {
+    static id cache;
+    static dispatch_once_t predicate;
+    
+    dispatch_once(&predicate, ^{
+        cache = [[self alloc] initForExtensionsWithName:PINDiskCacheSharedName rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject]];
+    });
+    
+    return cache;
+}
+
 #pragma mark - Private Methods -
 
-+ (id<PINBackgroundTask>)startBackgroundTask {
-  return [gBackgroundTaskClass start];
+- (id<PINBackgroundTask>)startBackgroundTask {
+  return [self.backgroundTaskClass start];
 }
 
 //! This method should only be called from an initializer
@@ -263,24 +269,31 @@ static Class gBackgroundTaskClass = nil;
 
 + (void)emptyTrash
 {
-    id<PINBackgroundTask> task = [self startBackgroundTask];
-  
-    dispatch_async([self sharedTrashQueue], ^{
-        NSError *searchTrashedItemsError = nil;
-        NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
-                                                              includingPropertiesForKeys:nil
-                                                                                 options:0
-                                                                                   error:&searchTrashedItemsError];
-        PINDiskCacheError(searchTrashedItemsError);
-        
-        for (NSURL *trashedItemURL in trashedItems) {
-            NSError *removeTrashedItemError = nil;
-            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
-            PINDiskCacheError(removeTrashedItemError);
-        }
-        
+    id<PINBackgroundTask> task = [PINApplicationBackgroundTask start];
+    [self emptyTrashWithCompletion:^{
         [task end];
-    });
+    }];
+}
+
++ (void)emptyTrashWithCompletion:(void (^)(void))completion
+{
+  dispatch_async([self sharedTrashQueue], ^{
+    NSError *searchTrashedItemsError = nil;
+    NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
+                                                          includingPropertiesForKeys:nil
+                                                                             options:0
+                                                                               error:&searchTrashedItemsError];
+    PINDiskCacheError(searchTrashedItemsError);
+    
+    for (NSURL *trashedItemURL in trashedItems) {
+      NSError *removeTrashedItemError = nil;
+      [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
+      PINDiskCacheError(removeTrashedItemError);
+    }
+    if (completion) {
+        completion();
+    }
+  });
 }
 
 #pragma mark - Private Queue Methods -
@@ -368,8 +381,11 @@ static Class gBackgroundTaskClass = nil;
     BOOL trashed = [PINDiskCache moveItemAtURLToTrash:fileURL];
     if (!trashed)
         return NO;
-    
-    [PINDiskCache emptyTrash];
+
+    id<PINBackgroundTask> task = [self startBackgroundTask];
+    [PINDiskCache emptyTrashWithCompletion:^{
+        [task end];
+    }];
     
     NSNumber *byteSize = [_sizes objectForKey:key];
     if (byteSize)
@@ -706,7 +722,7 @@ static Class gBackgroundTaskClass = nil;
     if (!key || !object)
         return;
     
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     NSURL *fileURL = nil;
     
@@ -762,7 +778,7 @@ static Class gBackgroundTaskClass = nil;
     if (!key)
         return;
     
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     NSURL *fileURL = nil;
     
@@ -785,7 +801,7 @@ static Class gBackgroundTaskClass = nil;
         return;
     }
     
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     [self lock];
         [self trimDiskToSize:trimByteCount];
@@ -804,7 +820,7 @@ static Class gBackgroundTaskClass = nil;
         return;
     }
     
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     [self lock];
         [self trimDiskToDate:trimDate];
@@ -820,7 +836,7 @@ static Class gBackgroundTaskClass = nil;
         return;
     }
     
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     [self lock];
         [self trimDiskToSizeByDate:trimByteCount];
@@ -831,15 +847,19 @@ static Class gBackgroundTaskClass = nil;
 
 - (void)removeAllObjects
 {
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     [self lock];
         if (self->_willRemoveAllObjectsBlock)
             self->_willRemoveAllObjectsBlock(self);
         
         [PINDiskCache moveItemAtURLToTrash:self->_cacheURL];
-        [PINDiskCache emptyTrash];
-        
+
+        id<PINBackgroundTask> trashTask = [self startBackgroundTask];
+        [PINDiskCache emptyTrashWithCompletion:^{
+            [trashTask end];
+        }];
+  
         [self createCacheDirectory];
         
         [self->_dates removeAllObjects];
@@ -858,7 +878,7 @@ static Class gBackgroundTaskClass = nil;
     if (!block)
         return;
     
-    id<PINBackgroundTask> task = [[self class] startBackgroundTask];
+    id<PINBackgroundTask> task = [self startBackgroundTask];
     
     [self lock];
         NSDate *now = [NSDate date];

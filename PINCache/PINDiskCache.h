@@ -150,12 +150,27 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
++ (instancetype)sharedCache NS_EXTENSION_UNAVAILABLE_IOS("Use sharedCacheForExtensions instead.");
+
+/**
+ A shared cache.
+ 
+ @result The shared singleton cache instance.
+ @note Uses a shared PINDiskCache that is created using an extension-safe initializer
+ */
++ (instancetype)sharedCacheForExtensions;
 
 /**
  Empties the trash with `DISPATCH_QUEUE_PRIORITY_BACKGROUND`. Does not use lock.
+ @note This method creates a UIApplication background task while emptying the trash, so it is not available in extensions
  */
-+ (void)emptyTrash;
++ (void)emptyTrash NS_EXTENSION_UNAVAILABLE_IOS("Use emptyTrashWithCompletion: instead.");
+
+/**
+ Empties the trash with `DISPATCH_QUEUE_PRIORITY_BACKGROUND`. Does not use lock.
+ @param completion block called when emptying the trash is complete, which is called on a background queue.
+ */
++ (void)emptyTrashWithCompletion:(nullable void (^)(void))completion;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -167,9 +182,8 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param name The name of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name;
+- (instancetype)initWithName:(NSString *)name NS_EXTENSION_UNAVAILABLE_IOS("Use initForExtensionWithName:rootPath: instead.");
 
-#if !TARGET_OS_WATCH
 /**
  Multiple instances with the same name are allowed and can safely access
  the same data on disk thanks to the magic of seriality.
@@ -178,10 +192,9 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param name The name of the cache.
  @param rootPath The path of the cache.
  @result A new cache with the specified name.
- @note Using this initializer will cause the disk cache to create UIApplication background tasks during critical operations. This behavior is not available in extensions or watchOS
+ @note By default, the receiver will create UIApplication background tasks during critical operations. This behavior is not available in extensions
  */
-- (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER NS_EXTENSION_UNAVAILABLE_IOS("Use initWithName:rootPath: instead.");
-#endif
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_EXTENSION_UNAVAILABLE_IOS("Use initWithName:rootPath: instead.") NS_DESIGNATED_INITIALIZER;
 
 /**
  Multiple instances with the same name are allowed and can safely access
@@ -192,7 +205,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param rootPath The path of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
+- (instancetype)initForExtensionsWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods

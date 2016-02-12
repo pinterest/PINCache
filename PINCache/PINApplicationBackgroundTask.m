@@ -6,7 +6,6 @@
 //  Copyright © 2016 Pinterest. All rights reserved.
 //
 
-#if !TARGET_OS_WATCH
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 #import <UIKit/UIKit.h>
 #endif
@@ -15,7 +14,7 @@
 
 @interface PINApplicationBackgroundTask ()
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
 @property (atomic, assign) UIBackgroundTaskIdentifier taskID;
 #endif
 
@@ -26,7 +25,7 @@
 - (instancetype)init
 {
   if (self = [super init]) {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
     _taskID = UIBackgroundTaskInvalid;
 #endif
   }
@@ -36,7 +35,7 @@
 + (instancetype)start
 {
   PINApplicationBackgroundTask *task = [[self alloc] init];
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
   // We have to declare this reference outside of the block, otherwise, the compiler complains about using [UIApplication sharedApplication] in a context that might be available from an extension
   UIApplication *sharedApplication = [UIApplication sharedApplication];
   task.taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
@@ -50,7 +49,7 @@
 
 - (void)end
 {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
   UIBackgroundTaskIdentifier taskID = self.taskID;
   self.taskID = UIBackgroundTaskInvalid;
   [[UIApplication sharedApplication] endBackgroundTask:taskID];
@@ -58,4 +57,3 @@
 }
 
 @end
-#endif
