@@ -58,19 +58,19 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 #if !TARGET_OS_WATCH
 - (instancetype)initWithBackgroundTasksWithName:(NSString *)name rootPath:(NSString *)rootPath
 {
-  if (!name)
-    return nil;
-  
-  if (self = [super init]) {
-    _name = [name copy];
-    
-    NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
-    _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
-    
-    _diskCache = [[PINDiskCache alloc] initWithBackgroundTasksWithName:_name rootPath:rootPath];
-    _memoryCache = [[PINMemoryCache alloc] init];
-  }
-  return self;
+    if (!name) {
+        return nil;
+    }
+    if (self = [super init]) {
+        _name = [name copy];
+
+        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
+        _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
+
+        _diskCache = [[PINDiskCache alloc] initWithBackgroundTasksWithName:_name rootPath:rootPath];
+        _memoryCache = [[PINMemoryCache alloc] init];
+    }
+    return self;
 }
 #endif
 
