@@ -115,7 +115,6 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
     __weak PINMemoryCache *weakSelf = self;
 
->>>>>>> Attempt at removing need for PIN_APP_EXTENSIONS
     dispatch_async(_concurrentQueue, ^{
         PINMemoryCache *strongSelf = weakSelf;
         if (!strongSelf) {
