@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Availability.h>
 #import "PINBackgroundTask.h"
 
 #if !TARGET_OS_WATCH
