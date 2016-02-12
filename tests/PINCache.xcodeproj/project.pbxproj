@@ -350,10 +350,10 @@
 		D07F1EAA171AFB7A001DBA02 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = TM;
+				CLASSPREFIX = PIN;
 				LastTestingUpgradeCheck = 0640;
 				LastUpgradeCheck = 0500;
-				ORGANIZATIONNAME = Tumblr;
+				ORGANIZATIONNAME = Pinterest;
 				TargetAttributes = {
 					662900101A66B60D009C10BD = {
 						CreatedOnToolsVersion = 6.1.1;

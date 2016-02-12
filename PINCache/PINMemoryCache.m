@@ -80,18 +80,17 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         _removeAllObjectsOnMemoryWarning = YES;
         _removeAllObjectsOnEnteringBackground = YES;
 
-		#if TARGET_OS_IPHONE && defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-        for (NSString *name in @[UIApplicationDidReceiveMemoryWarningNotification, UIApplicationDidEnterBackgroundNotification]) {
-            [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(didObserveApocalypticNotification:)
-                                                         name:name
-#if !defined(PIN_APP_EXTENSIONS)
-                                                       object:[UIApplication sharedApplication]];
-#else
-                                                       object:nil];
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(didReceiveEnterBackgroundNotification:)
+                                                   name:UIApplicationDidEnterBackgroundNotification
+                                                 object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(didReceiveMemoryWarningNotification:)
+                                                   name:UIApplicationDidReceiveMemoryWarningNotification
+                                                 object:nil];
+
 #endif
-        }
-        #endif
     }
     return self;
 }
@@ -110,51 +109,47 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 #pragma mark - Private Methods -
 
-- (void)didObserveApocalypticNotification:(NSNotification *)notification
+- (void)didReceiveMemoryWarningNotification:(NSNotification *)notification {
+    if (self.removeAllObjectsOnMemoryWarning)
+        [self removeAllObjects:nil];
+
+    __weak PINMemoryCache *weakSelf = self;
+
+    dispatch_async(_concurrentQueue, ^{
+        PINMemoryCache *strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+
+        [strongSelf lock];
+        PINMemoryCacheBlock didReceiveMemoryWarningBlock = strongSelf->_didReceiveMemoryWarningBlock;
+        [strongSelf unlock];
+
+        if (didReceiveMemoryWarningBlock)
+            didReceiveMemoryWarningBlock(strongSelf);
+    });
+}
+
+- (void)didReceiveEnterBackgroundNotification:(NSNotification *)notification
 {
-    #if TARGET_OS_IPHONE && defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+    if (self.removeAllObjectsOnEnteringBackground)
+        [self removeAllObjects:nil];
 
-    if ([[notification name] isEqualToString:UIApplicationDidReceiveMemoryWarningNotification]) {
-        if (self.removeAllObjectsOnMemoryWarning)
-            [self removeAllObjects:nil];
+    __weak PINMemoryCache *weakSelf = self;
 
-        __weak PINMemoryCache *weakSelf = self;
+    dispatch_async(_concurrentQueue, ^{
+        PINMemoryCache *strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
 
-        dispatch_async(_concurrentQueue, ^{
-            PINMemoryCache *strongSelf = weakSelf;
-            if (!strongSelf) {
-                return;
-            }
-            
-            [strongSelf lock];
-                PINMemoryCacheBlock didReceiveMemoryWarningBlock = strongSelf->_didReceiveMemoryWarningBlock;
-            [strongSelf unlock];
-            
-            if (didReceiveMemoryWarningBlock)
-                didReceiveMemoryWarningBlock(strongSelf);
-        });
-    } else if ([[notification name] isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
-        if (self.removeAllObjectsOnEnteringBackground)
-            [self removeAllObjects:nil];
+        [strongSelf lock];
+            PINMemoryCacheBlock didEnterBackgroundBlock = strongSelf->_didEnterBackgroundBlock;
+        [strongSelf unlock];
 
-        __weak PINMemoryCache *weakSelf = self;
-
-        dispatch_async(_concurrentQueue, ^{
-            PINMemoryCache *strongSelf = weakSelf;
-            if (!strongSelf) {
-                return;
-            }
-
-            [strongSelf lock];
-                PINMemoryCacheBlock didEnterBackgroundBlock = strongSelf->_didEnterBackgroundBlock;
-            [strongSelf unlock];
-            
-            if (didEnterBackgroundBlock)
-                didEnterBackgroundBlock(strongSelf);
-        });
-    }
-    
-    #endif
+        if (didEnterBackgroundBlock)
+            didEnterBackgroundBlock(strongSelf);
+    });
 }
 
 - (void)removeObjectAndExecuteBlocksForKey:(NSString *)key
