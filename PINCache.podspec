@@ -15,4 +15,10 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.7'
   s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '2.0'
+  pch_PIN = <<-EOS
+#ifndef TARGET_OS_WATCH
+  #define TARGET_OS_WATCH 0
+#endif
+EOS
+  s.prefix_header_contents = pch_PIN
 end

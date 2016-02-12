@@ -1,5 +1,10 @@
 language: objective-c
-script: ./build_tests.sh
+osx_image: xcode7.2
+rvm: 2.2.2
 branches:
   only:
     - master
+
+before_install: gem install cocoapods -v '0.39.0'
+before_script: pod lib lint --verbose
+script: ./build_tests.sh

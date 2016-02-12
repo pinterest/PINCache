@@ -84,6 +84,14 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (void)testDiskCacheURL
 {
+    // Wait for URL to be created
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+    [self.cache objectForKey:@"" block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     BOOL isDir = NO;
     BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:[self.cache.diskCache.cacheURL path] isDirectory:&isDir];
 
@@ -340,7 +348,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     if (isiOS8OrGreater) {
         //sending didEnterBackgroundNotification causes crash on iOS 8.
         NSNotification *notification = [NSNotification notificationWithName:UIApplicationDidEnterBackgroundNotification object:nil];
-        [self.cache.memoryCache performSelector:@selector(didObserveApocalypticNotification:) withObject:notification];
+        [self.cache.memoryCache performSelector:@selector(didReceiveEnterBackgroundNotification:) withObject:notification];
         
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidEnterBackgroundNotification
@@ -600,6 +608,14 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     [self.cache.diskCache setTtlCache:YES];
     [self.cache.memoryCache setTtlCache:YES];
 
+    // Wait for ttlCache to be set
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+    [self.cache objectForKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      dispatch_group_leave(group);
+    }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
     // With the TTL cache enabled, we expect enumerating over the caches to yield 0 objects
     NSUInteger expectedObjCount = 0;
     __block NSUInteger objCount = 0;
@@ -607,18 +623,24 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
       objCount++;
     }];
 
-    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
     objCount = 0;
     [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
       objCount++;
     }];
 
-    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
     [self.cache.diskCache setTtlCache:NO];
     [self.cache.memoryCache setTtlCache:NO];
 
+    // Wait for ttlCache to be set
+    dispatch_group_enter(group);
+    [self.cache objectForKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      dispatch_group_leave(group);
+    }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
     // With the TTL cache disabled, we expect enumerating over the caches to yield 1 object each, since the 2nd cache clearing hasn't happened yet
     expectedObjCount = 1;
@@ -627,14 +649,14 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
       objCount++;
     }];
 
-    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
     objCount = 0;
     [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
       objCount++;
     }];
 
-    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", expectedObjCount);
+    XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 }
 
 
