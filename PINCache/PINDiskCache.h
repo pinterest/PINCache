@@ -182,7 +182,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param name The name of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name NS_EXTENSION_UNAVAILABLE_IOS("Use initForExtensionWithName:rootPath: instead.");
+- (instancetype)initWithName:(NSString *)name NS_EXTENSION_UNAVAILABLE_IOS("Use initForExtensionsWithName:rootPath: instead.");
 
 /**
  Multiple instances with the same name are allowed and can safely access
@@ -194,7 +194,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @result A new cache with the specified name.
  @note By default, the receiver will create UIApplication background tasks during critical operations. This behavior is not available in extensions
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_EXTENSION_UNAVAILABLE_IOS("Use initWithName:rootPath: instead.") NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_EXTENSION_UNAVAILABLE_IOS("Use initForExtensionsWithName:rootPath: instead.") NS_DESIGNATED_INITIALIZER;
 
 /**
  Multiple instances with the same name are allowed and can safely access
