@@ -37,10 +37,12 @@
 {
   PINApplicationBackgroundTask *task = [[self alloc] init];
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+  // We have to declare this reference outside of the block, otherwise, the compiler complains about using [UIApplication sharedApplication] in a context that might be available from an extension
+  UIApplication *sharedApplication = [UIApplication sharedApplication];
   task.taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
     UIBackgroundTaskIdentifier taskID = task.taskID;
     task.taskID = UIBackgroundTaskInvalid;
-    [[UIApplication sharedApplication] endBackgroundTask:taskID];
+    [sharedApplication endBackgroundTask:taskID];
   }];
 #endif
   return task;
