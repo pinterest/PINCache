@@ -663,7 +663,10 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         fileURL = [self encodedFileURLForKey:key];
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
-            [self setFileModificationDate:now forURL:fileURL];
+            // Don't update the file modification time, if self is a ttlCache
+            if (!self->_ttlCache) {
+                [self setFileModificationDate:now forURL:fileURL];
+            }
         } else {
             fileURL = nil;
         }
