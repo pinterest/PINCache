@@ -659,5 +659,59 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 }
 
+- (void)testTTLCacheFileURLForKey {
+    NSString *key = @"key";
+
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+    __block NSURL *objectURL = nil;
+    [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL * _Nullable fileURL) {
+      objectURL = fileURL;
+      dispatch_group_leave(group);
+    }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    XCTAssertNotNil(objectURL, @"objectURL should have a non-nil URL");
+
+    NSError *error = nil;
+    NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[objectURL path] error:&error];
+    NSDate *initialModificationDate = attributes[NSFileModificationDate];
+    XCTAssertNotNil(initialModificationDate, @"The saved file should have a non-nil modification date");
+
+    // Wait a moment to ensure that the file modification time can be changed to something different
+    sleep(1);
+
+    [self.cache.diskCache setTtlCache:YES];
+    // Wait for ttlCache to be set
+    dispatch_group_enter(group);
+    [self.cache objectForKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      dispatch_group_leave(group);
+    }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    [self.cache.diskCache fileURLForKey:key];
+
+    attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[objectURL path] error:nil];
+    NSDate *ttlCacheEnabledModificationDate = attributes[NSFileModificationDate];
+    XCTAssertNotNil(ttlCacheEnabledModificationDate, @"The saved file should have a non-nil modification date");
+
+    XCTAssertEqualObjects(initialModificationDate, ttlCacheEnabledModificationDate, @"The modification date shouldn't change when accessing the file URL, when ttlCache is enabled");
+
+    [self.cache.diskCache setTtlCache:NO];
+    // Wait for ttlCache to be set
+    dispatch_group_enter(group);
+    [self.cache objectForKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+      dispatch_group_leave(group);
+    }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    [self.cache.diskCache fileURLForKey:key];
+
+    attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[objectURL path] error:nil];
+    NSDate *ttlCacheDisabledModificationDate = attributes[NSFileModificationDate];
+    XCTAssertNotNil(ttlCacheDisabledModificationDate, @"The saved file should have a non-nil modification date");
+
+    XCTAssertNotEqualObjects(initialModificationDate, ttlCacheDisabledModificationDate, @"The modification date should change when accessing the file URL, when ttlCache is not enabled");
+
+}
 
 @end
