@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'PINCache'
-  s.version       = '2.2'
+  s.version       = '2.2.1'
   s.source_files  = 'PINCache/*.{h,m}'
   s.homepage      = 'https://github.com/pinterest/PINCache'
   s.summary       = 'Fast, thread safe, parallel object cache for iOS and OS X.'
