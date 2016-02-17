@@ -1,3 +1,7 @@
+### 2.2.1 -- 2016 Feb 15 ###
+
+- [fixed] When ttlCache is enabled, skip updating the file modification time when accessing `fileURLForKey:` [#70](https://github.com/pinterest/PINCache/pull/70)
+
 ### 2.2 -- 2016 Feb 10 ###
 
 - [new] Allow caches to behave like a TTLCache [#66](https://github.com/pinterest/PINCache/pull/66)
