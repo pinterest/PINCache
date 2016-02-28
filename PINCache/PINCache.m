@@ -89,7 +89,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return cache;
 }
 
-+ (instancetype)sharedCacheForExtensions {
++ (instancetype)sharedCacheForExtensions
+{
     static id cache;
     static dispatch_once_t predicate;
     

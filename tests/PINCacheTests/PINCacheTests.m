@@ -527,7 +527,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssert(diskObj == nil, @"should not be in disk cache");
 }
 
-- (void)testTTLCacheObjectAccess {
+- (void)testTTLCacheObjectAccess
+{
     [self.cache removeAllObjects];
     NSString *key = @"key";
     [self.cache.memoryCache setAgeLimit:2];
@@ -591,7 +592,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertNotNil(diskObj, @"should still be in disk cache");
 }
 
-- (void)testTTLCacheObjectEnumeration {
+- (void)testTTLCacheObjectEnumeration
+{
     [self.cache removeAllObjects];
     NSString *key = @"key";
     [self.cache.memoryCache setAgeLimit:2];
@@ -659,7 +661,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 }
 
-- (void)testTTLCacheFileURLForKey {
+- (void)testTTLCacheFileURLForKey
+{
     NSString *key = @"key";
 
     dispatch_group_t group = dispatch_group_create();

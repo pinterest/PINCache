@@ -67,7 +67,8 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath {
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
+{
     if (!name) {
         return nil;
     }
@@ -78,7 +79,8 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return self;
 }
 
-- (instancetype)initForExtensionsWithName:(NSString *)name rootPath:(NSString *)rootPath {
+- (instancetype)initForExtensionsWithName:(NSString *)name rootPath:(NSString *)rootPath
+{
     if (!name) {
       return nil;
     }
@@ -106,7 +108,8 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return cache;
 }
 
-+ (instancetype)sharedCacheForExtensions {
++ (instancetype)sharedCacheForExtensions
+{
     static id cache;
     static dispatch_once_t predicate;
     
@@ -119,12 +122,14 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 #pragma mark - Private Methods -
 
-- (id<PINBackgroundTask>)startBackgroundTask {
+- (id<PINBackgroundTask>)startBackgroundTask
+{
   return [self.backgroundTaskClass start];
 }
 
 //! This method should only be called from an initializer
-- (void)prepareCacheWithName:(NSString *)name rootPath:(NSString *)rootPath {
+- (void)prepareCacheWithName:(NSString *)name rootPath:(NSString *)rootPath
+{
     _name = [name copy];
     _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", PINDiskCachePrefix] UTF8String], DISPATCH_QUEUE_CONCURRENT);
     _lockSemaphore = dispatch_semaphore_create(1);
@@ -277,23 +282,23 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 + (void)emptyTrashWithCompletion:(void (^)(void))completion
 {
-  dispatch_async([self sharedTrashQueue], ^{
-    NSError *searchTrashedItemsError = nil;
-    NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
-                                                          includingPropertiesForKeys:nil
-                                                                             options:0
-                                                                               error:&searchTrashedItemsError];
-    PINDiskCacheError(searchTrashedItemsError);
-    
-    for (NSURL *trashedItemURL in trashedItems) {
-      NSError *removeTrashedItemError = nil;
-      [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
-      PINDiskCacheError(removeTrashedItemError);
-    }
-    if (completion) {
-        completion();
-    }
-  });
+    dispatch_async([self sharedTrashQueue], ^{
+        NSError *searchTrashedItemsError = nil;
+        NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
+                                                              includingPropertiesForKeys:nil
+                                                                                 options:0
+                                                                                   error:&searchTrashedItemsError];
+        PINDiskCacheError(searchTrashedItemsError);
+
+        for (NSURL *trashedItemURL in trashedItems) {
+            NSError *removeTrashedItemError = nil;
+            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
+            PINDiskCacheError(removeTrashedItemError);
+        }
+        if (completion) {
+            completion();
+        }
+    });
 }
 
 #pragma mark - Private Queue Methods -
@@ -1110,7 +1115,8 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     });
 }
 
-- (BOOL)isTTLCache {
+- (BOOL)isTTLCache
+{
     BOOL isTTLCache;
     
     [self lock];
@@ -1120,7 +1126,8 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return isTTLCache;
 }
 
-- (void)setTtlCache:(BOOL)ttlCache {
+- (void)setTtlCache:(BOOL)ttlCache
+{
     __weak PINDiskCache *weakSelf = self;
 
     dispatch_async(_asyncQueue, ^{
