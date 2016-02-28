@@ -55,6 +55,23 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return self;
 }
 
+- (instancetype)initForExtensionsWithName:(NSString *)name rootPath:(NSString *)rootPath
+{
+    if (!name) {
+        return nil;
+    }
+    if (self = [super init]) {
+        _name = [name copy];
+
+        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
+        _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
+
+        _diskCache = [[PINDiskCache alloc] initForExtensionsWithName:_name rootPath:rootPath];
+        _memoryCache = [[PINMemoryCache alloc] init];
+    }
+    return self;
+}
+
 - (NSString *)description
 {
     return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINCachePrefix, _name, self];
@@ -67,6 +84,18 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     
     dispatch_once(&predicate, ^{
         cache = [[self alloc] initWithName:PINCacheSharedName];
+    });
+    
+    return cache;
+}
+
++ (instancetype)sharedCacheForExtensions
+{
+    static id cache;
+    static dispatch_once_t predicate;
+    
+    dispatch_once(&predicate, ^{
+        cache = [[self alloc] initForExtensionsWithName:PINCacheSharedName rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject]];
     });
     
     return cache;

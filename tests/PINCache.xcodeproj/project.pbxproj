@@ -19,6 +19,10 @@
 		662900461A66B830009C10BD /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662900471A66B831009C10BD /* PINDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662900481A66B831009C10BD /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A82D9ACD1C6D0D81007680F8 /* PINApplicationBackgroundTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A82D9ACC1C6D0D81007680F8 /* PINApplicationBackgroundTask.m */; };
+		A82D9ACF1C6D0DA1007680F8 /* PINApplicationBackgroundTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A82D9ACC1C6D0D81007680F8 /* PINApplicationBackgroundTask.m */; };
+		A82D9AD01C6D0DA1007680F8 /* PINApplicationBackgroundTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A82D9ACC1C6D0D81007680F8 /* PINApplicationBackgroundTask.m */; };
+		A82D9AD11C6D0DA2007680F8 /* PINApplicationBackgroundTask.m in Sources */ = {isa = PBXBuildFile; fileRef = A82D9ACC1C6D0D81007680F8 /* PINApplicationBackgroundTask.m */; };
 		D07F1EB6171AFB7A001DBA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB5171AFB7A001DBA02 /* UIKit.framework */; };
 		D07F1EB8171AFB7A001DBA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB7171AFB7A001DBA02 /* Foundation.framework */; };
 		D07F1EBA171AFB7A001DBA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB9171AFB7A001DBA02 /* CoreGraphics.framework */; };
@@ -67,6 +71,9 @@
 		662900141A66B60D009C10BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6629FFED1A66B512009C10BD /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6629FFF01A66B512009C10BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A82D9ACB1C6D0D81007680F8 /* PINApplicationBackgroundTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINApplicationBackgroundTask.h; sourceTree = "<group>"; };
+		A82D9ACC1C6D0D81007680F8 /* PINApplicationBackgroundTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINApplicationBackgroundTask.m; sourceTree = "<group>"; };
+		A82D9ACE1C6D0D95007680F8 /* PINBackgroundTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINBackgroundTask.h; sourceTree = "<group>"; };
 		D07F1EB2171AFB7A001DBA02 /* PINCache.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PINCache.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07F1EB5171AFB7A001DBA02 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D07F1EB7171AFB7A001DBA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -239,6 +246,9 @@
 				D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */,
 				D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */,
 				D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */,
+				A82D9ACE1C6D0D95007680F8 /* PINBackgroundTask.h */,
+				A82D9ACB1C6D0D81007680F8 /* PINApplicationBackgroundTask.h */,
+				A82D9ACC1C6D0D81007680F8 /* PINApplicationBackgroundTask.m */,
 			);
 			name = PINCache;
 			path = ../PINCache;
@@ -423,6 +433,7 @@
 				662900401A66B79B009C10BD /* PINCache.m in Sources */,
 				662900411A66B79B009C10BD /* PINDiskCache.m in Sources */,
 				662900421A66B79B009C10BD /* PINMemoryCache.m in Sources */,
+				A82D9AD11C6D0DA2007680F8 /* PINApplicationBackgroundTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +444,7 @@
 				6629003B1A66B76B009C10BD /* PINCache.m in Sources */,
 				6629003C1A66B76B009C10BD /* PINDiskCache.m in Sources */,
 				6629003D1A66B76B009C10BD /* PINMemoryCache.m in Sources */,
+				A82D9AD01C6D0DA1007680F8 /* PINApplicationBackgroundTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,6 +453,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D07F1EC2171AFB7A001DBA02 /* main.m in Sources */,
+				A82D9ACD1C6D0D81007680F8 /* PINApplicationBackgroundTask.m in Sources */,
 				D07F1EC6171AFB7A001DBA02 /* PINAppDelegate.m in Sources */,
 				D0E5D840171DF0AF0041E777 /* PINCache.m in Sources */,
 				D0E5D842171DF0AF0041E777 /* PINDiskCache.m in Sources */,
@@ -453,6 +466,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A82D9ACF1C6D0DA1007680F8 /* PINApplicationBackgroundTask.m in Sources */,
 				D07F1EE1171AFB7A001DBA02 /* PINCacheTests.m in Sources */,
 				D0E5D841171DF0AF0041E777 /* PINCache.m in Sources */,
 				D0E5D843171DF0AF0041E777 /* PINDiskCache.m in Sources */,

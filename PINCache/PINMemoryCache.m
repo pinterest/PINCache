@@ -109,7 +109,8 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 #pragma mark - Private Methods -
 
-- (void)didReceiveMemoryWarningNotification:(NSNotification *)notification {
+- (void)didReceiveMemoryWarningNotification:(NSNotification *)notification
+{
     if (self.removeAllObjectsOnMemoryWarning)
         [self removeAllObjects:nil];
 
@@ -686,7 +687,8 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     return cost;
 }
 
-- (BOOL)isTTLCache {
+- (BOOL)isTTLCache
+{
     BOOL isTTLCache;
     
     [self lock];
@@ -696,7 +698,8 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     return isTTLCache;
 }
 
-- (void)setTtlCache:(BOOL)ttlCache {
+- (void)setTtlCache:(BOOL)ttlCache
+{
     [self lock];
         _ttlCache = ttlCache;
     [self unlock];
