@@ -1108,9 +1108,17 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @implementation PINBackgroundTask
 
-+ (BOOL)isAppExtension
-{
-    return [[[NSBundle mainBundle] executablePath] containsString:@".appex/"];
++ (BOOL)isAppExtension {
+
+    static BOOL isExtension;
+    static dispatch_once_t onceToken;
+
+    dispatch_once(&onceToken, ^{
+        NSDictionary *extensionDictionary = [[NSBundle mainBundle] infoDictionary][@"NSExtension"];
+        isExtension = [extensionDictionary isKindOfClass:[NSDictionary class]];
+    });
+
+    return isExtension;
 }
 
 - (instancetype)init
