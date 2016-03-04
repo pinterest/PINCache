@@ -1133,12 +1133,14 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 + (instancetype)start
 {
-    PINBackgroundTask *task = [[self alloc] init];
+    PINBackgroundTask *task = nil;
     
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
     if ([self.class isAppExtension]) {
         return task;
     }
+    
+    task = [[self alloc] init];
     
     UIApplication *sharedApplication = [UIApplication performSelector:@selector(sharedApplication)];
     task.taskID = [sharedApplication beginBackgroundTaskWithExpirationHandler:^{
@@ -1147,6 +1149,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         [sharedApplication endBackgroundTask:taskID];
     }];
 #endif
+    
     return task;
 }
 
