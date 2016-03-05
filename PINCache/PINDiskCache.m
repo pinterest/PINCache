@@ -16,7 +16,7 @@ static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 @interface PINBackgroundTask : NSObject
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
 @property (atomic, assign) UIBackgroundTaskIdentifier taskID;
 #endif
 + (instancetype)start;
@@ -1107,10 +1107,24 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 @end
 
 @implementation PINBackgroundTask
+
++ (BOOL)isAppExtension {
+
+    static BOOL isExtension;
+    static dispatch_once_t onceToken;
+
+    dispatch_once(&onceToken, ^{
+        NSDictionary *extensionDictionary = [[NSBundle mainBundle] infoDictionary][@"NSExtension"];
+        isExtension = [extensionDictionary isKindOfClass:[NSDictionary class]];
+    });
+
+    return isExtension;
+}
+
 - (instancetype)init
 {
     if (self = [super init]) {
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
         _taskID = UIBackgroundTaskInvalid;
 #endif
     }
@@ -1119,23 +1133,38 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 + (instancetype)start
 {
-    PINBackgroundTask *task = [[self alloc] init];
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-    task.taskID = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+    PINBackgroundTask *task = nil;
+    
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+    if ([self.class isAppExtension]) {
+        return task;
+    }
+    
+    task = [[self alloc] init];
+    
+    UIApplication *sharedApplication = [UIApplication performSelector:@selector(sharedApplication)];
+    task.taskID = [sharedApplication beginBackgroundTaskWithExpirationHandler:^{
         UIBackgroundTaskIdentifier taskID = task.taskID;
         task.taskID = UIBackgroundTaskInvalid;
-        [[UIApplication sharedApplication] endBackgroundTask:taskID];
+        [sharedApplication endBackgroundTask:taskID];
     }];
 #endif
+    
     return task;
 }
 
 - (void)end
 {
-#if !defined(PIN_APP_EXTENSIONS) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+    if ([self.class isAppExtension]) {
+        return;
+    }
+    
     UIBackgroundTaskIdentifier taskID = self.taskID;
     self.taskID = UIBackgroundTaskInvalid;
-    [[UIApplication sharedApplication] endBackgroundTask:taskID];
+    
+    UIApplication *sharedApplication = [UIApplication performSelector:@selector(sharedApplication)];
+    [sharedApplication endBackgroundTask:taskID];
 #endif
 }
 
