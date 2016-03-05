@@ -1,3 +1,6 @@
+### 2.2.1 -- 2016 Mar 5 ###
+- [new] Removed need for extension macro: [#72](https://github.com/pinterest/PINCache/pull/72)
+
 ### 2.2.1 -- 2016 Feb 15 ###
 
 - [fixed] When ttlCache is enabled, skip updating the file modification time when accessing `fileURLForKey:` [#70](https://github.com/pinterest/PINCache/pull/70)
