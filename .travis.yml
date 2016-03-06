@@ -13,4 +13,4 @@ env:
     - OS='8.4' name='iPhone 6'
     - OS='latest' name='iPhone 6'
 script:
-    - xcodebuild ONLY_ACTIVE_ARCH=NO -project tests/PINCache.xcodeproj -scheme PINCacheTests -sdk iphonesimulator  -destination 'platform=iOS Simulator,name=$name,OS=$OS' clean build test | xcpretty
+    - xcodebuild clean test -project tests/PINCache.xcodeproj -scheme PINCacheTests -sdk iphonesimulator  -destination "platform=iOS Simulator,name=$name,OS=$OS" ONLY_ACTIVE_ARCH=NO | xcpretty -t; test ${PIPESTATUS[0]} -eq 0
