@@ -1,10 +1,16 @@
 language: objective-c
 osx_image: xcode7.2
-rvm: 2.2.2
 branches:
   only:
     - master
 
-before_install: gem install cocoapods -v '0.39.0'
+before_install: 
+    - gem install cocoapods -v '0.39.0'
+    - gem install xcpretty
 before_script: pod lib lint --verbose
-script: ./build_tests.sh
+env:
+    matrix:
+    - OS='8.4' name='iPhone 6'
+    - OS='latest' name='iPhone 6'
+script:
+    - xcodebuild ONLY_ACTIVE_ARCH=NO -project tests/PINCache.xcodeproj -scheme PINCacheTests -sdk iphonesimulator  -destination 'platform=iOS Simulator,name=$name,OS=$OS' clean build test | xcpretty
