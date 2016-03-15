@@ -88,9 +88,6 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
         PINCache *strongSelf = weakSelf;
         if (!strongSelf)
             return;
-        
-        __weak PINCache *weakSelf = strongSelf;
-        
         [strongSelf->_memoryCache objectForKey:key block:^(PINMemoryCache *memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
             PINCache *strongSelf = weakSelf;
             if (!strongSelf)
@@ -100,17 +97,12 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                 [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject, NSURL *fileURL) {
                     // update the access time on disk
                 }];
-                
-                __weak PINCache *weakSelf = strongSelf;
-                
                 dispatch_async(strongSelf->_concurrentQueue, ^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
                         block(strongSelf, memoryCacheKey, memoryCacheObject);
                 });
             } else {
-                __weak PINCache *weakSelf = strongSelf;
-                
                 [strongSelf->_diskCache objectForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject, NSURL *fileURL) {
                     PINCache *strongSelf = weakSelf;
                     if (!strongSelf)
@@ -118,8 +110,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                     
                     [strongSelf->_memoryCache setObject:diskCacheObject forKey:diskCacheKey block:nil];
                     
-                    __weak PINCache *weakSelf = strongSelf;
-                    
+
                     dispatch_async(strongSelf->_concurrentQueue, ^{
                         PINCache *strongSelf = weakSelf;
                         if (strongSelf)
