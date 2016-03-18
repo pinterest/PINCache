@@ -243,9 +243,9 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 + (void)emptyTrash
 {
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     dispatch_async([self sharedTrashQueue], ^{
+        PINBackgroundTask *task = [PINBackgroundTask start];
+        
         NSError *searchTrashedItemsError = nil;
         NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
                                                               includingPropertiesForKeys:nil
