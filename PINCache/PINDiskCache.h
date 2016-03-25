@@ -68,7 +68,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  The total number of bytes used on disk, as reported by `NSURLTotalFileAllocatedSizeKey`.
  
  @warning This property should only be read from a call to <synchronouslyLockFileAccessWhileExecutingBlock:> or
- its asynchronous equivolent <lockFileAccessWhileExecutingBlock:>
+ its asynchronous equivalent <lockFileAccessWhileExecutingBlock:>
  
  For example:
  
@@ -311,7 +311,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  @param key The key associated with the object.
  @result The file URL for the specified key.
  */
-- (NSURL *)fileURLForKey:(nullable NSString *)key;
+- (nullable NSURL *)fileURLForKey:(nullable NSString *)key;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until

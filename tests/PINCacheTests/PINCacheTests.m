@@ -171,7 +171,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
     dispatch_semaphore_wait(semaphore, [self timeout]);
     
-    XCTAssertNil(image, @"object with non-existant key was not nil");
+    XCTAssertNil(image, @"object with non-existent key was not nil");
 }
 
 - (void)testObjectRemove
@@ -534,7 +534,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     [self.cache.diskCache setAgeLimit:2];
 
 
-    // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cach clearing
+    // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cache clearing
     sleep(1);
     [self.cache setObject:[self image] forKey:key];
 
@@ -598,7 +598,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     [self.cache.diskCache setAgeLimit:2];
 
 
-    // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cach clearing
+    // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cache clearing
     sleep(1);
     [self.cache setObject:[self image] forKey:key];
 
