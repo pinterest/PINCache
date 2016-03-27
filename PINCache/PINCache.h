@@ -7,7 +7,6 @@
 #import "PINDiskCache.h"
 #import "PINMemoryCache.h"
 
-NS_ASSUME_NONNULL_BEGIN
 
 @class PINCache;
 
@@ -15,13 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
  A callback block which provides only the cache as an argument
  */
 
-typedef void (^PINCacheBlock)(PINCache *cache);
+typedef void (^PINCacheBlock)(PINCache * _Nonnull cache);
 
 /**
  A callback block which provides the cache, key and object as arguments
  */
 
-typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullable object);
+typedef void (^PINCacheObjectBlock)(PINCache * _Nonnull cache, NSString * _Nonnull key, id __nullable object);
 
 /**
  `PINCache` is a thread safe key/value store designed for persisting temporary objects that are expensive to
@@ -48,12 +47,12 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
 /**
  The name of this cache, used to create the <diskCache> and also appearing in stack traces.
  */
-@property (readonly) NSString *name;
+@property (readonly, nonnull) NSString *name;
 
 /**
  A concurrent queue on which blocks passed to the asynchronous access methods are run.
  */
-@property (readonly) dispatch_queue_t concurrentQueue;
+@property (readonly, nonnull) dispatch_queue_t concurrentQueue;
 
 /**
  Synchronously retrieves the total byte count of the <diskCache> on the shared disk queue.
@@ -63,12 +62,12 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
 /**
  The underlying disk cache, see <PINDiskCache> for additional configuration and trimming options.
  */
-@property (readonly) PINDiskCache *diskCache;
+@property (readonly, nonnull) PINDiskCache *diskCache;
 
 /**
  The underlying memory cache, see <PINMemoryCache> for additional configuration and trimming options.
  */
-@property (readonly) PINMemoryCache *memoryCache;
+@property (readonly, nonnull) PINMemoryCache *memoryCache;
 
 #pragma mark -
 /// @name Initialization
@@ -78,9 +77,9 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
++ (nonnull instancetype)sharedCache;
 
-- (instancetype)init NS_UNAVAILABLE;
+- (nonnull instancetype)init NS_UNAVAILABLE;
 
 /**
  Multiple instances with the same name are allowed and can safely access
@@ -90,7 +89,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param name The name of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name;
+- (nonnull instancetype)initWithName:(nonnull NSString *)name;
 
 /**
  Multiple instances with the same name are allowed and can safely access
@@ -101,7 +100,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param rootPath The path of the cache on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods
@@ -113,7 +112,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
+- (void)objectForKey:(nonnull NSString *)key block:(nonnull PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -123,7 +122,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)setObject:(nonnull id <NSCoding>)object forKey:(nonnull NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -132,7 +131,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)removeObjectForKey:(nonnull NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date. This method returns immediately and
@@ -141,7 +140,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(nullable PINCacheBlock)block;
+- (void)trimToDate:(nonnull NSDate *)date block:(nullable PINCacheBlock)block;
 
 /**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
@@ -162,7 +161,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param key The key associated with the object.
  @result The object for the specified key.
  */
-- (__nullable id)objectForKey:(NSString *)key;
+- (__nullable id)objectForKey:(nonnull NSString *)key;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
@@ -172,7 +171,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+- (void)setObject:(nonnull id <NSCoding>)object forKey:(nonnull NSString *)key;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
@@ -181,7 +180,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  
  @param key The key associated with the object to be removed.
  */
-- (void)removeObjectForKey:(NSString *)key;
+- (void)removeObjectForKey:(nonnull NSString *)key;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -190,7 +189,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
-- (void)trimToDate:(NSDate *)date;
+- (void)trimToDate:(nonnull NSDate *)date;
 
 /**
  Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
@@ -199,5 +198,3 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
 - (void)removeAllObjects;
 
 @end
-
-NS_ASSUME_NONNULL_END
