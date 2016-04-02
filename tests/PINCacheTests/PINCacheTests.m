@@ -143,7 +143,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     __block UIImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
-    [self.cache setObject:[self image] forKey:key];
+    self.cache[key] = [self image];
     
     [self.cache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
         image = (UIImage *)object;
@@ -162,7 +162,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     __block UIImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
-    [self.cache setObject:[self image] forKey:key];
+    self.cache[key] = [self image];
 
     [self.cache objectForKey:invalidKey block:^(PINCache *cache, NSString *key, id object) {
         image = (UIImage *)object;
@@ -179,7 +179,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     NSString *key = @"key";
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
-    [self.cache setObject:[self image] forKey:key];
+    self.cache[key] = [self image];
     
     [self.cache removeObjectForKey:key block:^(PINCache *cache, NSString *key, id object) {
         dispatch_semaphore_signal(semaphore);
@@ -187,7 +187,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     
     dispatch_semaphore_wait(semaphore, [self timeout]);
     
-    id object = [self.cache objectForKey:key];
+    id object = self.cache[key];
     
     XCTAssertNil(object, @"object was not removed");
 }
@@ -198,8 +198,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     NSString *key2 = @"key2";
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
-    [self.cache setObject:key1 forKey:key1];
-    [self.cache setObject:key2 forKey:key2];
+    self.cache[key1] = key1;
+    self.cache[key2] = key2;
     
     [self.cache removeAllObjects:^(PINCache *cache) {
         dispatch_semaphore_signal(semaphore);
@@ -207,8 +207,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     
     dispatch_semaphore_wait(semaphore, [self timeout]);
     
-    id object1 = [self.cache objectForKey:key1];
-    id object2 = [self.cache objectForKey:key2];
+    id object1 = self.cache[key1];
+    id object2 = self.cache[key2];
     
     XCTAssertNil(object1, @"not all objects were removed");
     XCTAssertNil(object2, @"not all objects were removed");
@@ -228,8 +228,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
     [self.cache.memoryCache trimToCost:1];
 
-    id object1 = [self.cache.memoryCache objectForKey:key1];
-    id object2 = [self.cache.memoryCache objectForKey:key2];
+    id object1 = self.cache.memoryCache[key1];
+    id object2 = self.cache.memoryCache[key2];
 
     XCTAssertNotNil(object1, @"object did not survive memory cache trim to cost");
     XCTAssertNil(object2, @"object was not trimmed despite exceeding cost");
@@ -246,8 +246,8 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
     [self.cache.memoryCache trimToCostByDate:1];
 
-    id object1 = [self.cache.memoryCache objectForKey:key1];
-    id object2 = [self.cache.memoryCache objectForKey:key2];
+    id object1 = self.cache.memoryCache[key1];
+    id object2 = self.cache.memoryCache[key2];
 
     XCTAssertNil(object1, @"object was not trimmed despite exceeding cost");
     XCTAssertNil(object2, @"object was not trimmed despite exceeding cost");
@@ -256,20 +256,20 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
 - (void)testDiskByteCount
 {
-    [self.cache setObject:[self image] forKey:@"image"];
+    self.cache[@"image"] = [self image];
     
     XCTAssertTrue(self.cache.diskByteCount > 0, @"disk cache byte count was not greater than zero");
 }
 
 - (void)testDiskByteCountWithExistingKey
 {
-    [self.cache setObject:[self image] forKey:@"image"];
+    self.cache[@"image"] = [self image];
     NSUInteger initialDiskByteCount = self.cache.diskByteCount;
-    [self.cache setObject:[self image] forKey:@"image"];
+    self.cache[@"image"] = [self image];
 
     XCTAssertTrue(self.cache.diskByteCount == initialDiskByteCount, @"disk cache byte count should not change by adding object with existing key and size");
 
-    [self.cache setObject:[self image] forKey:@"image2"];
+    self.cache[@"image2"] = [self image];
 
     XCTAssertTrue(self.cache.diskByteCount > initialDiskByteCount, @"disk cache byte count should increase with new key and object added to disk cache");
 }
@@ -372,7 +372,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     __block id object = nil;
     
     self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(PINMemoryCache *cache) {
-        object = [cache objectForKey:@"object"];
+        object = cache[@"object"];
         dispatch_semaphore_signal(semaphore);
     };
 
@@ -391,7 +391,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     dispatch_apply(objectCount, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t index) {
         NSString *key = [[NSString alloc] initWithFormat:@"key %zd", index];
         NSString *obj = [[NSString alloc] initWithFormat:@"obj %zd", index];
-        [self.cache.memoryCache setObject:obj forKey:key];
+        self.cache.memoryCache[key] = obj;
     });
 
     self.cache.memoryCache.removeAllObjectsOnMemoryWarning = NO;
@@ -478,7 +478,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 {
     [self.cache removeAllObjects];
     NSString *key = @"key";
-    [self.cache setObject:[self image] forKey:key];
+    self.cache[key] = [self image];
     [self.cache.memoryCache setAgeLimit:60];
     [self.cache.diskCache setAgeLimit:60];
     
@@ -600,7 +600,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
 
     // The cache is going to clear at 2 seconds, set an object at 1 second, so that it misses the first cache clearing
     sleep(1);
-    [self.cache setObject:[self image] forKey:key];
+    self.cache[key] = [self image];
 
     // Wait until time 3 so that we know the object should be expired, the 1st cache clearing has happened, and the 2nd cache clearing hasn't happened yet
     sleep(2);

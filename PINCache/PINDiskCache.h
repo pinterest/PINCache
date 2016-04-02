@@ -5,6 +5,8 @@
 #import <Foundation/Foundation.h>
 #import "Nullability.h"
 
+#import "PINCacheObjectSubscripting.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class PINDiskCache;
@@ -44,7 +46,7 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  <ageLimit> will trigger a GCD timer to periodically to trim the cache with <trimToDate:>.
  */
 
-@interface PINDiskCache : NSObject
+@interface PINDiskCache : NSObject <PINCacheObjectSubscripting>
 
 
 

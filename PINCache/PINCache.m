@@ -323,6 +323,16 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [_diskCache setObject:object forKey:key];
 }
 
+- (id)objectForKeyedSubscript:(NSString *)key
+{
+    return [self objectForKey:key];
+}
+
+- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key
+{
+    [self setObject:obj forKey:key];
+}
+
 - (void)removeObjectForKey:(NSString *)key
 {
     if (!key)
