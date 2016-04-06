@@ -5,6 +5,8 @@
 #import <Foundation/Foundation.h>
 #import "Nullability.h"
 
+#import "PINCacheObjectSubscripting.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class PINMemoryCache;
@@ -37,7 +39,7 @@ typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, 
  a memory cache backed by a disk cache.
  */
 
-@interface PINMemoryCache : NSObject
+@interface PINMemoryCache : NSObject <PINCacheObjectSubscripting>
 
 #pragma mark -
 /// @name Core

@@ -404,9 +404,19 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     return object;
 }
 
+- (id)objectForKeyedSubscript:(NSString *)key
+{
+    return [self objectForKey:key];
+}
+
 - (void)setObject:(id)object forKey:(NSString *)key
 {
     [self setObject:object forKey:key withCost:0];
+}
+
+- (void)setObject:(id)object forKeyedSubscript:(NSString *)key
+{
+    [self setObject:object forKey:key];
 }
 
 - (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost

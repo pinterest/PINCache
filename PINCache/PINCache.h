@@ -40,7 +40,7 @@ typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullabl
  @warning when using in extension or watch extension, define PIN_APP_EXTENSIONS=1
  */
 
-@interface PINCache : NSObject
+@interface PINCache : NSObject <PINCacheObjectSubscripting>
 
 #pragma mark -
 /// @name Core
