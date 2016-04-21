@@ -527,6 +527,37 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssert(diskObj == nil, @"should not be in disk cache");
 }
 
+- (void)testWritingProtectionOption
+{
+  #if !TARGET_OS_IPHONE
+    return;
+  #endif
+  
+  #if TARGET_OS_SIMULATOR
+    NSLog(@"Warning: file protection can't be tested on iPhone simulator");
+    return;
+  #endif
+  
+  self.cache.diskCache.writingProtectionOption = NSDataWritingFileProtectionCompleteUnlessOpen;
+  
+  NSString *key = @"key";
+  __block NSURL *diskFileURL = nil;
+  dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+
+  [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+    diskFileURL = fileURL;
+    dispatch_semaphore_signal(semaphore);
+  }];
+  
+  dispatch_semaphore_wait(semaphore, [self timeout]);
+  
+  NSError *error = nil;
+  NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:diskFileURL.path error:&error];
+  
+  XCTAssertNil(error, @"error getting attributes of file");
+  XCTAssertEqual(attributes[NSFileProtectionKey], NSFileProtectionCompleteUnlessOpen, @"file protection key is incorrect");
+}
+
 - (void)testTTLCacheObjectAccess {
     [self.cache removeAllObjects];
     NSString *key = @"key";

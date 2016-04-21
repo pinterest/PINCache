@@ -99,6 +99,21 @@ typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <
  */
 @property (assign) NSTimeInterval ageLimit;
 
+
+/**
+ The writing protection option used when writing a file on disk. This value is used every time an object is set.
+ NSDataWritingAtomic and NSDataWritingWithoutOverwriting are ignored if set
+ Defaults to NSDataWritingFileProtectionNone.
+ 
+ @warning Only new files are affected by the new writing protection. If you need all files to be affected,
+ you'll have to purge and set the objects back to the cache
+ 
+ Only available on iOS
+ */
+#if TARGET_OS_IPHONE
+@property (assign) NSDataWritingOptions writingProtectionOption;
+#endif
+
 /**
  If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
  cache, it only lives as long as self.ageLimit. This has the following implications:
