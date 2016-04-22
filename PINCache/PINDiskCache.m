@@ -50,6 +50,10 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 @synthesize ageLimit = _ageLimit;
 @synthesize ttlCache = _ttlCache;
 
+#if TARGET_OS_IPHONE
+@synthesize writingProtectionOption = _writingProtectionOption;
+#endif
+
 #pragma mark - Initialization -
 
 - (void)dealloc
@@ -91,7 +95,11 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         _byteCount = 0;
         _byteLimit = 0;
         _ageLimit = 0.0;
-        
+      
+        #if TARGET_OS_IPHONE
+          _writingProtectionOption = NSDataWritingFileProtectionNone;
+        #endif
+      
         _dates = [[NSMutableDictionary alloc] init];
         _sizes = [[NSMutableDictionary alloc] init];
         
@@ -698,6 +706,12 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     
     PINBackgroundTask *task = [PINBackgroundTask start];
     
+    #if TARGET_OS_IPHONE
+      NSDataWritingOptions writeOptions = NSDataWritingAtomic | self.writingProtectionOption;
+    #else
+      NSDataWritingOptions writeOptions = NSDataWritingAtomic;
+    #endif
+  
     NSURL *fileURL = nil;
     
     [self lock];
@@ -705,8 +719,12 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         
         if (self->_willAddObjectBlock)
             self->_willAddObjectBlock(self, key, object, fileURL);
-        
-        BOOL written = [NSKeyedArchiver archiveRootObject:object toFile:[fileURL path]];
+  
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object];
+        NSError *writeError = nil;
+  
+        BOOL written = [data writeToURL:fileURL options:writeOptions error:&writeError];
+        PINDiskCacheError(writeError);
         
         if (written) {
             [self setFileModificationDate:now forURL:fileURL];
@@ -1103,6 +1121,34 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         [strongSelf unlock];
     });
 }
+
+#if TARGET_OS_IPHONE
+- (NSDataWritingOptions)writingProtectionOption {
+    NSDataWritingOptions option;
+  
+    [self lock];
+        option = _writingProtectionOption;
+    [self unlock];
+  
+    return option;
+}
+
+- (void)setWritingProtectionOption:(NSDataWritingOptions)writingProtectionOption {
+  __weak PINDiskCache *weakSelf = self;
+  
+  dispatch_async(_asyncQueue, ^{
+    PINDiskCache *strongSelf = weakSelf;
+    if (!strongSelf)
+      return;
+    
+    NSDataWritingOptions option = NSDataWritingFileProtectionMask & writingProtectionOption;
+    
+    [strongSelf lock];
+    strongSelf->_writingProtectionOption = option;
+    [strongSelf unlock];
+  });
+}
+#endif
 
 - (void)lock
 {
