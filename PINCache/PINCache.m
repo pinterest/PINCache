@@ -46,7 +46,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     if (self = [super init]) {
         _name = [name copy];
         
-        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, self];
+        NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINCachePrefix, (void *)self];
         _concurrentQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", queueName] UTF8String], DISPATCH_QUEUE_CONCURRENT);
         
         _diskCache = [[PINDiskCache alloc] initWithName:_name rootPath:rootPath];
@@ -57,7 +57,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (NSString *)description
 {
-    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINCachePrefix, _name, self];
+    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINCachePrefix, _name, (void *)self];
 }
 
 + (instancetype)sharedCache

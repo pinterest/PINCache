@@ -121,7 +121,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (NSString *)description
 {
-    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINDiskCachePrefix, _name, self];
+    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINDiskCachePrefix, _name, (void *)self];
 }
 
 + (instancetype)sharedCache
