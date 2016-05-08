@@ -136,6 +136,27 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     XCTAssertEqual(cachedValue, value2, @"set did not overwrite previous object with same key");
 }
 
+- (void)testObjectContains
+{
+    NSString *key = @"key";
+    NSString *value = @"value";
+    
+    [self.cache setObject:value forKey:key];
+    
+    // Synchronously
+    XCTAssertTrue([self.cache containsObjectForKey:@"key"], @"object was gone");
+    
+    // Asynchronously
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block BOOL cacheContainsObject = NO;
+    [self.cache containsObjectForKey:key block:^(BOOL containsObject) {
+        cacheContainsObject = containsObject;
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertTrue(cacheContainsObject, @"object was gone");
+}
 
 - (void)testObjectGet
 {

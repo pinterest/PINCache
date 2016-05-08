@@ -74,6 +74,22 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 #pragma mark - Public Asynchronous Methods -
 
+- (void)containsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block
+{
+    if (!key || !block) {
+        return;
+    }
+    
+    __weak PINCache *weakSelf = self;
+    
+    dispatch_async(_concurrentQueue, ^{
+        PINCache *strongSelf = weakSelf;
+        
+        BOOL containsObject = [strongSelf containsObjectForKey:key];
+        block(containsObject);
+    });
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wshadow"
 
@@ -292,6 +308,14 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     }];
     
     return byteCount;
+}
+
+- (BOOL)containsObjectForKey:(NSString *)key
+{
+    if (!key)
+        return NO;
+    
+    return [_memoryCache containsObjectForKey:key] || [_diskCache containsObjectForKey:key];
 }
 
 - (__nullable id)objectForKey:(NSString *)key

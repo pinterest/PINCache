@@ -457,6 +457,22 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     });
 }
 
+- (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block
+{
+    __weak PINDiskCache *weakSelf = self;
+    
+    dispatch_async(_asyncQueue, ^{
+        PINDiskCache *strongSelf = weakSelf;
+        BOOL containsObject = [strongSelf containsObjectForKey:key];
+        
+        if (block) {
+            [strongSelf lock];
+                block(containsObject);
+            [strongSelf unlock];
+        }
+    });
+}
+
 - (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
@@ -615,6 +631,11 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     }
 }
 
+- (BOOL)containsObjectForKey:(NSString *)key
+{
+    return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
+}
+
 - (__nullable id<NSCoding>)objectForKey:(NSString *)key
 {
     return [self objectForKey:key fileURL:nil];
@@ -663,21 +684,27 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     return object;
 }
 
+/// Helper function to call fileURLForKey:updateFileModificationDate:
 - (NSURL *)fileURLForKey:(NSString *)key
 {
-    NSDate *now = [[NSDate alloc] init];
-    
-    if (!key)
+    // Don't update the file modification time, if self is a ttlCache
+    return [self fileURLForKey:key updateFileModificationDate:!self->_ttlCache];
+}
+
+- (NSURL *)fileURLForKey:(NSString *)key updateFileModificationDate:(BOOL)updateFileModificationDate
+{
+    if (!key) {
         return nil;
+    }
     
+    NSDate *now = [[NSDate alloc] init];
     NSURL *fileURL = nil;
     
     [self lock];
         fileURL = [self encodedFileURLForKey:key];
         
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
-            // Don't update the file modification time, if self is a ttlCache
-            if (!self->_ttlCache) {
+            if (updateFileModificationDate) {
                 [self setFileModificationDate:now forURL:fileURL];
             }
         } else {
