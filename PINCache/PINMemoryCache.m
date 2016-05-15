@@ -272,9 +272,8 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)containsObjectForKey:(NSString *)key block:(PINMemoryCacheContainmentBlock)block
 {
-    if (!key || !block) {
+    if (!key || !block)
         return;
-    }
     
     __weak PINMemoryCache *weakSelf = self;
     
