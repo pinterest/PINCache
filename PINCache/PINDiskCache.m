@@ -459,17 +459,14 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block
 {
+    if (!key || !block)
+        return;
+    
     __weak PINDiskCache *weakSelf = self;
     
     dispatch_async(_asyncQueue, ^{
         PINDiskCache *strongSelf = weakSelf;
-        BOOL containsObject = [strongSelf containsObjectForKey:key];
-        
-        if (block) {
-            [strongSelf lock];
-                block(containsObject);
-            [strongSelf unlock];
-        }
+        block([strongSelf containsObjectForKey:key]);
     });
 }
 
