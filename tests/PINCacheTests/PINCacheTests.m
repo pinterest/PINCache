@@ -144,7 +144,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 5.0;
     [self.cache setObject:value forKey:key];
     
     // Synchronously
-    XCTAssertTrue([self.cache containsObjectForKey:@"key"], @"object was gone");
+    XCTAssertTrue([self.cache containsObjectForKey:key], @"object was gone");
     
     // Asynchronously
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
