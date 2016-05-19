@@ -270,6 +270,21 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 #pragma mark - Public Asynchronous Methods -
 
+- (void)containsObjectForKey:(NSString *)key block:(PINMemoryCacheContainmentBlock)block
+{
+    if (!key || !block)
+        return;
+    
+    __weak PINMemoryCache *weakSelf = self;
+    
+    dispatch_async(_concurrentQueue, ^{
+        PINMemoryCache *strongSelf = weakSelf;
+        BOOL containsObject = [strongSelf containsObjectForKey:key];
+        
+        block(containsObject);
+    });
+}
+
 - (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
@@ -380,6 +395,17 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 }
 
 #pragma mark - Public Synchronous Methods -
+
+- (BOOL)containsObjectForKey:(NSString *)key
+{
+    if (!key)
+        return NO;
+    
+    [self lock];
+        BOOL containsObject = (_dictionary[key] != nil);
+    [self unlock];
+    return containsObject;
+}
 
 - (__nullable id)objectForKey:(NSString *)key
 {
