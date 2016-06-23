@@ -257,6 +257,17 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     XCTAssertTrue(self.cache.memoryCache.totalCost == 1, @"cache had an unexpected total cost");
 }
 
+- (void)testMemoryCostOnReplace
+{
+    NSString *key1 = @"key1";
+
+    for(int i=0; i<10; i++) {
+        [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
+    }
+
+    XCTAssertTrue(self.cache.memoryCache.totalCost == 1, @"cache had an unexpected total cost");
+}
+
 - (void)testMemoryCostByDate
 {
     NSString *key1 = @"key1";

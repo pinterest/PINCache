@@ -460,6 +460,10 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
         willAddObjectBlock(self, key, object);
     
     [self lock];
+        NSNumber* oldCost = _costs[key];
+        if (oldCost)
+            _totalCost -= [oldCost unsignedIntegerValue];
+
         _dictionary[key] = object;
         _dates[key] = [[NSDate alloc] init];
         _costs[key] = @(cost);
