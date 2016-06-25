@@ -25,8 +25,8 @@
 		692C967F1C89D05A00CE9C49 /* PINDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83D171DF0AF0041E777 /* PINDiskCache.m */; };
 		692C96801C89D06100CE9C49 /* PINMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */; };
 		692C96811C89D06600CE9C49 /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E5D83B171DF0AF0041E777 /* PINCache.m */; };
-		705DF8581CB03E20004BF1EB /* PINCacheObjectSubscripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 705DF8571CB03E20004BF1EB /* PINCacheObjectSubscripting.h */; };
-		705DF8591CB03E20004BF1EB /* PINCacheObjectSubscripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 705DF8571CB03E20004BF1EB /* PINCacheObjectSubscripting.h */; };
+		705DF8581CB03E20004BF1EB /* PINCacheObjectSubscripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 705DF8571CB03E20004BF1EB /* PINCacheObjectSubscripting.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		705DF8591CB03E20004BF1EB /* PINCacheObjectSubscripting.h in Headers */ = {isa = PBXBuildFile; fileRef = 705DF8571CB03E20004BF1EB /* PINCacheObjectSubscripting.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D07F1EB6171AFB7A001DBA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB5171AFB7A001DBA02 /* UIKit.framework */; };
 		D07F1EB8171AFB7A001DBA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB7171AFB7A001DBA02 /* Foundation.framework */; };
 		D07F1EBA171AFB7A001DBA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D07F1EB9171AFB7A001DBA02 /* CoreGraphics.framework */; };
