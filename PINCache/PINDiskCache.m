@@ -8,6 +8,8 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#import <pthread.h>
+
 #define PINDiskCacheError(error) if (error) { NSLog(@"%@ (%d) ERROR: %@", \
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], \
 __LINE__, [error localizedDescription]); }
@@ -23,16 +25,16 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 - (void)end;
 @end
 
-@interface PINDiskCache ()
+@interface PINDiskCache () {
+    pthread_mutex_t _instanceLock;
+}
 
 @property (assign) NSUInteger byteCount;
 @property (strong, nonatomic) NSURL *cacheURL;
 #if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic) dispatch_queue_t asyncQueue;
-@property (strong, nonatomic) dispatch_semaphore_t lockSemaphore;
 #else
 @property (assign, nonatomic) dispatch_queue_t asyncQueue;
-@property (assign, nonatomic) dispatch_semaphore_t lockSemaphore;
 #endif
 @property (strong, nonatomic) NSMutableDictionary *dates;
 @property (strong, nonatomic) NSMutableDictionary *sizes;
@@ -58,8 +60,9 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)dealloc
 {
+    pthread_mutex_destroy(&_instanceLock);
+
 #if !OS_OBJECT_USE_OBJC
-    dispatch_release(_lockSemaphore);
     dispatch_release(_asyncQueue);
     _asyncQueue = nil;
 #endif
@@ -84,7 +87,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     if (self = [super init]) {
         _name = [name copy];
         _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", PINDiskCachePrefix] UTF8String], DISPATCH_QUEUE_CONCURRENT);
-        _lockSemaphore = dispatch_semaphore_create(1);
+        pthread_mutex_init(&_instanceLock, NULL);
         _willAddObjectBlock = nil;
         _willRemoveObjectBlock = nil;
         _willRemoveAllObjectsBlock = nil;
@@ -1176,12 +1179,12 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)lock
 {
-    dispatch_semaphore_wait(_lockSemaphore, DISPATCH_TIME_FOREVER);
+    pthread_mutex_lock(&_instanceLock);
 }
 
 - (void)unlock
 {
-    dispatch_semaphore_signal(_lockSemaphore);
+    pthread_mutex_unlock(&_instanceLock);
 }
 
 @end
