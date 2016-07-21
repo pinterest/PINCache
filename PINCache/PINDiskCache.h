@@ -232,8 +232,6 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  Retrieves the object for the specified key. This method returns immediately and executes the passed
  block as soon as the object is available.
  
- @warning The fileURL is only valid for the duration of this block, do not use it after the block ends.
- 
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
@@ -246,9 +244,10 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  @warning Access is protected for the duration of the block, but to maintain safe disk access do not
  access this fileURL after the block has ended.
  
- @warning The PINDiskCache lock is held while block is executed. Any calls to the diskcache or a cache
- which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is 
- *not* passed the instance of the disk cache.
+ @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
+ or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
+ *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
+ lock is held.
  
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the file URL is available.
@@ -318,9 +317,10 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed after the enumeration is complete.
  
- @warning The PINDiskCache lock is held while block is executed. Any calls to the diskcache or a cache
- which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
- *not* passed the instance of the disk cache.
+ @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
+ or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
+ *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
+ lock is held.
  
  */
 - (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock;
@@ -422,9 +422,10 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  @warning Do not call this method within the event blocks (<didRemoveObjectBlock>, etc.)
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
  
- @warning The PINDiskCache lock is held while block is executed. Any calls to the diskcache or a cache
- which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
- *not* passed the instance of the disk cache.
+ @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
+ or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
+ *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
+ lock is held.
  
  */
 - (void)enumerateObjectsWithBlock:(nullable PINDiskCacheFileURLBlock)block;
