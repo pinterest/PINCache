@@ -25,8 +25,13 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 - (void)end;
 @end
 
+typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
+    PINDiskCacheConditionNotReady = 0,
+    PINDiskCacheConditionReady = 1,
+};
+
 @interface PINDiskCache () {
-    pthread_mutex_t _instanceLock;
+    NSConditionLock *_instanceLock;
 }
 
 @property (assign) NSUInteger byteCount;
@@ -60,8 +65,6 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)dealloc
 {
-    pthread_mutex_destroy(&_instanceLock);
-
 #if !OS_OBJECT_USE_OBJC
     dispatch_release(_asyncQueue);
     _asyncQueue = nil;
@@ -87,7 +90,7 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
     if (self = [super init]) {
         _name = [name copy];
         _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", PINDiskCachePrefix] UTF8String], DISPATCH_QUEUE_CONCURRENT);
-        pthread_mutex_init(&_instanceLock, NULL);
+        _instanceLock = [[NSConditionLock alloc] initWithCondition:PINDiskCacheConditionNotReady];
         _willAddObjectBlock = nil;
         _willRemoveObjectBlock = nil;
         _willRemoveAllObjectsBlock = nil;
@@ -110,13 +113,12 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
         _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
         
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
-        //this is only safe because we use a dispatch_semaphore as a lock. If we switch to an NSLock or posix locks, this will *no longer be safe*.
-        [self lock];
         dispatch_async(_asyncQueue, ^{
-            [self createCacheDirectory];
-            [self initializeDiskProperties];
-
-            [self unlock];
+            //should always be able to aquire the lock unless the below code is running.
+            [_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
+                [self createCacheDirectory];
+                [self initializeDiskProperties];
+            [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
         });
     }
     return self;
@@ -1179,12 +1181,12 @@ static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 - (void)lock
 {
-    pthread_mutex_lock(&_instanceLock);
+    [_instanceLock lockWhenCondition:PINDiskCacheConditionReady];
 }
 
 - (void)unlock
 {
-    pthread_mutex_unlock(&_instanceLock);
+    [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
 }
 
 @end
