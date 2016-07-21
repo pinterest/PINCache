@@ -206,11 +206,101 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 		</Token>
 		
 		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/setWritingProtectionOption:</TokenIdentifier>
+			<Abstract type="html">The writing protection option used when writing a file on disk. This value is used every time an object is set.
+NSDataWritingAtomic and NSDataWritingWithoutOverwriting are ignored if set
+Defaults to NSDataWritingFileProtectionNone.</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+			<Declaration>@property (assign) NSDataWritingOptions writingProtectionOption</Declaration>
+			
+			
+			<Anchor>//api/name/writingProtectionOption</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/writingProtectionOption</TokenIdentifier>
+			<Abstract type="html">The writing protection option used when writing a file on disk. This value is used every time an object is set.
+NSDataWritingAtomic and NSDataWritingWithoutOverwriting are ignored if set
+Defaults to NSDataWritingFileProtectionNone.</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+			<Declaration>@property (assign) NSDataWritingOptions writingProtectionOption</Declaration>
+			
+			
+			<Anchor>//api/name/writingProtectionOption</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instp/PINDiskCache/writingProtectionOption</TokenIdentifier>
+			<Abstract type="html">The writing protection option used when writing a file on disk. This value is used every time an object is set.
+NSDataWritingAtomic and NSDataWritingWithoutOverwriting are ignored if set
+Defaults to NSDataWritingFileProtectionNone.</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+			<Declaration>@property (assign) NSDataWritingOptions writingProtectionOption</Declaration>
+			
+			
+			<Anchor>//api/name/writingProtectionOption</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/setTtlCache:</TokenIdentifier>
+			<Abstract type="html">If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
+cache, it only lives as long as self.ageLimit. This has the following implications:
+    - Accessing an object in the cache does not extend that object&apos;s lifetime in the cache
+    - When attempting to access an object in the cache that has lived longer than self.ageLimit,
+      the cache will behave as if the object does not exist</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+			<Declaration>@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache</Declaration>
+			
+			
+			<Anchor>//api/name/ttlCache</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/isTTLCache</TokenIdentifier>
+			<Abstract type="html">If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
+cache, it only lives as long as self.ageLimit. This has the following implications:
+    - Accessing an object in the cache does not extend that object&apos;s lifetime in the cache
+    - When attempting to access an object in the cache that has lived longer than self.ageLimit,
+      the cache will behave as if the object does not exist</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+			<Declaration>@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache</Declaration>
+			
+			
+			<Anchor>//api/name/ttlCache</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instp/PINDiskCache/ttlCache</TokenIdentifier>
+			<Abstract type="html">If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
+cache, it only lives as long as self.ageLimit. This has the following implications:
+    - Accessing an object in the cache does not extend that object&apos;s lifetime in the cache
+    - When attempting to access an object in the cache that has lived longer than self.ageLimit,
+      the cache will behave as if the object does not exist</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+			<Declaration>@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache</Declaration>
+			
+			
+			<Anchor>//api/name/ttlCache</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/setWillAddObjectBlock:</TokenIdentifier>
 			<Abstract type="html">A block to be executed just before an object is added to the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock willAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable willAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willAddObjectBlock</Anchor>
@@ -222,7 +312,7 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 			<Abstract type="html">A block to be executed just before an object is added to the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock willAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable willAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willAddObjectBlock</Anchor>
@@ -234,7 +324,7 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 			<Abstract type="html">A block to be executed just before an object is added to the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock willAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable willAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willAddObjectBlock</Anchor>
@@ -246,7 +336,7 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 			<Abstract type="html">A block to be executed just before an object is removed from the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock willRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable willRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveObjectBlock</Anchor>
@@ -258,7 +348,7 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 			<Abstract type="html">A block to be executed just before an object is removed from the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock willRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable willRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveObjectBlock</Anchor>
@@ -270,7 +360,7 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 			<Abstract type="html">A block to be executed just before an object is removed from the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock willRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable willRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveObjectBlock</Anchor>
@@ -283,7 +373,7 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0, meaning no limit.</
 The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheBlock willRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheBlock __nullable willRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveAllObjectsBlock</Anchor>
@@ -296,7 +386,7 @@ The queue waits during execution.</Abstract>
 The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheBlock willRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheBlock __nullable willRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveAllObjectsBlock</Anchor>
@@ -309,7 +399,7 @@ The queue waits during execution.</Abstract>
 The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheBlock willRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheBlock __nullable willRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveAllObjectsBlock</Anchor>
@@ -321,7 +411,7 @@ The queue waits during execution.</Abstract>
 			<Abstract type="html">A block to be executed just after an object is added to the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock didAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable didAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didAddObjectBlock</Anchor>
@@ -333,7 +423,7 @@ The queue waits during execution.</Abstract>
 			<Abstract type="html">A block to be executed just after an object is added to the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock didAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable didAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didAddObjectBlock</Anchor>
@@ -345,7 +435,7 @@ The queue waits during execution.</Abstract>
 			<Abstract type="html">A block to be executed just after an object is added to the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock didAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable didAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didAddObjectBlock</Anchor>
@@ -357,7 +447,7 @@ The queue waits during execution.</Abstract>
 			<Abstract type="html">A block to be executed just after an object is removed from the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock didRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable didRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveObjectBlock</Anchor>
@@ -369,7 +459,7 @@ The queue waits during execution.</Abstract>
 			<Abstract type="html">A block to be executed just after an object is removed from the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock didRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable didRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveObjectBlock</Anchor>
@@ -381,7 +471,7 @@ The queue waits during execution.</Abstract>
 			<Abstract type="html">A block to be executed just after an object is removed from the cache. The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheObjectBlock didRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheObjectBlock __nullable didRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveObjectBlock</Anchor>
@@ -394,7 +484,7 @@ The queue waits during execution.</Abstract>
 The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheBlock didRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheBlock __nullable didRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveAllObjectsBlock</Anchor>
@@ -407,7 +497,7 @@ The queue waits during execution.</Abstract>
 The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheBlock didRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheBlock __nullable didRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveAllObjectsBlock</Anchor>
@@ -420,7 +510,7 @@ The queue waits during execution.</Abstract>
 The queue waits during execution.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINDiskCacheBlock didRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINDiskCacheBlock __nullable didRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveAllObjectsBlock</Anchor>
@@ -505,7 +595,7 @@ the same data on disk thanks to the magic of seriality.</Abstract>
 			<Abstract type="html">Locks access to ivars and allows safe interaction with files on disk. This method returns immediately.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)lockFileAccessWhileExecutingBlock:(PINDiskCacheBlock)block</Declaration>
+			<Declaration>- (void)lockFileAccessWhileExecutingBlock:(nullable PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -518,12 +608,39 @@ the same data on disk thanks to the magic of seriality.</Abstract>
 		</Token>
 		
 		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/containsObjectForKey:block:</TokenIdentifier>
+			<Abstract type="html">This method determines whether an object is present for the given key in the cache. This method returns immediately
+and executes the passed block after the object is available, potentially in parallel with other blocks on the
+&lt;concurrentQueue&gt;.</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+	<RelatedTokens>
+		<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/containsObjectForKey:</TokenIdentifier>
+		
+	</RelatedTokens>
+	
+			<Declaration>- (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>key</Name>
+					<Abstract type="html">The key associated with the object.</Abstract>
+				</Parameter><Parameter>
+					<Name>block</Name>
+					<Abstract type="html">A block to be executed concurrently after the containment check happened</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/containsObjectForKey:block:</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/objectForKey:block:</TokenIdentifier>
 			<Abstract type="html">Retrieves the object for the specified key. This method returns immediately and executes the passed
 block as soon as the object is available.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)objectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -544,7 +661,7 @@ block as soon as the object is available.</Abstract>
 returns immediately and executes the passed block as soon as the object is available.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)fileURLForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)fileURLForKey:(nullable NSString *)key block:(nullable PINDiskCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -565,7 +682,7 @@ returns immediately and executes the passed block as soon as the object is avail
 passed block as soon as the object has been stored.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)setObject:(id&lt;NSCoding&gt;)object forKey:(NSString *)key block:(PINDiskCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)setObject:(id&lt;NSCoding&gt;)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>object</Name>
@@ -589,7 +706,7 @@ passed block as soon as the object has been stored.</Abstract>
 as soon as the object has been removed.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)removeObjectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)removeObjectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -610,7 +727,7 @@ as soon as the object has been removed.</Abstract>
 This method returns immediately and executes the passed block as soon as the cache has been trimmed.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToDate:(NSDate *)date block:(PINDiskCacheBlock)block</Declaration>
+			<Declaration>- (void)trimToDate:(NSDate *)date block:(nullable PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>date</Name>
@@ -631,7 +748,7 @@ This method returns immediately and executes the passed block as soon as the cac
 This method returns immediately and executes the passed block as soon as the cache has been trimmed.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToSize:(NSUInteger)byteCount block:(PINDiskCacheBlock)block</Declaration>
+			<Declaration>- (void)trimToSize:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>byteCount</Name>
@@ -653,7 +770,7 @@ than the specified byteCount. This method returns immediately and executes the p
 been trimmed.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToSizeByDate:(NSUInteger)byteCount block:(PINDiskCacheBlock)block</Declaration>
+			<Declaration>- (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>byteCount</Name>
@@ -674,7 +791,7 @@ been trimmed.</Abstract>
 cache has been cleared.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)removeAllObjects:(PINDiskCacheBlock)block</Declaration>
+			<Declaration>- (void)removeAllObjects:(nullable PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -693,7 +810,7 @@ read from disk, the object parameter of the block will be nil but the fileURL wi
 This method returns immediately.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block completionBlock:(PINDiskCacheBlock)completionBlock</Declaration>
+			<Declaration>- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -714,7 +831,7 @@ This method returns immediately.</Abstract>
 has been run.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINDiskCacheBlock)block</Declaration>
+			<Declaration>- (void)synchronouslyLockFileAccessWhileExecutingBlock:(nullable PINDiskCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -723,6 +840,28 @@ has been run.</Abstract>
 			</Parameters>
 			
 			<Anchor>//api/name/synchronouslyLockFileAccessWhileExecutingBlock:</Anchor>
+            <NodeRef refid="2"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/containsObjectForKey:</TokenIdentifier>
+			<Abstract type="html">This method determines whether an object is present for the given key in the cache.</Abstract>
+			<DeclaredIn>PINDiskCache.h</DeclaredIn>
+			
+	<RelatedTokens>
+		<TokenIdentifier>//apple_ref/occ/instm/PINDiskCache/containsObjectForKey:block:</TokenIdentifier>
+		
+	</RelatedTokens>
+	
+			<Declaration>- (BOOL)containsObjectForKey:(NSString *)key</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>key</Name>
+					<Abstract type="html">The key associated with the object.</Abstract>
+				</Parameter>
+			</Parameters>
+			<ReturnValue><Abstract type="html">YES if an object is present for the given key in the cache, otherwise NO.</Abstract></ReturnValue>
+			<Anchor>//api/name/containsObjectForKey:</Anchor>
             <NodeRef refid="2"/>
 		</Token>
 		
@@ -737,7 +876,7 @@ object is available.</Abstract>
 		
 	</RelatedTokens>
 	
-			<Declaration>- (id&lt;NSCoding&gt;)objectForKey:(NSString *)key</Declaration>
+			<Declaration>- (__nullable id&lt;NSCoding&gt;)objectForKey:(NSString *)key</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -761,7 +900,7 @@ shouldn&apos;t even exist, just use the asynchronous one.</Abstract>
 		
 	</RelatedTokens>
 	
-			<Declaration>- (NSURL *)fileURLForKey:(NSString *)key</Declaration>
+			<Declaration>- (nullable NSURL *)fileURLForKey:(nullable NSString *)key</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -823,7 +962,7 @@ has been removed.</Abstract>
 This method blocks the calling thread until the cache has been trimmed.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToDate:(NSDate *)date</Declaration>
+			<Declaration>- (void)trimToDate:(nullable NSDate *)date</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>date</Name>
@@ -890,7 +1029,7 @@ read from disk, the object parameter of the block will be nil but the fileURL wi
 This method blocks the calling thread until all objects have been enumerated.</Abstract>
 			<DeclaredIn>PINDiskCache.h</DeclaredIn>
 			
-			<Declaration>- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)enumerateObjectsWithBlock:(nullable PINDiskCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
