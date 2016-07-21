@@ -777,4 +777,21 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
 
 }
 
+- (void)testAsyncDiskInitialization
+{
+    NSString * const cacheName = @"testAsyncDiskInitialization";
+    PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:cacheName];
+    NSURL *testCacheURL = testCache.cacheURL;
+    NSError *error = nil;
+    
+    //Make sure the cache URL does not exist.
+    [[NSFileManager defaultManager] removeItemAtURL:testCacheURL error:&error];
+    XCTAssertNil(error);
+    
+    testCache = [[PINDiskCache alloc] initWithName:cacheName];
+    //This should not return until *after* disk cache directory has been created
+    [testCache objectForKey:@"some bogus key"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[testCacheURL path]]);
+}
+
 @end
