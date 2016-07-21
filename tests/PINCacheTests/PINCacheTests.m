@@ -785,8 +785,10 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     NSError *error = nil;
     
     //Make sure the cache URL does not exist.
-    [[NSFileManager defaultManager] removeItemAtURL:testCacheURL error:&error];
-    XCTAssertNil(error);
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[testCacheURL path]]) {
+        [[NSFileManager defaultManager] removeItemAtURL:testCacheURL error:&error];
+        XCTAssertNil(error);
+    }
     
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
     //This should not return until *after* disk cache directory has been created
