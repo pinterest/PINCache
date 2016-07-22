@@ -110,16 +110,14 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                 return;
             
             if (memoryCacheObject) {
-                [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject, NSURL *fileURL) {
-                    // update the access time on disk
-                }];
+                [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:NULL];
                 dispatch_async(strongSelf->_concurrentQueue, ^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
                         block(strongSelf, memoryCacheKey, memoryCacheObject);
                 });
             } else {
-                [strongSelf->_diskCache objectForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject, NSURL *fileURL) {
+                [strongSelf->_diskCache objectForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject) {
                     PINCache *strongSelf = weakSelf;
                     if (!strongSelf)
                         return;
@@ -158,7 +156,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
             dispatch_group_leave(group);
         };
         
-        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject, NSURL *memoryCacheFileURL) {
+        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject) {
             dispatch_group_leave(group);
         };
     }
@@ -198,7 +196,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
             dispatch_group_leave(group);
         };
         
-        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject, NSURL *memoryCacheFileURL) {
+        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject) {
             dispatch_group_leave(group);
         };
     }

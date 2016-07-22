@@ -19,7 +19,12 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object, NSURL * __nullable fileURL);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object);
+
+/**
+ A callback block which provides the key and fileURL of the object
+ */
+typedef void (^PINDiskCacheFileURLBlock)(NSString *key, NSURL * __nullable fileURL);
 
 /**
  A callback block which provides a BOOL value as argument
@@ -227,8 +232,6 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  Retrieves the object for the specified key. This method returns immediately and executes the passed
  block as soon as the object is available.
  
- @warning The fileURL is only valid for the duration of this block, do not use it after the block ends.
- 
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
@@ -241,10 +244,15 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  @warning Access is protected for the duration of the block, but to maintain safe disk access do not
  access this fileURL after the block has ended.
  
+ @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
+ or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
+ *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
+ lock is held.
+ 
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the file URL is available.
  */
-- (void)fileURLForKey:(nullable NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)fileURLForKey:(NSString *)key block:(nullable PINDiskCacheFileURLBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -308,8 +316,14 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
 
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed after the enumeration is complete.
+ 
+ @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
+ or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
+ *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
+ lock is held.
+ 
  */
-- (void)enumerateObjectsWithBlock:(PINDiskCacheObjectBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -404,10 +418,17 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  read from disk, the `object` parameter of the block will be `nil` but the `fileURL` will be available.
  This method blocks the calling thread until all objects have been enumerated.
  @param block A block to be executed for every object in the cache.
+ 
  @warning Do not call this method within the event blocks (<didRemoveObjectBlock>, etc.)
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
+ 
+ @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
+ or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
+ *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
+ lock is held.
+ 
  */
-- (void)enumerateObjectsWithBlock:(nullable PINDiskCacheObjectBlock)block;
+- (void)enumerateObjectsWithBlock:(nullable PINDiskCacheFileURLBlock)block;
 
 @end
 

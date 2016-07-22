@@ -167,6 +167,54 @@ Setting it back to 0.0 will stop the timer. Defaults to 0.0.</Abstract>
 		</Token>
 		
 		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/setTtlCache:</TokenIdentifier>
+			<Abstract type="html">If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
+cache, it only lives as long as self.ageLimit. This has the following implications:
+- Accessing an object in the cache does not extend that object&apos;s lifetime in the cache
+- When attempting to access an object in the cache that has lived longer than self.ageLimit,
+the cache will behave as if the object does not exist</Abstract>
+			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
+			
+			<Declaration>@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache</Declaration>
+			
+			
+			<Anchor>//api/name/ttlCache</Anchor>
+            <NodeRef refid="3"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/isTTLCache</TokenIdentifier>
+			<Abstract type="html">If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
+cache, it only lives as long as self.ageLimit. This has the following implications:
+- Accessing an object in the cache does not extend that object&apos;s lifetime in the cache
+- When attempting to access an object in the cache that has lived longer than self.ageLimit,
+the cache will behave as if the object does not exist</Abstract>
+			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
+			
+			<Declaration>@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache</Declaration>
+			
+			
+			<Anchor>//api/name/ttlCache</Anchor>
+            <NodeRef refid="3"/>
+		</Token>
+		
+		<Token>
+			<TokenIdentifier>//apple_ref/occ/instp/PINMemoryCache/ttlCache</TokenIdentifier>
+			<Abstract type="html">If ttlCache is YES, the cache behaves like a ttlCache. This means that once an object enters the
+cache, it only lives as long as self.ageLimit. This has the following implications:
+- Accessing an object in the cache does not extend that object&apos;s lifetime in the cache
+- When attempting to access an object in the cache that has lived longer than self.ageLimit,
+the cache will behave as if the object does not exist</Abstract>
+			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
+			
+			<Declaration>@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache</Declaration>
+			
+			
+			<Anchor>//api/name/ttlCache</Anchor>
+            <NodeRef refid="3"/>
+		</Token>
+		
+		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/setRemoveAllObjectsOnMemoryWarning:</TokenIdentifier>
 			<Abstract type="html">When YES on iOS the cache will remove all objects when the app receives a memory warning.
 Defaults to YES.</Abstract>
@@ -251,7 +299,7 @@ a lock, i.e. all reads and writes are suspended for the duration of the block.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock willAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable willAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willAddObjectBlock</Anchor>
@@ -265,7 +313,7 @@ a lock, i.e. all reads and writes are suspended for the duration of the block.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock willAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable willAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willAddObjectBlock</Anchor>
@@ -279,7 +327,7 @@ a lock, i.e. all reads and writes are suspended for the duration of the block.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock willAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable willAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willAddObjectBlock</Anchor>
@@ -293,7 +341,7 @@ within a lock, i.e. all reads and writes are suspended for the duration of the b
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock willRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable willRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveObjectBlock</Anchor>
@@ -307,7 +355,7 @@ within a lock, i.e. all reads and writes are suspended for the duration of the b
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock willRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable willRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveObjectBlock</Anchor>
@@ -321,7 +369,7 @@ within a lock, i.e. all reads and writes are suspended for the duration of the b
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock willRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable willRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveObjectBlock</Anchor>
@@ -335,7 +383,7 @@ This block will be excuted within a lock, i.e. all reads and writes are suspende
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock willRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable willRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveAllObjectsBlock</Anchor>
@@ -349,7 +397,7 @@ This block will be excuted within a lock, i.e. all reads and writes are suspende
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock willRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable willRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveAllObjectsBlock</Anchor>
@@ -363,7 +411,7 @@ This block will be excuted within a lock, i.e. all reads and writes are suspende
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock willRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable willRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/willRemoveAllObjectsBlock</Anchor>
@@ -377,7 +425,7 @@ a lock, i.e. all reads and writes are suspended for the duration of the block.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock didAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable didAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didAddObjectBlock</Anchor>
@@ -391,7 +439,7 @@ a lock, i.e. all reads and writes are suspended for the duration of the block.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock didAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable didAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didAddObjectBlock</Anchor>
@@ -405,7 +453,7 @@ a lock, i.e. all reads and writes are suspended for the duration of the block.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock didAddObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable didAddObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didAddObjectBlock</Anchor>
@@ -419,7 +467,7 @@ within a lock, i.e. all reads and writes are suspended for the duration of the b
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock didRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable didRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveObjectBlock</Anchor>
@@ -433,7 +481,7 @@ within a lock, i.e. all reads and writes are suspended for the duration of the b
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock didRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable didRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveObjectBlock</Anchor>
@@ -447,7 +495,7 @@ within a lock, i.e. all reads and writes are suspended for the duration of the b
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheObjectBlock didRemoveObjectBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheObjectBlock __nullable didRemoveObjectBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveObjectBlock</Anchor>
@@ -461,7 +509,7 @@ This block will be excuted within a lock, i.e. all reads and writes are suspende
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveAllObjectsBlock</Anchor>
@@ -475,7 +523,7 @@ This block will be excuted within a lock, i.e. all reads and writes are suspende
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveAllObjectsBlock</Anchor>
@@ -489,7 +537,7 @@ This block will be excuted within a lock, i.e. all reads and writes are suspende
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didRemoveAllObjectsBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didRemoveAllObjectsBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didRemoveAllObjectsBlock</Anchor>
@@ -502,7 +550,7 @@ Calling synchronous methods on the cache within this callback will likely cause 
 This block will be executed regardless of the value of removeAllObjectsOnMemoryWarning. Defaults to nil.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didReceiveMemoryWarningBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didReceiveMemoryWarningBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didReceiveMemoryWarningBlock</Anchor>
@@ -515,7 +563,7 @@ This block will be executed regardless of the value of removeAllObjectsOnMemoryW
 This block will be executed regardless of the value of removeAllObjectsOnMemoryWarning. Defaults to nil.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didReceiveMemoryWarningBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didReceiveMemoryWarningBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didReceiveMemoryWarningBlock</Anchor>
@@ -528,7 +576,7 @@ This block will be executed regardless of the value of removeAllObjectsOnMemoryW
 This block will be executed regardless of the value of removeAllObjectsOnMemoryWarning. Defaults to nil.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didReceiveMemoryWarningBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didReceiveMemoryWarningBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didReceiveMemoryWarningBlock</Anchor>
@@ -541,7 +589,7 @@ This block will be executed regardless of the value of removeAllObjectsOnMemoryW
 This block will be executed regardless of the value of removeAllObjectsOnEnteringBackground. Defaults to nil.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didEnterBackgroundBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didEnterBackgroundBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didEnterBackgroundBlock</Anchor>
@@ -554,7 +602,7 @@ This block will be executed regardless of the value of removeAllObjectsOnEnterin
 This block will be executed regardless of the value of removeAllObjectsOnEnteringBackground. Defaults to nil.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didEnterBackgroundBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didEnterBackgroundBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didEnterBackgroundBlock</Anchor>
@@ -567,7 +615,7 @@ This block will be executed regardless of the value of removeAllObjectsOnEnterin
 This block will be executed regardless of the value of removeAllObjectsOnEnteringBackground. Defaults to nil.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>@property (copy) PINMemoryCacheBlock didEnterBackgroundBlock</Declaration>
+			<Declaration>@property (copy) PINMemoryCacheBlock __nullable didEnterBackgroundBlock</Declaration>
 			
 			
 			<Anchor>//api/name/didEnterBackgroundBlock</Anchor>
@@ -587,12 +635,39 @@ This block will be executed regardless of the value of removeAllObjectsOnEnterin
 		</Token>
 		
 		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/containsObjectForKey:block:</TokenIdentifier>
+			<Abstract type="html">This method determines whether an object is present for the given key in the cache. This method returns immediately
+and executes the passed block after the object is available, potentially in parallel with other blocks on the
+concurrentQueue.</Abstract>
+			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
+			
+	<RelatedTokens>
+		<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/containsObjectForKey:</TokenIdentifier>
+		
+	</RelatedTokens>
+	
+			<Declaration>- (void)containsObjectForKey:(NSString *)key block:(PINMemoryCacheContainmentBlock)block</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>key</Name>
+					<Abstract type="html">The key associated with the object.</Abstract>
+				</Parameter><Parameter>
+					<Name>block</Name>
+					<Abstract type="html">A block to be executed concurrently after the containment check happened</Abstract>
+				</Parameter>
+			</Parameters>
+			
+			<Anchor>//api/name/containsObjectForKey:block:</Anchor>
+            <NodeRef refid="3"/>
+		</Token>
+		
+		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/objectForKey:block:</TokenIdentifier>
 			<Abstract type="html">Retrieves the object for the specified key. This method returns immediately and executes the passed
 block after the object is available, potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)objectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -613,7 +688,7 @@ block after the object is available, potentially in parallel with other blocks o
 passed block after the object has been stored, potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)setObject:(id)object forKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)setObject:(id)object forKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>object</Name>
@@ -639,7 +714,7 @@ and executes the passed block after the object has been stored, potentially in p
 on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINMemoryCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINMemoryCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>object</Name>
@@ -666,7 +741,7 @@ on the concurrentQueue.</Abstract>
 block after the object has been removed, potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)removeObjectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)removeObjectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -688,7 +763,7 @@ This method returns immediately and executes the passed block after the cache ha
 potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToDate:(NSDate *)date block:(PINMemoryCacheBlock)block</Declaration>
+			<Declaration>- (void)trimToDate:(NSDate *)date block:(nullable PINMemoryCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>date</Name>
@@ -710,7 +785,7 @@ value. This method returns immediately and executes the passed block after the c
 potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToCost:(NSUInteger)cost block:(PINMemoryCacheBlock)block</Declaration>
+			<Declaration>- (void)trimToCost:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>cost</Name>
@@ -732,7 +807,7 @@ the specified value. This method returns immediately and executes the passed blo
 trimmed, potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToCostByDate:(NSUInteger)cost block:(PINMemoryCacheBlock)block</Declaration>
+			<Declaration>- (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>cost</Name>
@@ -753,7 +828,7 @@ trimmed, potentially in parallel with other blocks on the concurrentQueue.</Abst
 the cache has been cleared, potentially in parallel with other blocks on the concurrentQueue.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)removeAllObjects:(PINMemoryCacheBlock)block</Declaration>
+			<Declaration>- (void)removeAllObjects:(nullable PINMemoryCacheBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -771,7 +846,7 @@ the cache has been cleared, potentially in parallel with other blocks on the con
 write to the cache inside block may be unsafe and may result in a deadlock. This method returns immediately.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(PINMemoryCacheBlock)completionBlock</Declaration>
+			<Declaration>- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
@@ -787,6 +862,28 @@ write to the cache inside block may be unsafe and may result in a deadlock. This
 		</Token>
 		
 		<Token>
+			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/containsObjectForKey:</TokenIdentifier>
+			<Abstract type="html">This method determines whether an object is present for the given key in the cache.</Abstract>
+			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
+			
+	<RelatedTokens>
+		<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/containsObjectForKey:block:</TokenIdentifier>
+		
+	</RelatedTokens>
+	
+			<Declaration>- (BOOL)containsObjectForKey:(NSString *)key</Declaration>
+			<Parameters>
+				<Parameter>
+					<Name>key</Name>
+					<Abstract type="html">The key associated with the object.</Abstract>
+				</Parameter>
+			</Parameters>
+			<ReturnValue><Abstract type="html">YES if an object is present for the given key in the cache, otherwise NO.</Abstract></ReturnValue>
+			<Anchor>//api/name/containsObjectForKey:</Anchor>
+            <NodeRef refid="3"/>
+		</Token>
+		
+		<Token>
 			<TokenIdentifier>//apple_ref/occ/instm/PINMemoryCache/objectForKey:</TokenIdentifier>
 			<Abstract type="html">Retrieves the object for the specified key. This method blocks the calling thread until the
 object is available.</Abstract>
@@ -797,7 +894,7 @@ object is available.</Abstract>
 		
 	</RelatedTokens>
 	
-			<Declaration>- (id)objectForKey:(NSString *)key</Declaration>
+			<Declaration>- (__nullable id)objectForKey:(nullable NSString *)key</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -842,7 +939,7 @@ to go over the costLimit the cache is trimmed (oldest objects first). This metho
 until the object has been stored.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost</Declaration>
+			<Declaration>- (void)setObject:(nullable id)object forKey:(nullable NSString *)key withCost:(NSUInteger)cost</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>object</Name>
@@ -866,7 +963,7 @@ until the object has been stored.</Abstract>
 has been removed.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)removeObjectForKey:(NSString *)key</Declaration>
+			<Declaration>- (void)removeObjectForKey:(nullable NSString *)key</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>key</Name>
@@ -884,7 +981,7 @@ has been removed.</Abstract>
 This method blocks the calling thread until the cache has been trimmed.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)trimToDate:(NSDate *)date</Declaration>
+			<Declaration>- (void)trimToDate:(nullable NSDate *)date</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>date</Name>
@@ -951,7 +1048,7 @@ This method blocks the calling thread until all objects have been enumerated.
 Calling synchronous methods on the cache within this callback will likely cause a deadlock.</Abstract>
 			<DeclaredIn>PINMemoryCache.h</DeclaredIn>
 			
-			<Declaration>- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block</Declaration>
+			<Declaration>- (void)enumerateObjectsWithBlock:(nullable PINMemoryCacheObjectBlock)block</Declaration>
 			<Parameters>
 				<Parameter>
 					<Name>block</Name>
