@@ -17,14 +17,6 @@ __LINE__, [error localizedDescription]); }
 static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
-@interface PINBackgroundTask : NSObject
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-@property (atomic, assign) UIBackgroundTaskIdentifier taskID;
-#endif
-+ (instancetype)start;
-- (void)end;
-@end
-
 typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     PINDiskCacheConditionNotReady = 0,
     PINDiskCacheConditionReady = 1,
@@ -257,8 +249,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 + (void)emptyTrash
 {
     dispatch_async([self sharedTrashQueue], ^{
-        PINBackgroundTask *task = [PINBackgroundTask start];
-        
         NSError *searchTrashedItemsError = nil;
         NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
                                                               includingPropertiesForKeys:nil
@@ -271,8 +261,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
             [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
             PINDiskCacheError(removeTrashedItemError);
         }
-        
-        [task end];
     });
 }
 
@@ -750,8 +738,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     if (!key || !object)
         return;
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     #if TARGET_OS_IPHONE
       NSDataWritingOptions writeOptions = NSDataWritingAtomic | self.writingProtectionOption;
     #else
@@ -810,8 +796,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     if (outFileURL) {
         *outFileURL = fileURL;
     }
-    
-    [task end];
 }
 
 - (void)removeObjectForKey:(NSString *)key
@@ -824,8 +808,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     if (!key)
         return;
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     NSURL *fileURL = nil;
     
     [self lock];
@@ -833,8 +815,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     [self unlock];
     
     [self removeFileAndExecuteBlocksForKey:key];
-    
-    [task end];
     
     if (outFileURL) {
         *outFileURL = fileURL;
@@ -848,11 +828,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         return;
     }
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     [self trimDiskToSize:trimByteCount];
-    
-    [task end];
 }
 
 - (void)trimToDate:(NSDate *)trimDate
@@ -865,11 +841,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         return;
     }
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     [self trimDiskToDate:trimDate];
-    
-    [task end];
 }
 
 - (void)trimToSizeByDate:(NSUInteger)trimByteCount
@@ -879,17 +851,11 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         return;
     }
     
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     [self trimDiskToSizeByDate:trimByteCount];
-    
-    [task end];
 }
 
 - (void)removeAllObjects
 {
-    PINBackgroundTask *task = [PINBackgroundTask start];
-    
     [self lock];
         PINDiskCacheBlock willRemoveAllObjectsBlock = self->_willRemoveAllObjectsBlock;
         if (willRemoveAllObjectsBlock) {
@@ -915,16 +881,12 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         }
     
     [self unlock];
-    
-    [task end];
 }
 
 - (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block
 {
     if (!block)
         return;
-    
-    PINBackgroundTask *task = [PINBackgroundTask start];
     
     [self lock];
         NSDate *now = [NSDate date];
@@ -938,8 +900,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
             }
         }
     [self unlock];
-    
-    [task end];
 }
 
 #pragma mark - Public Thread Safe Accessors -
@@ -1216,70 +1176,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 - (void)unlock
 {
     [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
-}
-
-@end
-
-@implementation PINBackgroundTask
-
-+ (BOOL)isAppExtension {
-
-    static BOOL isExtension;
-    static dispatch_once_t onceToken;
-
-    dispatch_once(&onceToken, ^{
-        NSDictionary *extensionDictionary = [[NSBundle mainBundle] infoDictionary][@"NSExtension"];
-        isExtension = [extensionDictionary isKindOfClass:[NSDictionary class]];
-    });
-
-    return isExtension;
-}
-
-- (instancetype)init
-{
-    if (self = [super init]) {
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-        _taskID = UIBackgroundTaskInvalid;
-#endif
-    }
-    return self;
-}
-
-+ (instancetype)start
-{
-    PINBackgroundTask *task = nil;
-    
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-    if ([self.class isAppExtension]) {
-        return task;
-    }
-    
-    task = [[self alloc] init];
-    
-    UIApplication *sharedApplication = [UIApplication performSelector:@selector(sharedApplication)];
-    task.taskID = [sharedApplication beginBackgroundTaskWithExpirationHandler:^{
-        UIBackgroundTaskIdentifier taskID = task.taskID;
-        task.taskID = UIBackgroundTaskInvalid;
-        [sharedApplication endBackgroundTask:taskID];
-    }];
-#endif
-    
-    return task;
-}
-
-- (void)end
-{
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
-    if ([self.class isAppExtension]) {
-        return;
-    }
-    
-    UIBackgroundTaskIdentifier taskID = self.taskID;
-    self.taskID = UIBackgroundTaskInvalid;
-    
-    UIApplication *sharedApplication = [UIApplication performSelector:@selector(sharedApplication)];
-    [sharedApplication endBackgroundTask:taskID];
-#endif
 }
 
 @end
