@@ -107,6 +107,21 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  */
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
 
+/**
+ Multiple instances with the same name are allowed and can safely access
+ the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ Initializer allows you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization for <diskCache>.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache on disk.
+ @param serializer   A block used to serialize object before writing to disk.
+ @param deserializer A block used to deserialize object read from disk.
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer NS_DESIGNATED_INITIALIZER;
+
+
 #pragma mark -
 /// @name Asynchronous Methods
 
