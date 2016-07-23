@@ -31,6 +31,24 @@ typedef void (^PINDiskCacheFileURLBlock)(NSString *key, NSURL * __nullable fileU
  */
 typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
 
+/**
+ *  A block used to serialize object before writing to disk
+ *
+ *  @param object Object to serialize
+ *
+ *  @return Serialized object representation
+ */
+typedef NSData* __nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object);
+
+/**
+ *  A block used to deserialize objects
+ *
+ *  @param data Serialized object data
+ *
+ *  @return Deserialized object
+ */
+typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
+
 
 /**
  `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
@@ -205,6 +223,18 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  @result A new cache with the specified name.
  */
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
+
+/**
+ Initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache.
+ @param serializer   A block used to serialize object
+ @param deserializer A block used to deserialize object
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer;
 
 #pragma mark -
 /// @name Asynchronous Methods
