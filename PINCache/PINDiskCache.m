@@ -79,8 +79,20 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
 {
+    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil];
+
+}
+
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer
+{
     if (!name)
         return nil;
+    
+    if ((serializer && !deserializer) ||
+        (!serializer && deserializer)){
+        @throw [NSException exceptionWithName:@"Must initialize with a both serializer and deserializer" reason:@"PINDiskCache must be initialized with a serializer and deserializer." userInfo:nil];
+        return nil;
+    }
     
     if (self = [super init]) {
         _name = [name copy];
@@ -96,48 +108,38 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         _byteCount = 0;
         _byteLimit = 0;
         _ageLimit = 0.0;
-      
-        #if TARGET_OS_IPHONE
-          _writingProtectionOption = NSDataWritingFileProtectionNone;
-        #endif
-      
+        
+#if TARGET_OS_IPHONE
+        _writingProtectionOption = NSDataWritingFileProtectionNone;
+#endif
+        
         _dates = [[NSMutableDictionary alloc] init];
         _sizes = [[NSMutableDictionary alloc] init];
         
         NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", PINDiskCachePrefix, _name];
         _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
         
-        //setup default serializers
-        _serializer = ^NSData*(id<NSCoding> object){
-            return [NSKeyedArchiver archivedDataWithRootObject:object];
-        };
-        
-        _deserializer = ^id(NSData * data){
-            return [NSKeyedUnarchiver unarchiveObjectWithData:data];
-        };
-        
+        //setup serializers
+        if(serializer) {
+            _serializer = [serializer copy];
+        } else {
+            _serializer = self.defaultSerializer;
+        }
+
+        if(deserializer) {
+            _deserializer = [deserializer copy];
+        } else {
+            _deserializer = self.defaultDeserializer;
+        }
+
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
         dispatch_async(_asyncQueue, ^{
             //should always be able to aquire the lock unless the below code is running.
             [_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
-                [self _locked_createCacheDirectory];
-                [self _locked_initializeDiskProperties];
+            [self _locked_createCacheDirectory];
+            [self _locked_initializeDiskProperties];
             [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
         });
-    }
-    return self;
-}
-
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer
-{
-    if (!serializer || !deserializer){
-        @throw [NSException exceptionWithName:@"Must initialize with a both serializer and deserializer" reason:@"PINDiskCache must be initialized with a serializer and deserializer." userInfo:nil];
-        return nil;
-    }
-    
-    if (self = [self initWithName:name rootPath:rootPath]) {
-        _serializer = [serializer copy];
-        _deserializer = [deserializer copy];
     }
     return self;
 }
@@ -220,6 +222,20 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 #pragma clang diagnostic pop
         return (__bridge_transfer NSString *)unescapedString;
     }
+}
+
+-(PINDiskCacheSerializerBlock) defaultSerializer
+{
+    return ^NSData*(id<NSCoding> object){
+        return [NSKeyedArchiver archivedDataWithRootObject:object];
+    };
+}
+
+-(PINDiskCacheDeserializerBlock) defaultDeserializer
+{
+    return ^id(NSData * data){
+        return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    };
 }
 
 #pragma mark - Private Trash Methods -

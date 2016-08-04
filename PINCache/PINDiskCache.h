@@ -222,7 +222,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
  @param rootPath The path of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath;
 
 /**
  Initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
@@ -230,11 +230,11 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
  @see name
  @param name The name of the cache.
  @param rootPath The path of the cache.
- @param serializer   A block used to serialize object
- @param deserializer A block used to deserialize object
+ @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
+ @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer;
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods
