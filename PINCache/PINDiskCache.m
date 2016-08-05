@@ -187,7 +187,13 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     }
     
     if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
-        return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
+        NSString *encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
+        if (self.fileExtension) {
+            return [encodedString stringByAppendingPathExtension:self.fileExtension];
+        }
+        else {
+            return encodedString;
+        }
     }
     else {
         CFStringRef static const charsToEscape = CFSTR(".:/%");
@@ -199,8 +205,15 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
                                                                             charsToEscape,
                                                                             kCFStringEncodingUTF8);
 #pragma clang diagnostic pop
-        return (__bridge_transfer NSString *)escapedString;
+        
+        if (self.fileExtension) {
+            return [(__bridge_transfer NSString *)escapedString stringByAppendingPathExtension:self.fileExtension];
+        }
+        else {
+            return (__bridge_transfer NSString *)escapedString;
+        }
     }
+    
 }
 
 - (NSString *)decodedString:(NSString *)string

@@ -126,6 +126,10 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
  */
 @property (assign) NSTimeInterval ageLimit;
 
+/**
+ Extension for all cache files on disk. Defaults to no extension. 
+ */
+@property (nonatomic, nullable, copy) NSString *fileExtension;
 
 /**
  The writing protection option used when writing a file on disk. This value is used every time an object is set.
