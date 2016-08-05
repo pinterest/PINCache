@@ -74,16 +74,20 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 - (instancetype)initWithName:(NSString *)name
 {
-    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
+    return [self initWithName:name fileExtension:nil];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
+- (instancetype)initWithName:(NSString *)name fileExtension:(NSString *)fileExtension
 {
-    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil];
-
+    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] fileExtension:fileExtension];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath fileExtension:(NSString *)fileExtension
+{
+    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil fileExtension:fileExtension];
+}
+
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension
 {
     if (!name)
         return nil;
@@ -96,6 +100,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     
     if (self = [super init]) {
         _name = [name copy];
+        _fileExtension = [fileExtension copy];
         _asyncQueue = dispatch_queue_create([[NSString stringWithFormat:@"%@ Asynchronous Queue", PINDiskCachePrefix] UTF8String], DISPATCH_QUEUE_CONCURRENT);
         _instanceLock = [[NSConditionLock alloc] initWithCondition:PINDiskCacheConditionNotReady];
         _willAddObjectBlock = nil;
@@ -187,7 +192,13 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     }
     
     if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
-        return [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
+        NSString *encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
+        if (self.fileExtension.length > 0) {
+            return [encodedString stringByAppendingPathExtension:self.fileExtension];
+        }
+        else {
+            return encodedString;
+        }
     }
     else {
         CFStringRef static const charsToEscape = CFSTR(".:/%");
@@ -199,7 +210,13 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
                                                                             charsToEscape,
                                                                             kCFStringEncodingUTF8);
 #pragma clang diagnostic pop
-        return (__bridge_transfer NSString *)escapedString;
+        
+        if (self.fileExtension.length > 0) {
+            return [(__bridge_transfer NSString *)escapedString stringByAppendingPathExtension:self.fileExtension];
+        }
+        else {
+            return (__bridge_transfer NSString *)escapedString;
+        }
     }
 }
 

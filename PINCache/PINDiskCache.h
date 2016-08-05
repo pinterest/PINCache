@@ -126,6 +126,10 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
  */
 @property (assign) NSTimeInterval ageLimit;
 
+/**
+ Extension for all cache files on disk. Defaults to no extension. 
+ */
+@property (readonly) NSString *fileExtension;
 
 /**
  The writing protection option used when writing a file on disk. This value is used every time an object is set.
@@ -211,30 +215,43 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
  @param name The name of the cache.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name;
+- (instancetype)initWithName:(nonnull NSString *)name;
 
 /**
- The designated initializer. Multiple instances with the same name are allowed and can safely access
+ Multiple instances with the same name are allowed and can safely access
+ the same data on disk thanks to the magic of seriality.
+ 
+ @see name
+ @param name The name of the cache.
+ @param fileExtension The file extension for files on disk.
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(nonnull NSString *)name fileExtension:(nullable NSString *)fileExtension;
+
+/**
+ Multiple instances with the same name are allowed and can safely access
  the same data on disk thanks to the magic of seriality.
  
  @see name
  @param name The name of the cache.
  @param rootPath The path of the cache.
+ @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath;
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath fileExtension:(nullable NSString *)fileExtension;
 
 /**
- Initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
+ The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
  
  @see name
  @param name The name of the cache.
  @param rootPath The path of the cache.
  @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
  @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
+ @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods

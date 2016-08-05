@@ -800,4 +800,26 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[testCacheURL path]]);
 }
 
+- (void)testCustomFileExtension {
+    
+    PINCache *cache = [[PINCache alloc] initWithName:[[NSUUID UUID] UUIDString] fileExtension:@"obj"];
+    
+    NSString *key = @"key";
+    __block NSURL *diskFileURL = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    [cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+        [cache fileURLForKey:key block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
+            diskFileURL = fileURL;
+            dispatch_semaphore_signal(semaphore);
+        }];
+    }];
+    
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertNotNil(diskFileURL.pathExtension);
+    XCTAssertEqualObjects(diskFileURL.pathExtension, @"obj");
+    
+}
+
 @end
