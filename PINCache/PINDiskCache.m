@@ -193,7 +193,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     
     if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
         NSString *encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
-        if (self.fileExtension) {
+        if (self.fileExtension.length > 0) {
             return [encodedString stringByAppendingPathExtension:self.fileExtension];
         }
         else {
