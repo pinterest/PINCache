@@ -458,7 +458,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
         NSString *key = [[NSString alloc] initWithFormat:@"key %zd", index];
         NSString *obj = [[NSString alloc] initWithFormat:@"obj %zd", index];
         dispatch_group_enter(group);
-        [self.cache.diskCache setObject:obj forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+        [self.cache.diskCache setObject:obj forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
             dispatch_group_leave(group);
         }];
     });
@@ -526,7 +526,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
@@ -548,7 +548,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
@@ -576,11 +576,9 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
   __block NSURL *diskFileURL = nil;
   dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
-  [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
-    [cache fileURLForKey:key block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
-        diskFileURL = fileURL;
-        dispatch_semaphore_signal(semaphore);
-    }];
+  [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+      diskFileURL = fileURL;
+      dispatch_semaphore_signal(semaphore);
   }];
   
   dispatch_semaphore_wait(semaphore, [self timeout]);
@@ -621,7 +619,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     }];
 
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
@@ -645,7 +643,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     }];
 
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
@@ -676,7 +674,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     // Wait for ttlCache to be set
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL *fileURL) {
         dispatch_group_leave(group);
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -702,7 +700,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
 
     // Wait for ttlCache to be set
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL *fileURL) {
         dispatch_group_leave(group);
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -730,11 +728,9 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
     __block NSURL *objectURL = nil;
-    [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
-        [cache fileURLForKey:key block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
-            objectURL = fileURL;
-            dispatch_group_leave(group);
-        }];
+    [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL *fileURL) {
+        objectURL = fileURL;
+        dispatch_group_leave(group);
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     XCTAssertNotNil(objectURL, @"objectURL should have a non-nil URL");
@@ -750,7 +746,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     [self.cache.diskCache setTtlCache:YES];
     // Wait for ttlCache to be set
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL *fileURL) {
       dispatch_group_leave(group);
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -766,7 +762,7 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     [self.cache.diskCache setTtlCache:NO];
     // Wait for ttlCache to be set
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
+    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object, NSURL *fileURL) {
       dispatch_group_leave(group);
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
@@ -798,6 +794,26 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     //This should not return until *after* disk cache directory has been created
     [testCache objectForKey:@"some bogus key"];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[testCacheURL path]]);
+}
+
+- (void)testCustomFileExtension {
+    
+    self.cache.diskCache.fileExtension = @"obj";
+    
+    NSString *key = @"key";
+    __block NSURL *diskFileURL = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object, NSURL *fileURL) {
+        diskFileURL = fileURL;
+        dispatch_semaphore_signal(semaphore);
+    }];
+    
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertNotNil(diskFileURL.pathExtension);
+    XCTAssertEqualObjects(diskFileURL.pathExtension, @"obj");
+    
 }
 
 @end

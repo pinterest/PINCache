@@ -122,7 +122,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                         block(strongSelf, memoryCacheKey, memoryCacheObject);
                 });
             } else {
-                [strongSelf->_diskCache objectForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject) {
+                [strongSelf->_diskCache objectForKey:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject, NSURL *fileURL) {
                     PINCache *strongSelf = weakSelf;
                     if (!strongSelf)
                         return;
@@ -161,7 +161,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
             dispatch_group_leave(group);
         };
         
-        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject) {
+        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject, NSURL *fileURL) {
             dispatch_group_leave(group);
         };
     }
@@ -201,7 +201,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
             dispatch_group_leave(group);
         };
         
-        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject) {
+        diskBlock = ^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> memoryCacheObject, NSURL *fileURL) {
             dispatch_group_leave(group);
         };
     }

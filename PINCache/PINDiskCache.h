@@ -19,7 +19,7 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object, NSURL * __nullable fileURL);
 
 /**
  A callback block which provides the key and fileURL of the object
@@ -126,6 +126,10 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
  */
 @property (assign) NSTimeInterval ageLimit;
 
+/**
+ Extension for all cache files on disk. Defaults to no extension. 
+ */
+@property (nonatomic, nullable, copy) NSString *fileExtension;
 
 /**
  The writing protection option used when writing a file on disk. This value is used every time an object is set.
