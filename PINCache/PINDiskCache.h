@@ -19,7 +19,7 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object, NSURL * __nullable fileURL);
 
 /**
  A callback block which provides the key and fileURL of the object

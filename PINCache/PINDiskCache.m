@@ -392,7 +392,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheObjectBlock willRemoveObjectBlock = _willRemoveObjectBlock;
         if (willRemoveObjectBlock) {
             [self unlock];
-            willRemoveObjectBlock(self, key, nil);
+            willRemoveObjectBlock(self, key, nil, nil);
             [self lock];
         }
         
@@ -414,7 +414,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
         if (didRemoveObjectBlock) {
             [self unlock];
-            _didRemoveObjectBlock(self, key, nil);
+            _didRemoveObjectBlock(self, key, nil, nil);
             [self lock];
         }
     
@@ -548,7 +548,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         id <NSCoding> object = [strongSelf objectForKey:key fileURL:&fileURL];
         
         if (block) {
-            block(strongSelf, key, object);
+            block(strongSelf, key, object, fileURL);
         }
     });
 }
@@ -579,7 +579,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         [strongSelf setObject:object forKey:key fileURL:&fileURL];
         
         if (block) {
-            block(strongSelf, key, object);
+            block(strongSelf, key, object, fileURL);
         }
     });
 }
@@ -594,7 +594,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         [strongSelf removeObjectForKey:key fileURL:&fileURL];
         
         if (block) {
-            block(strongSelf, key, nil);
+            block(strongSelf, key, nil, nil);
         }
     });
 }
@@ -795,7 +795,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
         if (willAddObjectBlock) {
             [self unlock];
-            willAddObjectBlock(self, key, object);
+            willAddObjectBlock(self, key, object, fileURL);
             [self lock];
         }
     
@@ -831,7 +831,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheObjectBlock didAddObjectBlock = self->_didAddObjectBlock;
         if (didAddObjectBlock) {
             [self unlock];
-            didAddObjectBlock(self, key, object);
+            didAddObjectBlock(self, key, object, fileURL);
             [self lock];
         }
     [self unlock];
