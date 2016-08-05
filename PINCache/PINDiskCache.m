@@ -206,7 +206,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
                                                                             kCFStringEncodingUTF8);
 #pragma clang diagnostic pop
         
-        if (self.fileExtension) {
+        if (self.fileExtension.length > 0) {
             return [(__bridge_transfer NSString *)escapedString stringByAppendingPathExtension:self.fileExtension];
         }
         else {
