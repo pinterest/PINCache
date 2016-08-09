@@ -729,15 +729,21 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]] &&
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit)) {
+            NSData *objectData = [[NSData alloc] initWithContentsOfFile:[fileURL path]];
+            
+            //Be careful with locking below. We unlock here so that we're not locked while deserializing, we re-lock after.
+            [self unlock];
             @try {
-                NSData * objectData = [[NSData alloc] initWithContentsOfFile:[fileURL path]];
                 object = _deserializer(objectData);
             }
             @catch (NSException *exception) {
                 NSError *error = nil;
-                [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
+                [self lock];
+                    [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
+                [self unlock];
                 PINDiskCacheError(error);
             }
+            [self lock];
           if (!self->_ttlCache) {
             [self _locked_setFileModificationDate:now forURL:fileURL];
           }
@@ -816,7 +822,11 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
             [self lock];
         }
     
-        NSData *data = _serializer(object);
+        //We unlock here so that we're not locked while serializing.
+        [self unlock];
+            NSData *data = _serializer(object);
+        [self lock];
+    
         NSError *writeError = nil;
   
         BOOL written = [data writeToURL:fileURL options:writeOptions error:&writeError];
