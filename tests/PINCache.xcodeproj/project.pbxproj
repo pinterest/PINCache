@@ -259,6 +259,7 @@
 				D07F1EB3171AFB7A001DBA02 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		D07F1EB3171AFB7A001DBA02 /* Products */ = {
 			isa = PBXGroup;
