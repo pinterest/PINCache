@@ -44,7 +44,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    int result = pthread_mutex_destroy(&_mutex);
+    __unused int result = pthread_mutex_destroy(&_mutex);
     NSCAssert(result == 0, @"Failed to destroy lock in PINMemoryCache %p. Code: %d", (void *)self, result);
 
     #if !OS_OBJECT_USE_OBJC
@@ -56,7 +56,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 - (instancetype)init
 {
     if (self = [super init]) {
-        int result = pthread_mutex_init(&_mutex, NULL);
+        __unused int result = pthread_mutex_init(&_mutex, NULL);
         NSAssert(result == 0, @"Failed to init lock in PINMemoryCache %@. Code: %d", self, result);
 
         NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINMemoryCachePrefix, (void *)self];
@@ -749,13 +749,13 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)lock
 {
-    int result = pthread_mutex_lock(&_mutex);
+    __unused int result = pthread_mutex_lock(&_mutex);
     NSAssert(result == 0, @"Failed to lock PINMemoryCache %@. Code: %d", self, result);
 }
 
 - (void)unlock
 {
-    int result = pthread_mutex_unlock(&_mutex);
+    __unused int result = pthread_mutex_unlock(&_mutex);
     NSAssert(result == 0, @"Failed to unlock PINMemoryCache %@. Code: %d", self, result);
 }
 
