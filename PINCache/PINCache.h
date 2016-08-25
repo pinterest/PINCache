@@ -209,7 +209,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 
 /**
  Retrieves the object for the specified key. This method blocks the calling thread until the object is available.
- Uses a semaphore to achieve synchronicity on the disk cache.
+ Uses a lock to achieve synchronicity on the disk cache.
  
  @see objectForKey:block:
  @param key The key associated with the object.
@@ -219,7 +219,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
- Uses a semaphore to achieve synchronicity on the disk cache.
+ Uses a lock to achieve synchronicity on the disk cache.
  
  @see setObject:forKey:block:
  @param object An object to store in the cache.
@@ -230,7 +230,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
  has been removed.
- Uses a semaphore to achieve synchronicity on the disk cache.
+ Uses a lock to achieve synchronicity on the disk cache.
  
  @param key The key associated with the object to be removed.
  */
@@ -239,7 +239,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 /**
  Removes all objects from the cache that have not been used since the specified date.
  This method blocks the calling thread until the cache has been trimmed.
- Uses a semaphore to achieve synchronicity on the disk cache.
+ Uses a lock to achieve synchronicity on the disk cache.
  
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
@@ -247,7 +247,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 
 /**
  Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
- Uses a semaphore to achieve synchronicity on the disk cache.
+ Uses a lock to achieve synchronicity on the disk cache.
  */
 - (void)removeAllObjects;
 

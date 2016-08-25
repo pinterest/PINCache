@@ -3,6 +3,7 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import "PINMemoryCache.h"
+#import <pthread.h>
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 #import <UIKit/UIKit.h>
@@ -13,11 +14,10 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 @interface PINMemoryCache ()
 #if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic) dispatch_queue_t concurrentQueue;
-@property (strong, nonatomic) dispatch_semaphore_t lockSemaphore;
 #else
 @property (assign, nonatomic) dispatch_queue_t concurrentQueue;
-@property (assign, nonatomic) dispatch_semaphore_t lockSemaphore;
 #endif
+@property (assign, nonatomic) pthread_mutex_t mutex;
 @property (strong, nonatomic) NSMutableDictionary *dictionary;
 @property (strong, nonatomic) NSMutableDictionary *dates;
 @property (strong, nonatomic) NSMutableDictionary *costs;
@@ -44,9 +44,11 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
+    int result = pthread_mutex_destroy(&_mutex);
+    NSCAssert(result == 0, @"Failed to destroy lock in PINMemoryCache %p. Code: %d", (void *)self, result);
+
     #if !OS_OBJECT_USE_OBJC
     dispatch_release(_concurrentQueue);
-    dispatch_release(_lockSemaphore);
     _concurrentQueue = nil;
     #endif
 }
@@ -54,7 +56,9 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 - (instancetype)init
 {
     if (self = [super init]) {
-        _lockSemaphore = dispatch_semaphore_create(1);
+        int result = pthread_mutex_init(&_mutex, NULL);
+        NSAssert(result == 0, @"Failed to init lock in PINMemoryCache %@. Code: %d", self, result);
+
         NSString *queueName = [[NSString alloc] initWithFormat:@"%@.%p", PINMemoryCachePrefix, (void *)self];
         _concurrentQueue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
@@ -745,12 +749,14 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)lock
 {
-    dispatch_semaphore_wait(_lockSemaphore, DISPATCH_TIME_FOREVER);
+    int result = pthread_mutex_lock(&_mutex);
+    NSAssert(result == 0, @"Failed to lock PINMemoryCache %@. Code: %d", self, result);
 }
 
 - (void)unlock
 {
-    dispatch_semaphore_signal(_lockSemaphore);
+    int result = pthread_mutex_unlock(&_mutex);
+    NSAssert(result == 0, @"Failed to unlock PINMemoryCache %@. Code: %d", self, result);
 }
 
 @end
