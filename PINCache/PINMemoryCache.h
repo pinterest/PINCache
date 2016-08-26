@@ -32,7 +32,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  automatically to reduce memory usage when the app receives a memory warning or goes into the background.
  
  Access is natively synchronous. Asynchronous variations are provided. Every asynchronous method accepts a
- callback block that runs on a concurrent <concurrentQueue>, with cache reads and writes protected by an semaphore.
+ callback block that runs on a concurrent <concurrentQueue>, with cache reads and writes protected by a lock.
  
  All access to the cache is dated so the that the least-used objects can be trimmed first. Setting an
  optional <ageLimit> will trigger a GCD timer to periodically to trim the cache to that age.
