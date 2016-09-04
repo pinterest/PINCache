@@ -35,19 +35,21 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  *  A block used to serialize object before writing to disk
  *
  *  @param object Object to serialize
+ *  @param key The key associated with the object
  *
  *  @return Serialized object representation
  */
-typedef NSData* __nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object);
+typedef NSData* __nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object, NSString *key);
 
 /**
  *  A block used to deserialize objects
  *
  *  @param data Serialized object data
+ *  @param key The key associated with the object
  *
  *  @return Deserialized object
  */
-typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data);
+typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSString *key);
 
 
 /**
