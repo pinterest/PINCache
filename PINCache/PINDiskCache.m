@@ -243,14 +243,14 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 -(PINDiskCacheSerializerBlock) defaultSerializer
 {
-    return ^NSData*(id<NSCoding> object){
+    return ^NSData*(id<NSCoding> object, NSString *key){
         return [NSKeyedArchiver archivedDataWithRootObject:object];
     };
 }
 
 -(PINDiskCacheDeserializerBlock) defaultDeserializer
 {
-    return ^id(NSData * data){
+    return ^id(NSData * data, NSString *key){
         return [NSKeyedUnarchiver unarchiveObjectWithData:data];
     };
 }
@@ -734,7 +734,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
             //Be careful with locking below. We unlock here so that we're not locked while deserializing, we re-lock after.
             [self unlock];
             @try {
-                object = _deserializer(objectData);
+                object = _deserializer(objectData, key);
             }
             @catch (NSException *exception) {
                 NSError *error = nil;
@@ -824,7 +824,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     
         //We unlock here so that we're not locked while serializing.
         [self unlock];
-            NSData *data = _serializer(object);
+            NSData *data = _serializer(object, key);
         [self lock];
     
         NSError *writeError = nil;
