@@ -131,7 +131,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 /**
  Extension for all cache files on disk. Defaults to no extension. 
  */
-@property (readonly) NSString *fileExtension;
+@property (readonly) NSString * __nullable fileExtension;
 
 /**
  The writing protection option used when writing a file on disk. This value is used every time an object is set.
