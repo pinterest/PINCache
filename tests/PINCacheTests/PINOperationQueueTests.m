@@ -183,4 +183,25 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
 #pragma clang diagnostic pop
 }
 
+- (void)testCancelation
+{
+  const NSUInteger sleepTime = 100000;
+  for (NSUInteger count = 0; count < PINOperationQueueTestsMaxOperations + 1; count++) {
+    [self.queue addOperation:^{
+      usleep(sleepTime);
+    } withPriority:PINOperationQueuePriorityDefault];
+  }
+  
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+  id <PINOperationReference> operation = [self.queue addOperation:^{
+    XCTAssertTrue(NO, @"operation should have been canceled");
+  } withPriority:PINOperationQueuePriorityDefault];
+#pragma clang diagnostics pop
+  
+  [self.queue cancelOperation:operation];
+  
+  usleep(sleepTime * (PINOperationQueueTestsMaxOperations + 1));
+}
+
 @end

@@ -73,6 +73,8 @@
     _serialQueue = dispatch_queue_create("PINOperationQueue Serial Queue", DISPATCH_QUEUE_SERIAL);
     
     _concurrentQueue = dispatch_queue_create("PINOperationQueue Unprioritized Serial Queue", DISPATCH_QUEUE_CONCURRENT);
+    
+    //Create a queue with max - 1 because this plus the serial queue add up to max.
     _concurrentSemaphore = dispatch_semaphore_create(maxConcurrentOperations - 1);
     _semaphoreQueue = dispatch_queue_create("PINOperationQueue Serial Semaphore Queue", DISPATCH_QUEUE_SERIAL);
     
@@ -80,6 +82,8 @@
     _lowPriorityOperations = [[NSMutableOrderedSet alloc] init];
     _defaultPriorityOperations = [[NSMutableOrderedSet alloc] init];
     _highPriorityOperations = [[NSMutableOrderedSet alloc] init];
+    
+    _canceledOperations = [NSHashTable weakObjectsHashTable];
   }
   return self;
 }
@@ -101,12 +105,14 @@
 {
   id <PINOperationReference> reference = [self nextOperationReference];
   
-  NSMutableOrderedSet *queue;
+  NSMutableOrderedSet *queue = nil;
   switch (priority) {
     case PINOperationQueuePriorityLow:
       queue = _lowPriorityOperations;
       break;
       
+    default:
+      NSAssert(NO, @"Invalid priority set");
     case PINOperationQueuePriorityDefault:
       queue = _defaultPriorityOperations;
       break;
@@ -122,7 +128,7 @@
     [_allOperations addObject:operation];
   [self unlock];
   
-  [self scheduleOperations:NO];
+  [self scheduleNextOperations:NO];
   
   return reference;
 }
@@ -134,15 +140,18 @@
   [self unlock];
 }
 
-- (void)scheduleOperations:(BOOL)onlyCheckSerial
+/**
+ Schedule next operations schedules the next operation by queue order onto the serial queue if
+ it's available and one operation by priority order onto the concurrent queue.
+ */
+- (void)scheduleNextOperations:(BOOL)onlyCheckSerial
 {
   [self lock];
     //get next available operation in order, ignoring priority and run it on the serial queue
     if (_serialQueueBusy == NO) {
-      PINOperation *operation = [_allOperations firstObject];
+      PINOperation *operation = [self locked_nextOperationByQueue];
       if (operation) {
         _serialQueueBusy = YES;
-        [self removeOperation:operation];
         dispatch_async(_serialQueue, ^{
           operation.block();
           [self lock];
@@ -150,7 +159,7 @@
           [self unlock];
           
           //see if there are any other operations
-          [self scheduleOperations:YES];
+          [self scheduleNextOperations:YES];
         });
       }
     }
@@ -163,8 +172,7 @@
   dispatch_async(_semaphoreQueue, ^{
       dispatch_semaphore_wait(_concurrentSemaphore, DISPATCH_TIME_FOREVER);
       [self lock];
-        PINOperation *operation = [self nextOperationByPriority];
-        [self removeOperation:operation];
+        PINOperation *operation = [self locked_nextOperationByPriority];
       [self unlock];
     
       if (operation) {
@@ -179,22 +187,37 @@
 }
 
 //Call with lock held
-- (PINOperation *)nextOperationByPriority
+- (PINOperation *)locked_nextOperationByPriority
 {
-  PINOperation *operation = [_highPriorityOperations firstObject];
-  if (operation) {
-    return operation;
+  NSArray *operationSets = @[_highPriorityOperations, _defaultPriorityOperations, _lowPriorityOperations];
+  for (NSOrderedSet *operations in operationSets) {
+    PINOperation *operation = [operations firstObject];
+    if (operation) {
+      [self locked_removeOperation:operation];
+      if ([_canceledOperations containsObject:operation.reference]) {
+        return nil;
+      } else {
+        return operation;
+      }
+    }
   }
-  operation = [_defaultPriorityOperations firstObject];
-  if (operation) {
-    return operation;
-  }
-  operation = [_lowPriorityOperations firstObject];
-  return operation;
+  return nil;
 }
 
 //Call with lock held
-- (void)removeOperation:(PINOperation *)operation
+- (PINOperation *)locked_nextOperationByQueue
+{
+  PINOperation *operation = [_allOperations firstObject];
+  [self locked_removeOperation:operation];
+  if ([_canceledOperations containsObject:operation.reference]) {
+    return nil;
+  } else {
+    return operation;
+  }
+}
+
+//Call with lock held
+- (void)locked_removeOperation:(PINOperation *)operation
 {
   if (operation) {
     [_allOperations removeObject:operation];
