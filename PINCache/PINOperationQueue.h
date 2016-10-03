@@ -19,7 +19,8 @@ typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
 @interface PINOperationQueue : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations;
+- (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations concurrentQueue:(dispatch_queue_t)concurrentQueue NS_DESIGNATED_INITIALIZER;
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)operation withPriority:(PINOperationQueuePriority)priority;
 - (void)cancelOperation:(id <PINOperationReference>)operationReference;
 

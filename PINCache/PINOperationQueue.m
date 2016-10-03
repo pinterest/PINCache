@@ -61,6 +61,11 @@
 
 - (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations
 {
+  return [self initWithMaxConcurrentOperations:maxConcurrentOperations concurrentQueue:dispatch_queue_create("PINOperationQueue Unprioritized Serial Queue", DISPATCH_QUEUE_CONCURRENT)];
+}
+
+- (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations concurrentQueue:(dispatch_queue_t)concurrentQueue
+{
   if (self = [super init]) {
     NSAssert(maxConcurrentOperations > 1, @"Max concurrent operations must be greater than 1. If it's one, just use a serial queue!");
     _operationReferenceCount = 0;
@@ -72,7 +77,7 @@
     
     _serialQueue = dispatch_queue_create("PINOperationQueue Serial Queue", DISPATCH_QUEUE_SERIAL);
     
-    _concurrentQueue = dispatch_queue_create("PINOperationQueue Unprioritized Serial Queue", DISPATCH_QUEUE_CONCURRENT);
+    _concurrentQueue = concurrentQueue;
     
     //Create a queue with max - 1 because this plus the serial queue add up to max.
     _concurrentSemaphore = dispatch_semaphore_create(maxConcurrentOperations - 1);
