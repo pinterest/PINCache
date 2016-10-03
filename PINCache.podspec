@@ -21,4 +21,8 @@ Pod::Spec.new do |s|
 #endif
 EOS
   s.prefix_header_contents = pch_PIN
+  s.subspec 'arc-exception-safe' do |sp|
+      sp.source_files = 'PINCache/PINDiskCache.m'
+      sp.compiler_flags = '-fobjc-arc-exceptions'
+  end
 end
