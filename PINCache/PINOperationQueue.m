@@ -72,6 +72,7 @@
     
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
+    //mutex must be recursive to allow scheduling of operations from operations
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&_lock, &attr);
     
