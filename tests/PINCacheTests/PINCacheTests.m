@@ -822,4 +822,40 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     
 }
 
+- (void)testDiskCacheSet
+{
+  PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:@"testDiskCacheSet"];
+  const NSUInteger objectCount = 100;
+  [self measureBlock:^{
+    for (NSUInteger idx = 0; idx < objectCount; idx++) {
+      [testCache setObject:[@(idx) stringValue] forKey:[@(idx) stringValue]];
+    }
+  }];
+}
+
+- (void)testDiskCacheHit
+{
+  PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:@"textDiskCacheHit"];
+  const NSUInteger objectCount = 100;
+  for (NSUInteger idx = 0; idx < objectCount; idx++) {
+    [testCache setObject:[@(idx) stringValue] forKey:[@(idx) stringValue]];
+  }
+  [self measureBlock:^{
+    for (NSUInteger idx = 0; idx < objectCount; idx++) {
+      [testCache objectForKey:[@(idx) stringValue]];
+    }
+  }];
+}
+
+- (void)testDiskCacheMiss
+{
+  PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:@"testDiskCacheMiss"];
+  const NSUInteger objectCount = 100;
+  [self measureBlock:^{
+    for (NSUInteger idx = 0; idx < objectCount; idx++) {
+      [testCache objectForKey:[@(idx) stringValue]];
+    }
+  }];
+}
+
 @end
