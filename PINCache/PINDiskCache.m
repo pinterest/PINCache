@@ -728,20 +728,22 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             NSData *objectData = [[NSData alloc] initWithContentsOfFile:[fileURL path]];
-            
-            //Be careful with locking below. We unlock here so that we're not locked while deserializing, we re-lock after.
-            [self unlock];
-            @try {
-                object = _deserializer(objectData, key);
+          
+            if (objectData) {
+              //Be careful with locking below. We unlock here so that we're not locked while deserializing, we re-lock after.
+              [self unlock];
+              @try {
+                  object = _deserializer(objectData, key);
+              }
+              @catch (NSException *exception) {
+                  NSError *error = nil;
+                  [self lock];
+                      [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
+                  [self unlock];
+                  PINDiskCacheError(error);
+              }
+              [self lock];
             }
-            @catch (NSException *exception) {
-                NSError *error = nil;
-                [self lock];
-                    [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
-                [self unlock];
-                PINDiskCacheError(error);
-            }
-            [self lock];
             if (object && !self->_ttlCache) {
                 //It's unlikely these need to be run in order or to be run quickly. Get it done eventually instead of blocking.
                 __weak PINDiskCache *weakSelf = self;
