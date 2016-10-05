@@ -25,12 +25,15 @@
   dispatch_queue_t _concurrentQueue;
   dispatch_queue_t _semaphoreQueue;
   
-  NSMutableOrderedSet *_allOperations;
+  NSMutableOrderedSet *_queuedOperations;
   NSMutableOrderedSet *_lowPriorityOperations;
   NSMutableOrderedSet *_defaultPriorityOperations;
   NSMutableOrderedSet *_highPriorityOperations;
   
   NSHashTable *_canceledOperations;
+  NSMapTable *_referenceToOperations;
+  
+  NSArray <NSMutableOrderedSet *> *_prioritizedOperationQueues;
 }
 
 @end
@@ -84,12 +87,15 @@
     _concurrentSemaphore = dispatch_semaphore_create(maxConcurrentOperations - 1);
     _semaphoreQueue = dispatch_queue_create("PINOperationQueue Serial Semaphore Queue", DISPATCH_QUEUE_SERIAL);
     
-    _allOperations = [[NSMutableOrderedSet alloc] init];
+    _queuedOperations = [[NSMutableOrderedSet alloc] init];
     _lowPriorityOperations = [[NSMutableOrderedSet alloc] init];
     _defaultPriorityOperations = [[NSMutableOrderedSet alloc] init];
     _highPriorityOperations = [[NSMutableOrderedSet alloc] init];
     
+    _prioritizedOperationQueues = @[_highPriorityOperations, _defaultPriorityOperations, _lowPriorityOperations];
+    
     _canceledOperations = [NSHashTable weakObjectsHashTable];
+    _referenceToOperations = [NSMapTable weakToWeakObjectsMapTable];
   }
   return self;
 }
@@ -111,27 +117,14 @@
 {
   id <PINOperationReference> reference = [self nextOperationReference];
   
-  NSMutableOrderedSet *queue = nil;
-  switch (priority) {
-    case PINOperationQueuePriorityLow:
-      queue = _lowPriorityOperations;
-      break;
-      
-    default:
-      NSAssert(NO, @"Invalid priority set");
-    case PINOperationQueuePriorityDefault:
-      queue = _defaultPriorityOperations;
-      break;
-      
-    case PINOperationQueuePriorityHigh:
-      queue = _highPriorityOperations;
-  }
+  NSMutableOrderedSet *queue = [self operationQueueWithPriority:priority];
   
   PINOperation *operation = [PINOperation operationWithBlock:block reference:reference];
   
   [self lock];
     [queue addObject:operation];
-    [_allOperations addObject:operation];
+    [_queuedOperations addObject:operation];
+    [_referenceToOperations setObject:operation forKey:reference];
   [self unlock];
   
   [self scheduleNextOperations:NO];
@@ -143,6 +136,20 @@
 {
   [self lock];
     [_canceledOperations addObject:operationReference];
+  [self unlock];
+}
+
+- (void)setOperationPriority:(PINOperationQueuePriority)priority withReference:(id <PINOperationReference>)reference
+{
+  [self lock];
+    PINOperation *operation = [_referenceToOperations objectForKey:reference];
+    if (operation) {
+      for (NSMutableOrderedSet *queue in _prioritizedOperationQueues) {
+        [queue removeObject:operation];
+      }
+      NSMutableOrderedSet *queue = [self operationQueueWithPriority:priority];
+      [queue addObject:operation];
+    }
   [self unlock];
 }
 
@@ -192,12 +199,27 @@
   });
 }
 
+- (NSMutableOrderedSet *)operationQueueWithPriority:(PINOperationQueuePriority)priority
+{
+  switch (priority) {
+    case PINOperationQueuePriorityLow:
+      return _lowPriorityOperations;
+      
+    default:
+      NSAssert(NO, @"Invalid priority set");
+    case PINOperationQueuePriorityDefault:
+      return _defaultPriorityOperations;
+      
+    case PINOperationQueuePriorityHigh:
+      return _highPriorityOperations;
+  }
+}
+
 //Call with lock held
 - (PINOperation *)locked_nextOperationByPriority
 {
-  NSArray *operationSets = @[_highPriorityOperations, _defaultPriorityOperations, _lowPriorityOperations];
-  for (NSOrderedSet *operations in operationSets) {
-    PINOperation *operation = [operations firstObject];
+  for (NSOrderedSet *queue in _prioritizedOperationQueues) {
+    PINOperation *operation = [queue firstObject];
     if (operation) {
       [self locked_removeOperation:operation];
       if ([_canceledOperations containsObject:operation.reference]) {
@@ -213,7 +235,7 @@
 //Call with lock held
 - (PINOperation *)locked_nextOperationByQueue
 {
-  PINOperation *operation = [_allOperations firstObject];
+  PINOperation *operation = [_queuedOperations firstObject];
   [self locked_removeOperation:operation];
   if ([_canceledOperations containsObject:operation.reference]) {
     return nil;
@@ -226,7 +248,7 @@
 - (void)locked_removeOperation:(PINOperation *)operation
 {
   if (operation) {
-    [_allOperations removeObject:operation];
+    [_queuedOperations removeObject:operation];
     [_lowPriorityOperations removeObject:operation];
     [_defaultPriorityOperations removeObject:operation];
     [_highPriorityOperations removeObject:operation];
