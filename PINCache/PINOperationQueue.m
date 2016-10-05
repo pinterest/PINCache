@@ -30,7 +30,6 @@
   NSMutableOrderedSet *_defaultPriorityOperations;
   NSMutableOrderedSet *_highPriorityOperations;
   
-  NSHashTable *_canceledOperations;
   NSMapTable *_referenceToOperations;
   
   NSArray <NSMutableOrderedSet *> *_prioritizedOperationQueues;
@@ -94,7 +93,6 @@
     
     _prioritizedOperationQueues = @[_highPriorityOperations, _defaultPriorityOperations, _lowPriorityOperations];
     
-    _canceledOperations = [NSHashTable weakObjectsHashTable];
     _referenceToOperations = [NSMapTable weakToWeakObjectsMapTable];
   }
   return self;
@@ -135,14 +133,20 @@
 - (void)cancelOperation:(id <PINOperationReference>)operationReference
 {
   [self lock];
-    [_canceledOperations addObject:operationReference];
+    PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
+    if (operation) {
+      for (NSMutableOrderedSet *queue in _prioritizedOperationQueues) {
+        [queue removeObject:operation];
+      }
+      [_queuedOperations removeObject:operation];
+    }
   [self unlock];
 }
 
-- (void)setOperationPriority:(PINOperationQueuePriority)priority withReference:(id <PINOperationReference>)reference
+- (void)setOperationPriority:(PINOperationQueuePriority)priority withReference:(id <PINOperationReference>)operationReference
 {
   [self lock];
-    PINOperation *operation = [_referenceToOperations objectForKey:reference];
+    PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
     if (operation) {
       for (NSMutableOrderedSet *queue in _prioritizedOperationQueues) {
         [queue removeObject:operation];
@@ -222,11 +226,7 @@
     PINOperation *operation = [queue firstObject];
     if (operation) {
       [self locked_removeOperation:operation];
-      if ([_canceledOperations containsObject:operation.reference]) {
-        return nil;
-      } else {
-        return operation;
-      }
+      return operation;
     }
   }
   return nil;
@@ -237,11 +237,7 @@
 {
   PINOperation *operation = [_queuedOperations firstObject];
   [self locked_removeOperation:operation];
-  if ([_canceledOperations containsObject:operation.reference]) {
-    return nil;
-  } else {
-    return operation;
-  }
+  return operation;
 }
 
 //Call with lock held
