@@ -535,11 +535,11 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     
     XCTAssert(memObj != nil, @"should still be in memory cache");
     XCTAssert(diskObj != nil, @"should still be in disk cache");
-    
-    sleep(2);
-    
+  
     [self.cache.memoryCache setAgeLimit:1];
     [self.cache.diskCache setAgeLimit:1];
+  
+    sleep(2);
     
     dispatch_group_enter(group);
     [self.cache.memoryCache objectForKey:key block:^(PINMemoryCache *cache, NSString *key, id object) {
