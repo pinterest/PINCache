@@ -6,12 +6,10 @@ branches:
 
 before_install: 
     - gem install cocoapods -v '0.39.0'
-    - gem install xcpretty -v '0.2.2'
-    - gem uninstall xcpretty --version '>0.2.2'
 before_script: pod lib lint --verbose
 env:
     matrix:
     - OS='8.4' name='iPhone 6'
     - OS='latest' name='iPhone 6'
 script:
-    - xcodebuild clean test -project tests/PINCache.xcodeproj -scheme PINCacheTests -sdk iphonesimulator  -destination "platform=iOS Simulator,name=$name,OS=$OS" ONLY_ACTIVE_ARCH=NO | xcpretty -t; test ${PIPESTATUS[0]} -eq 0
+    - xcodebuild clean test -project tests/PINCache.xcodeproj -scheme PINCacheTests -sdk iphonesimulator  -destination "platform=iOS Simulator,name=$name,OS=$OS" ONLY_ACTIVE_ARCH=NO
