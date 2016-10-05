@@ -6,6 +6,7 @@ branches:
 
 before_install: 
     - gem install cocoapods -v '0.39.0'
+    - gem uninstall xcpretty
     - gem install xcpretty -v 0.2.2
 before_script: pod lib lint --verbose
 env:
