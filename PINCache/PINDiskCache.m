@@ -376,6 +376,19 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         self.byteCount = byteCount; // atomic
 }
 
+- (void)asynchronouslySetFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
+{
+    __weak PINDiskCache *weakSelf = self;
+    dispatch_async(_asyncQueue, ^{
+        PINDiskCache *strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf lock];
+                [self _locked_setFileModificationDate:date forURL:fileURL];
+            [strongSelf unlock];
+        }
+    });
+}
+
 - (BOOL)_locked_setFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
 {
     if (!date || !fileURL) {
@@ -745,16 +758,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
               [self lock];
             }
             if (object && !self->_ttlCache) {
-                //It's unlikely these need to be run in order or to be run quickly. Get it done eventually instead of blocking.
-                __weak PINDiskCache *weakSelf = self;
-                dispatch_async(_asyncQueue, ^{
-                    PINDiskCache *strongSelf = weakSelf;
-                    if (strongSelf) {
-                        [strongSelf lock];
-                            [self _locked_setFileModificationDate:now forURL:fileURL];
-                        [strongSelf unlock];
-                    }
-                });
+                [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
         }
     [self unlock];
@@ -785,16 +789,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     [self lock];
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             if (updateFileModificationDate) {
-                //It's unlikely these need to be run in order or to be run quickly. Get it done eventually instead of blocking.
-                __weak PINDiskCache *weakSelf = self;
-                dispatch_async(_asyncQueue, ^{
-                    PINDiskCache *strongSelf = weakSelf;
-                    if (strongSelf) {
-                        [strongSelf lock];
-                            [self _locked_setFileModificationDate:now forURL:fileURL];
-                        [strongSelf unlock];
-                    }
-                });
+                [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
         } else {
             fileURL = nil;
@@ -847,6 +842,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheError(writeError);
         
         if (written) {
+            //Attempting to do this asynchronously seems to result in *worse* performance.
             [self _locked_setFileModificationDate:now forURL:fileURL];
             
             NSError *error = nil;
