@@ -810,8 +810,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL
 {
-    NSDate *now = [[NSDate alloc] init];
-    
     if (!key || !object)
         return;
     
@@ -842,11 +840,8 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheError(writeError);
         
         if (written) {
-            //Attempting to do this asynchronously seems to result in *worse* performance.
-            [self _locked_setFileModificationDate:now forURL:fileURL];
-            
             NSError *error = nil;
-            NSDictionary *values = [fileURL resourceValuesForKeys:@[ NSURLTotalFileAllocatedSizeKey ] error:&error];
+            NSDictionary *values = [fileURL resourceValuesForKeys:@[ NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey ] error:&error];
             PINDiskCacheError(error);
             
             NSNumber *diskFileSize = [values objectForKey:NSURLTotalFileAllocatedSizeKey];
@@ -858,6 +853,10 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
                 [self->_sizes setObject:diskFileSize forKey:key];
                 self.byteCount = self->_byteCount + [diskFileSize unsignedIntegerValue]; // atomic
             }
+            NSDate *date = [values objectForKey:NSURLContentModificationDateKey];
+            if (date) {
+                [self->_dates setObject:date forKey:key];
+            }
             
             if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
                 [self trimToSizeByDate:self->_byteLimit block:nil];
@@ -868,7 +867,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheObjectBlock didAddObjectBlock = self->_didAddObjectBlock;
         if (didAddObjectBlock) {
             [self unlock];
-            didAddObjectBlock(self, key, object);
+                didAddObjectBlock(self, key, object);
             [self lock];
         }
     [self unlock];
