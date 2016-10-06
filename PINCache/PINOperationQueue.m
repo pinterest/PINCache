@@ -209,13 +209,15 @@
     case PINOperationQueuePriorityLow:
       return _lowPriorityOperations;
       
-    default:
-      NSAssert(NO, @"Invalid priority set");
     case PINOperationQueuePriorityDefault:
       return _defaultPriorityOperations;
       
     case PINOperationQueuePriorityHigh:
       return _highPriorityOperations;
+          
+    default:
+      NSAssert(NO, @"Invalid priority set");
+      return _defaultPriorityOperations;
   }
 }
 
