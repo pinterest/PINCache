@@ -168,12 +168,14 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 #pragma mark - Private Methods -
 
-- (NSURL *)_locked_encodedFileURLForKey:(NSString *)key
+- (NSURL *)encodedFileURLForKey:(NSString *)key
 {
     if (![key length])
         return nil;
     
-    return [_cacheURL URLByAppendingPathComponent:[self encodedString:key]];
+    //Significantly improve performance by indicating that the URL will *not* result in a directory.
+    //Also note that accessing _cacheURL is safe without the lock because it is only set on init.
+    return [_cacheURL URLByAppendingPathComponent:[self encodedString:key] isDirectory:NO];
 }
 
 - (NSString *)keyForEncodedFileURL:(NSURL *)url
@@ -292,14 +294,14 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     return sharedTrashURL;
 }
 
-+(BOOL)moveItemAtURLToTrash:(NSURL *)itemURL
++ (BOOL)moveItemAtURLToTrash:(NSURL *)itemURL
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:[itemURL path]])
         return NO;
     
     NSError *error = nil;
     NSString *uniqueString = [[NSProcessInfo processInfo] globallyUniqueString];
-    NSURL *uniqueTrashURL = [[PINDiskCache sharedTrashURL] URLByAppendingPathComponent:uniqueString];
+    NSURL *uniqueTrashURL = [[PINDiskCache sharedTrashURL] URLByAppendingPathComponent:uniqueString isDirectory:NO];
     BOOL moved = [[NSFileManager defaultManager] moveItemAtURL:itemURL toURL:uniqueTrashURL error:&error];
     PINDiskCacheError(error);
     return moved;
@@ -374,6 +376,19 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         self.byteCount = byteCount; // atomic
 }
 
+- (void)asynchronouslySetFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
+{
+    __weak PINDiskCache *weakSelf = self;
+    dispatch_async(_asyncQueue, ^{
+        PINDiskCache *strongSelf = weakSelf;
+        if (strongSelf) {
+            [strongSelf lock];
+                [self _locked_setFileModificationDate:date forURL:fileURL];
+            [strongSelf unlock];
+        }
+    });
+}
+
 - (BOOL)_locked_setFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
 {
     if (!date || !fileURL) {
@@ -398,9 +413,9 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 - (BOOL)removeFileAndExecuteBlocksForKey:(NSString *)key
 {
-    [self lock];
-        NSURL *fileURL = [self _locked_encodedFileURLForKey:key];
+    NSURL *fileURL = [self encodedFileURLForKey:key];
     
+    [self lock];
         if (!fileURL || ![[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             [self unlock];
             return NO;
@@ -720,33 +735,31 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         return nil;
     
     id <NSCoding> object = nil;
-    NSURL *fileURL = nil;
+    NSURL *fileURL = [self encodedFileURLForKey:key];
     
     [self lock];
-        fileURL = [self _locked_encodedFileURLForKey:key];
-        object = nil;
-        
-        if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]] &&
+        if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
-            (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit)) {
             NSData *objectData = [[NSData alloc] initWithContentsOfFile:[fileURL path]];
-            
-            //Be careful with locking below. We unlock here so that we're not locked while deserializing, we re-lock after.
-            [self unlock];
-            @try {
-                object = _deserializer(objectData, key);
+          
+            if (objectData) {
+              //Be careful with locking below. We unlock here so that we're not locked while deserializing, we re-lock after.
+              [self unlock];
+              @try {
+                  object = _deserializer(objectData, key);
+              }
+              @catch (NSException *exception) {
+                  NSError *error = nil;
+                  [self lock];
+                      [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
+                  [self unlock];
+                  PINDiskCacheError(error);
+              }
+              [self lock];
             }
-            @catch (NSException *exception) {
-                NSError *error = nil;
-                [self lock];
-                    [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
-                [self unlock];
-                PINDiskCacheError(error);
+            if (object && !self->_ttlCache) {
+                [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
-            [self lock];
-          if (!self->_ttlCache) {
-            [self _locked_setFileModificationDate:now forURL:fileURL];
-          }
         }
     [self unlock];
     
@@ -771,14 +784,12 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     }
     
     NSDate *now = [[NSDate alloc] init];
-    NSURL *fileURL = nil;
+    NSURL *fileURL = [self encodedFileURLForKey:key];
     
     [self lock];
-        fileURL = [self _locked_encodedFileURLForKey:key];
-        
         if ([[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             if (updateFileModificationDate) {
-                [self _locked_setFileModificationDate:now forURL:fileURL];
+                [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
         } else {
             fileURL = nil;
@@ -810,15 +821,13 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
       NSDataWritingOptions writeOptions = NSDataWritingAtomic;
     #endif
   
-    NSURL *fileURL = nil;
+    NSURL *fileURL = [self encodedFileURLForKey:key];
     
     [self lock];
-        fileURL = [self _locked_encodedFileURLForKey:key];
-    
         PINDiskCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
         if (willAddObjectBlock) {
             [self unlock];
-            willAddObjectBlock(self, key, object);
+                willAddObjectBlock(self, key, object);
             [self lock];
         }
     
@@ -833,6 +842,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         PINDiskCacheError(writeError);
         
         if (written) {
+            //Attempting to do this asynchronously seems to result in *worse* performance.
             [self _locked_setFileModificationDate:now forURL:fileURL];
             
             NSError *error = nil;
@@ -880,9 +890,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     
     NSURL *fileURL = nil;
     
-    [self lock];
-        fileURL = [self _locked_encodedFileURLForKey:key];
-    [self unlock];
+    fileURL = [self encodedFileURLForKey:key];
     
     [self removeFileAndExecuteBlocksForKey:key];
     
@@ -963,7 +971,7 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         NSArray *keysSortedByDate = [self->_dates keysSortedByValueUsingSelector:@selector(compare:)];
         
         for (NSString *key in keysSortedByDate) {
-            NSURL *fileURL = [self _locked_encodedFileURLForKey:key];
+            NSURL *fileURL = [self encodedFileURLForKey:key];
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
                 block(key, fileURL);
