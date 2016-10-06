@@ -6,7 +6,7 @@
 #import "PINCache.h"
 
 static NSString * const PINCacheTestName = @"PINCacheTest";
-static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
+static const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 @interface PINDiskCache()
 
@@ -318,26 +318,25 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
         NSString *key = [[NSString alloc] initWithFormat:@"key %lu", (unsigned long)i];
         NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
         
-        [self.cache setObject:obj forKey:key block:nil];
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
         dispatch_group_enter(group);
-    }
-    
-    for (NSUInteger i = 0; i < max; i++) {
-        NSString *key = [[NSString alloc] initWithFormat:@"key %lu", (unsigned long)i];
-        
-        [self.cache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
+        [self.cache setObject:obj forKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
             dispatch_async(queue, ^{
-                NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
-                XCTAssertTrue([object isEqualToString:obj] == YES, @"object returned was not object set");
-                count -= 1;
-                dispatch_group_leave(group);
+                [self.cache objectForKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+                    NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
+                    XCTAssertTrue([object isEqualToString:obj] == YES, @"object returned was not object set");
+                    count -= 1;
+                    dispatch_group_leave(group);
+                }];
             });
         }];
     }
+#pragma clang diagnostic pop
     
-    dispatch_group_wait(group, [self timeout]);
+    NSUInteger success = dispatch_group_wait(group, [self timeout]);
 
+    XCTAssert(success == 0, @"Timed out waiting on operations");
     XCTAssertTrue(count == 0, @"one or more object blocks failed to execute, possible queue deadlock");
 }
 
@@ -738,6 +737,9 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     XCTAssertNotNil(objectURL, @"objectURL should have a non-nil URL");
+    
+    // Wait a moment to ensure that the file modification time is set (done asynchronously)
+    sleep(1);
 
     NSError *error = nil;
     NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[objectURL path] error:&error];
@@ -748,14 +750,15 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     sleep(1);
 
     [self.cache.diskCache setTtlCache:YES];
+    
     // Wait for ttlCache to be set
-    dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
-      dispatch_group_leave(group);
-    }];
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-
+    sleep(1);
+    
+    [self.cache.diskCache objectForKey:key];
     [self.cache.diskCache fileURLForKey:key];
+    
+    // Wait a moment to ensure that the file modification time is set (done asynchronously)
+    sleep(1);
 
     attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[objectURL path] error:nil];
     NSDate *ttlCacheEnabledModificationDate = attributes[NSFileModificationDate];
@@ -764,14 +767,15 @@ static const NSTimeInterval PINCacheTestBlockTimeout = 10.0;
     XCTAssertEqualObjects(initialModificationDate, ttlCacheEnabledModificationDate, @"The modification date shouldn't change when accessing the file URL, when ttlCache is enabled");
 
     [self.cache.diskCache setTtlCache:NO];
+    
     // Wait for ttlCache to be set
-    dispatch_group_enter(group);
-    [self.cache.diskCache objectForKey:key block:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
-      dispatch_group_leave(group);
-    }];
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-
+    sleep(1);
+    
+    [self.cache.diskCache objectForKey:key];
     [self.cache.diskCache fileURLForKey:key];
+    
+    // Wait a moment to ensure that the file modification time is set (done asynchronously)
+    sleep(1);
 
     attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[objectURL path] error:nil];
     NSDate *ttlCacheDisabledModificationDate = attributes[NSFileModificationDate];
