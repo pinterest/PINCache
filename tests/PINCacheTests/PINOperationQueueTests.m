@@ -111,8 +111,8 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
     [self.queue addOperation:^{
       @synchronized (self) {
         ++highOperationComplete;
-        XCTAssert(defaultOperationComplete < PINOperationQueueTestsMaxOperations, @"Running default operations before high");
-        XCTAssert(lowOperationComplete < PINOperationQueueTestsMaxOperations, @"Running low operations before high");
+        XCTAssert(defaultOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running default operations before high");
+        XCTAssert(lowOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running low operations before high");
       }
       dispatch_group_leave(group);
     } withPriority:PINOperationQueuePriorityHigh];
@@ -123,7 +123,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
     [self.queue addOperation:^{
       @synchronized (self) {
         ++defaultOperationComplete;
-        XCTAssert(lowOperationComplete < PINOperationQueueTestsMaxOperations, @"Running low operations before default");
+        XCTAssert(lowOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running low operations before default");
         XCTAssert(highOperationComplete > highOperationCount - PINOperationQueueTestsMaxOperations, @"Running high operations after default");
       }
       dispatch_group_leave(group);
