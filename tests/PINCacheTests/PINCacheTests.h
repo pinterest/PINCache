@@ -4,6 +4,8 @@
 
 #import <XCTest/XCTest.h>
 
+extern const NSTimeInterval PINCacheTestBlockTimeout;
+
 @interface PINCacheTests : XCTestCase
 
 @end
