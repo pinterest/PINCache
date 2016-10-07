@@ -104,15 +104,20 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   
   dispatch_group_t group = dispatch_group_create();
   
+  //This is actually a pretty annoying unit test to write. Because multiple operations are allowed to be concurrent, lower priority operations can potentially repeatidly
+  //obtain the lock while higher priority operations wait… So I'm attempting to make the operations less about lock contention and more about the length of time they take
+  //to execute and adding a sleep before they obtain the lock to hopefully improve reliability.
+  
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
   for (NSUInteger count = 0; count < highOperationCount; count++) {
     dispatch_group_enter(group);
     [self.queue addOperation:^{
+      usleep(10000);
       @synchronized (self) {
         ++highOperationComplete;
-        XCTAssert(defaultOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running default operations before high");
-        XCTAssert(lowOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running low operations before high");
+        XCTAssert(defaultOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running default operations before high. Default operations complete: %lu", (unsigned long)defaultOperationComplete);
+        XCTAssert(lowOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running low operations before high. Low operations complete: %lu", (unsigned long)lowOperationComplete);
       }
       dispatch_group_leave(group);
     } withPriority:PINOperationQueuePriorityHigh];
@@ -121,10 +126,11 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   for (NSUInteger count = 0; count < defaultOperationCount; count++) {
     dispatch_group_enter(group);
     [self.queue addOperation:^{
+      usleep(10000);
       @synchronized (self) {
         ++defaultOperationComplete;
-        XCTAssert(lowOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running low operations before default");
-        XCTAssert(highOperationComplete > highOperationCount - PINOperationQueueTestsMaxOperations, @"Running high operations after default");
+        XCTAssert(lowOperationComplete <= PINOperationQueueTestsMaxOperations, @"Running low operations before default. Low operations complete: %lu", (unsigned long)lowOperationComplete);
+        XCTAssert(highOperationComplete > highOperationCount - PINOperationQueueTestsMaxOperations, @"Running high operations after default. High operations complete: %lu", (unsigned long)highOperationComplete);
       }
       dispatch_group_leave(group);
     } withPriority:PINOperationQueuePriorityDefault];
@@ -133,10 +139,11 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   for (NSUInteger count = 0; count < lowOperationCount; count++) {
     dispatch_group_enter(group);
     [self.queue addOperation:^{
+      usleep(10000);
       @synchronized (self) {
         ++lowOperationComplete;
-        XCTAssert(defaultOperationComplete > defaultOperationCount - PINOperationQueueTestsMaxOperations, @"Running default operations after low");
-        XCTAssert(highOperationComplete > highOperationCount - PINOperationQueueTestsMaxOperations, @"Running high operations after low");
+        XCTAssert(defaultOperationComplete > defaultOperationCount - PINOperationQueueTestsMaxOperations, @"Running default operations after low. Default operations complete: %lu", (unsigned long)defaultOperationComplete);
+        XCTAssert(highOperationComplete > highOperationCount - PINOperationQueueTestsMaxOperations, @"Running high operations after low. High operations complete: %lu", (unsigned long)highOperationComplete);
       }
       dispatch_group_leave(group);
     } withPriority:PINOperationQueuePriorityLow];
