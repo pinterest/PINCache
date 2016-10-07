@@ -31,8 +31,6 @@
   NSMutableOrderedSet *_highPriorityOperations;
   
   NSMapTable *_referenceToOperations;
-  
-  NSArray <NSMutableOrderedSet *> *_prioritizedOperationQueues;
 }
 
 @end
@@ -41,18 +39,20 @@
 
 @property (nonatomic, strong) dispatch_block_t block;
 @property (nonatomic, strong) id <PINOperationReference> reference;
+@property (nonatomic, assign) PINOperationQueuePriority priority;
 
-+ (instancetype)operationWithBlock:(dispatch_block_t)block reference:(id <PINOperationReference>)reference;
++ (instancetype)operationWithBlock:(dispatch_block_t)block reference:(id <PINOperationReference>)reference priority:(PINOperationQueuePriority)priority;
 
 @end
 
 @implementation PINOperation
 
-+ (instancetype)operationWithBlock:(dispatch_block_t)block reference:(id<PINOperationReference>)reference
++ (instancetype)operationWithBlock:(dispatch_block_t)block reference:(id<PINOperationReference>)reference priority:(PINOperationQueuePriority)priority
 {
   PINOperation *operation = [[self alloc] init];
   operation.block = block;
   operation.reference = reference;
+  operation.priority = priority;
 
   return operation;
 }
@@ -91,8 +91,6 @@
     _defaultPriorityOperations = [[NSMutableOrderedSet alloc] init];
     _highPriorityOperations = [[NSMutableOrderedSet alloc] init];
     
-    _prioritizedOperationQueues = @[_highPriorityOperations, _defaultPriorityOperations, _lowPriorityOperations];
-    
     _referenceToOperations = [NSMapTable weakToWeakObjectsMapTable];
   }
   return self;
@@ -117,7 +115,7 @@
   
   NSMutableOrderedSet *queue = [self operationQueueWithPriority:priority];
   
-  PINOperation *operation = [PINOperation operationWithBlock:block reference:reference];
+  PINOperation *operation = [PINOperation operationWithBlock:block reference:reference priority:priority];
   
   [self lock];
     [queue addObject:operation];
@@ -135,9 +133,8 @@
   [self lock];
     PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
     if (operation) {
-      for (NSMutableOrderedSet *queue in _prioritizedOperationQueues) {
-        [queue removeObject:operation];
-      }
+      NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
+      [queue removeObject:operation];
       [_queuedOperations removeObject:operation];
     }
   [self unlock];
@@ -147,10 +144,12 @@
 {
   [self lock];
     PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
-    if (operation) {
-      for (NSMutableOrderedSet *queue in _prioritizedOperationQueues) {
-        [queue removeObject:operation];
-      }
+    if (operation && operation.priority != priority) {
+      NSMutableOrderedSet *oldQueue = [self operationQueueWithPriority:operation.priority];
+      [oldQueue removeObject:operation];
+      
+      operation.priority = priority;
+      
       NSMutableOrderedSet *queue = [self operationQueueWithPriority:priority];
       [queue addObject:operation];
     }
@@ -224,14 +223,17 @@
 //Call with lock held
 - (PINOperation *)locked_nextOperationByPriority
 {
-  for (NSOrderedSet *queue in _prioritizedOperationQueues) {
-    PINOperation *operation = [queue firstObject];
-    if (operation) {
-      [self locked_removeOperation:operation];
-      return operation;
-    }
+  PINOperation *operation = [_highPriorityOperations firstObject];
+  if (operation == nil) {
+    operation = [_defaultPriorityOperations firstObject];
   }
-  return nil;
+  if (operation == nil) {
+    operation = [_lowPriorityOperations firstObject];
+  }
+  if (operation) {
+    [self locked_removeOperation:operation];
+  }
+  return operation;
 }
 
 //Call with lock held
@@ -246,10 +248,9 @@
 - (void)locked_removeOperation:(PINOperation *)operation
 {
   if (operation) {
+    NSMutableOrderedSet *priorityQueue = [self operationQueueWithPriority:operation.priority];
+    [priorityQueue removeObject:operation];
     [_queuedOperations removeObject:operation];
-    [_lowPriorityOperations removeObject:operation];
-    [_defaultPriorityOperations removeObject:operation];
-    [_highPriorityOperations removeObject:operation];
   }
 }
 

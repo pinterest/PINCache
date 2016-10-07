@@ -12,6 +12,7 @@ typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
   PINOperationQueuePriorityLow,
   PINOperationQueuePriorityDefault,
   PINOperationQueuePriorityHigh,
+  PINOperationQueuePriorityCount,
 };
 
 @protocol PINOperationReference;
