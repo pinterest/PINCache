@@ -211,4 +211,41 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   usleep(sleepTime * (PINOperationQueueTestsMaxOperations + 1));
 }
 
+- (void)testChangingPriority
+{
+  const NSUInteger defaultOperationCount = 100;
+  
+  __block NSUInteger defaultOperationComplete = 0;
+  
+  dispatch_group_t group = dispatch_group_create();
+  
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+  for (NSUInteger count = 0; count < defaultOperationCount; count++) {
+    dispatch_group_enter(group);
+    [self.queue addOperation:^{
+      usleep(100);
+      @synchronized (self) {
+        ++defaultOperationComplete;
+      }
+      dispatch_group_leave(group);
+    } withPriority:PINOperationQueuePriorityDefault];
+  }
+  
+  dispatch_group_enter(group);
+  id <PINOperationReference> operation = [self.queue addOperation:^{
+    @synchronized (self) {
+      //Make sure we're less than defaultOperationCount - PINOperationQueueTestsMaxOperations because this operation could start even while the others are running even
+      //if started last.
+      XCTAssert(defaultOperationComplete < defaultOperationCount - PINOperationQueueTestsMaxOperations, @"operation was not completed before default operations even though reprioritized.");
+    }
+    dispatch_group_leave(group);
+  } withPriority:PINOperationQueuePriorityLow];
+#pragma clang diagnostic pop
+  [self.queue setOperationPriority:PINOperationQueuePriorityHigh withReference:operation];
+  
+  NSUInteger success = dispatch_group_wait(group, [self timeout]);
+  XCTAssert(success == 0, @"Timed out");
+}
+
 @end
