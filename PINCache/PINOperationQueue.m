@@ -18,6 +18,8 @@
   //increments with every operation to allow cancelation
   NSUInteger _operationReferenceCount;
   
+  dispatch_group_t _group;
+  
   dispatch_queue_t _serialQueue;
   BOOL _serialQueueBusy;
   
@@ -78,6 +80,8 @@
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&_lock, &attr);
     
+    _group = dispatch_group_create();
+    
     _serialQueue = dispatch_queue_create("PINOperationQueue Serial Queue", DISPATCH_QUEUE_SERIAL);
     
     _concurrentQueue = concurrentQueue;
@@ -118,6 +122,7 @@
   PINOperation *operation = [PINOperation operationWithBlock:block reference:reference priority:priority];
   
   [self lock];
+    dispatch_group_enter(_group);
     [queue addObject:operation];
     [_queuedOperations addObject:operation];
     [_referenceToOperations setObject:operation forKey:reference];
@@ -136,6 +141,7 @@
       NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
       [queue removeObject:operation];
       [_queuedOperations removeObject:operation];
+      dispatch_group_leave(_group); // Add operation to queue
     }
   [self unlock];
 }
@@ -170,6 +176,8 @@
         _serialQueueBusy = YES;
         dispatch_async(_serialQueue, ^{
           operation.block();
+          dispatch_group_leave(_group);
+          
           [self lock];
             _serialQueueBusy = NO;
           [self unlock];
@@ -194,6 +202,7 @@
       if (operation) {
         dispatch_async(_concurrentQueue, ^{
           operation.block();
+          dispatch_group_leave(_group);
           dispatch_semaphore_signal(_concurrentSemaphore);
         });
       } else {
@@ -242,6 +251,12 @@
   PINOperation *operation = [_queuedOperations firstObject];
   [self locked_removeOperation:operation];
   return operation;
+}
+
+- (void)waitUntilAllOperationsAreFinished
+{
+  [self scheduleNextOperations:NO];
+  dispatch_group_wait(_group, DISPATCH_TIME_FOREVER);
 }
 
 //Call with lock held
