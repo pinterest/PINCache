@@ -9,6 +9,8 @@
 #import "PINOperationQueue.h"
 #import <pthread.h>
 
+@class PINOperation;
+
 @interface NSNumber (PINOperationQueue) <PINOperationReference>
 
 @end
@@ -25,12 +27,12 @@
   dispatch_queue_t _concurrentQueue;
   dispatch_queue_t _semaphoreQueue;
   
-  NSMutableOrderedSet *_queuedOperations;
-  NSMutableOrderedSet *_lowPriorityOperations;
-  NSMutableOrderedSet *_defaultPriorityOperations;
-  NSMutableOrderedSet *_highPriorityOperations;
+  NSMutableOrderedSet<PINOperation *> *_queuedOperations;
+  NSMutableOrderedSet<PINOperation *> *_lowPriorityOperations;
+  NSMutableOrderedSet<PINOperation *> *_defaultPriorityOperations;
+  NSMutableOrderedSet<PINOperation *> *_highPriorityOperations;
   
-  NSMapTable *_referenceToOperations;
+  NSMapTable<id<PINOperationReference>, PINOperation *> *_referenceToOperations;
 }
 
 @end
