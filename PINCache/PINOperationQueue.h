@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
   PINOperationQueuePriorityLow,
   PINOperationQueuePriorityDefault,
@@ -30,3 +32,5 @@ typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
 @protocol PINOperationReference <NSObject>
 
 @end
+
+NS_ASSUME_NONNULL_END
