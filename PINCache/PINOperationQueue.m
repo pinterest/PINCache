@@ -131,9 +131,9 @@
 - (void)cancelAllOperations
 {
   [self lock];
-  for (PINOperation *operation in [_referenceToOperations objectEnumerator]) {
-    [self locked_cancelOperation:operation.reference];
-  }
+    for (PINOperation *operation in [[_referenceToOperations copy] objectEnumerator]) {
+      [self locked_cancelOperation:operation.reference];
+    }
   [self unlock];
 }
 
