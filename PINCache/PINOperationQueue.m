@@ -130,16 +130,31 @@
   return reference;
 }
 
+- (void)cancelAllOperations
+{
+  [self lock];
+    for (PINOperation *operation in [[_referenceToOperations copy] objectEnumerator]) {
+      [self locked_cancelOperation:operation.reference];
+    }
+  [self unlock];
+}
+
+
 - (void)cancelOperation:(id <PINOperationReference>)operationReference
 {
   [self lock];
-    PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
-    if (operation) {
-      NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
-      [queue removeObject:operation];
-      [_queuedOperations removeObject:operation];
-    }
+    [self locked_cancelOperation:operationReference];
   [self unlock];
+}
+
+- (void)locked_cancelOperation:(id <PINOperationReference>)operationReference
+{
+  PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
+  if (operation) {
+    NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
+    [queue removeObject:operation];
+    [_queuedOperations removeObject:operation];
+  }
 }
 
 - (void)setOperationPriority:(PINOperationQueuePriority)priority withReference:(id <PINOperationReference>)operationReference
