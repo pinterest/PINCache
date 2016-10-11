@@ -61,17 +61,16 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
 - (void)testWaitUntilAllOperationsFinished
 {
   const NSUInteger operationCount = 100;
-  __block NSInteger runnedOperations = 0;;
+  __block NSInteger operationsRun = 0;;
   for (NSUInteger count = 0; count < operationCount; count++) {
     [self.queue addOperation:^{
-      runnedOperations += 1;
+      operationsRun += 1;
     } withPriority:PINOperationQueuePriorityDefault];
   }
   
-  //
   [self.queue waitUntilAllOperationsAreFinished];
   
-  XCTAssert(operationCount == runnedOperations, @"Timed out before completing 100 operations");
+  XCTAssert(operationCount == operationsRun, @"Timed out before completing 100 operations");
 }
 
 - (void)testWaitUntilAllOperationsFinishedWithNestedOperations
@@ -90,7 +89,6 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
     } withPriority:PINOperationQueuePriorityDefault];
   }
 
-  //
   [self.queue waitUntilAllOperationsAreFinished];
 
   XCTAssert(runnedOperations == (operationCount*2), @"Timed out before completing 100 operations");
