@@ -19,8 +19,26 @@
 		662900461A66B830009C10BD /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662900471A66B831009C10BD /* PINDiskCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83C171DF0AF0041E777 /* PINDiskCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		662900481A66B831009C10BD /* PINMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E5D83E171DF0AF0041E777 /* PINMemoryCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68CA92731DAEF1A9008BECE2 /* PINOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 68E5DD8F1D73946D0018CDEE /* PINOperationQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68CA92741DAEF1AA008BECE2 /* PINOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 68E5DD8F1D73946D0018CDEE /* PINOperationQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68CA92751DAEF1AA008BECE2 /* PINOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 68E5DD8F1D73946D0018CDEE /* PINOperationQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68CA92761DAEF1B1008BECE2 /* PINOperationGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 68E9CD331DA9BC6D00EEF947 /* PINOperationGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68CA92771DAEF1B2008BECE2 /* PINOperationGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 68E9CD331DA9BC6D00EEF947 /* PINOperationGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		68CA92781DAEF1B2008BECE2 /* PINOperationGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 68E9CD331DA9BC6D00EEF947 /* PINOperationGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68E5DD8E1D7394170018CDEE /* PINOperationQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD8D1D7394170018CDEE /* PINOperationQueueTests.m */; };
 		68E5DD911D73946D0018CDEE /* PINOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD901D73946D0018CDEE /* PINOperationQueue.m */; };
+		68E9CD351DA9BC6D00EEF947 /* PINOperationGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */; };
+		68E9CD361DA9BC7800EEF947 /* PINOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD901D73946D0018CDEE /* PINOperationQueue.m */; };
+		68E9CD371DA9BC7900EEF947 /* PINOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD901D73946D0018CDEE /* PINOperationQueue.m */; };
+		68E9CD381DA9BC7A00EEF947 /* PINOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD901D73946D0018CDEE /* PINOperationQueue.m */; };
+		68E9CD391DA9BC7A00EEF947 /* PINOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD901D73946D0018CDEE /* PINOperationQueue.m */; };
+		68E9CD3A1DA9BC7B00EEF947 /* PINOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E5DD901D73946D0018CDEE /* PINOperationQueue.m */; };
+		68E9CD3B1DA9BC8200EEF947 /* PINOperationGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */; };
+		68E9CD3C1DA9BC8300EEF947 /* PINOperationGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */; };
+		68E9CD3D1DA9BC8300EEF947 /* PINOperationGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */; };
+		68E9CD3E1DA9BC8500EEF947 /* PINOperationGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */; };
+		68E9CD3F1DA9BC8600EEF947 /* PINOperationGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */; };
+		68E9CD411DAECE2B00EEF947 /* PINOperationGroupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 68E9CD401DAECE2B00EEF947 /* PINOperationGroupTests.m */; };
 		692C96731C88C37900CE9C49 /* ActionRequestHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 692C96721C88C37900CE9C49 /* ActionRequestHandler.m */; };
 		692C96751C88C37900CE9C49 /* Action.js in Resources */ = {isa = PBXBuildFile; fileRef = 692C96741C88C37900CE9C49 /* Action.js */; };
 		692C96791C88C37900CE9C49 /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 692C966F1C88C37900CE9C49 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -106,6 +124,9 @@
 		68E5DD8D1D7394170018CDEE /* PINOperationQueueTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINOperationQueueTests.m; sourceTree = "<group>"; };
 		68E5DD8F1D73946D0018CDEE /* PINOperationQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINOperationQueue.h; sourceTree = "<group>"; };
 		68E5DD901D73946D0018CDEE /* PINOperationQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINOperationQueue.m; sourceTree = "<group>"; };
+		68E9CD331DA9BC6D00EEF947 /* PINOperationGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINOperationGroup.h; sourceTree = "<group>"; };
+		68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINOperationGroup.m; sourceTree = "<group>"; };
+		68E9CD401DAECE2B00EEF947 /* PINOperationGroupTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PINOperationGroupTests.m; sourceTree = "<group>"; };
 		692C966F1C88C37900CE9C49 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		692C96711C88C37900CE9C49 /* ActionRequestHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionRequestHandler.h; sourceTree = "<group>"; };
 		692C96721C88C37900CE9C49 /* ActionRequestHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ActionRequestHandler.m; sourceTree = "<group>"; };
@@ -319,6 +340,7 @@
 				D07F1EDF171AFB7A001DBA02 /* PINCacheTests.h */,
 				D07F1EE0171AFB7A001DBA02 /* PINCacheTests.m */,
 				68E5DD8D1D7394170018CDEE /* PINOperationQueueTests.m */,
+				68E9CD401DAECE2B00EEF947 /* PINOperationGroupTests.m */,
 			);
 			path = PINCacheTests;
 			sourceTree = "<group>";
@@ -336,6 +358,8 @@
 				D0E5D83F171DF0AF0041E777 /* PINMemoryCache.m */,
 				68E5DD8F1D73946D0018CDEE /* PINOperationQueue.h */,
 				68E5DD901D73946D0018CDEE /* PINOperationQueue.m */,
+				68E9CD331DA9BC6D00EEF947 /* PINOperationGroup.h */,
+				68E9CD341DA9BC6D00EEF947 /* PINOperationGroup.m */,
 			);
 			name = PINCache;
 			path = ../PINCache;
@@ -350,8 +374,10 @@
 			files = (
 				705DF8591CB03E20004BF1EB /* PINCacheObjectSubscripting.h in Headers */,
 				662900361A66B727009C10BD /* PINCache.h in Headers */,
+				68CA92771DAEF1B2008BECE2 /* PINOperationGroup.h in Headers */,
 				662900481A66B831009C10BD /* PINMemoryCache.h in Headers */,
 				662900471A66B831009C10BD /* PINDiskCache.h in Headers */,
+				68CA92741DAEF1AA008BECE2 /* PINOperationQueue.h in Headers */,
 				E0BE3BFF1ABA6BD700B516E5 /* Nullability.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -362,8 +388,10 @@
 			files = (
 				705DF8581CB03E20004BF1EB /* PINCacheObjectSubscripting.h in Headers */,
 				662900351A66B724009C10BD /* PINCache.h in Headers */,
+				68CA92761DAEF1B1008BECE2 /* PINOperationGroup.h in Headers */,
 				662900461A66B830009C10BD /* PINMemoryCache.h in Headers */,
 				662900451A66B830009C10BD /* PINDiskCache.h in Headers */,
+				68CA92731DAEF1A9008BECE2 /* PINOperationQueue.h in Headers */,
 				E0BE3BFE1ABA6BD000B516E5 /* Nullability.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -374,8 +402,10 @@
 			files = (
 				962F1E1C1CFC53F70086E394 /* PINCacheObjectSubscripting.h in Headers */,
 				962F1E151CFC53D20086E394 /* Nullability.h in Headers */,
+				68CA92781DAEF1B2008BECE2 /* PINOperationGroup.h in Headers */,
 				962F1E161CFC53D90086E394 /* PINCache.h in Headers */,
 				962F1E1A1CFC53EE0086E394 /* PINMemoryCache.h in Headers */,
+				68CA92751DAEF1AA008BECE2 /* PINOperationQueue.h in Headers */,
 				962F1E181CFC53E30086E394 /* PINDiskCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -594,6 +624,8 @@
 				662900401A66B79B009C10BD /* PINCache.m in Sources */,
 				662900411A66B79B009C10BD /* PINDiskCache.m in Sources */,
 				662900421A66B79B009C10BD /* PINMemoryCache.m in Sources */,
+				68E9CD3D1DA9BC8300EEF947 /* PINOperationGroup.m in Sources */,
+				68E9CD381DA9BC7A00EEF947 /* PINOperationQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,6 +636,8 @@
 				6629003B1A66B76B009C10BD /* PINCache.m in Sources */,
 				6629003C1A66B76B009C10BD /* PINDiskCache.m in Sources */,
 				6629003D1A66B76B009C10BD /* PINMemoryCache.m in Sources */,
+				68E9CD3C1DA9BC8300EEF947 /* PINOperationGroup.m in Sources */,
+				68E9CD371DA9BC7900EEF947 /* PINOperationQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -615,6 +649,8 @@
 				692C96801C89D06100CE9C49 /* PINMemoryCache.m in Sources */,
 				692C967F1C89D05A00CE9C49 /* PINDiskCache.m in Sources */,
 				692C96731C88C37900CE9C49 /* ActionRequestHandler.m in Sources */,
+				68E9CD3A1DA9BC7B00EEF947 /* PINOperationQueue.m in Sources */,
+				68E9CD3F1DA9BC8600EEF947 /* PINOperationGroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -625,6 +661,8 @@
 				962F1E171CFC53DF0086E394 /* PINCache.m in Sources */,
 				962F1E1B1CFC53F30086E394 /* PINMemoryCache.m in Sources */,
 				962F1E191CFC53E80086E394 /* PINDiskCache.m in Sources */,
+				68E9CD3E1DA9BC8500EEF947 /* PINOperationGroup.m in Sources */,
+				68E9CD391DA9BC7A00EEF947 /* PINOperationQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,6 +673,7 @@
 				D07F1EC2171AFB7A001DBA02 /* main.m in Sources */,
 				D07F1EC6171AFB7A001DBA02 /* PINAppDelegate.m in Sources */,
 				D0E5D840171DF0AF0041E777 /* PINCache.m in Sources */,
+				68E9CD351DA9BC6D00EEF947 /* PINOperationGroup.m in Sources */,
 				D0E5D842171DF0AF0041E777 /* PINDiskCache.m in Sources */,
 				D0E5D844171DF0AF0041E777 /* PINMemoryCache.m in Sources */,
 				68E5DD911D73946D0018CDEE /* PINOperationQueue.m in Sources */,
@@ -647,7 +686,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D07F1EE1171AFB7A001DBA02 /* PINCacheTests.m in Sources */,
+				68E9CD361DA9BC7800EEF947 /* PINOperationQueue.m in Sources */,
 				D0E5D841171DF0AF0041E777 /* PINCache.m in Sources */,
+				68E9CD411DAECE2B00EEF947 /* PINOperationGroupTests.m in Sources */,
+				68E9CD3B1DA9BC8200EEF947 /* PINOperationGroup.m in Sources */,
 				D0E5D843171DF0AF0041E777 /* PINDiskCache.m in Sources */,
 				D0E5D845171DF0AF0041E777 /* PINMemoryCache.m in Sources */,
 				68E5DD8E1D7394170018CDEE /* PINOperationQueueTests.m in Sources */,
