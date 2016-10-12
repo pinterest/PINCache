@@ -62,9 +62,14 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
 {
   const NSUInteger operationCount = 100;
   __block NSInteger operationsRun = 0;
+
+  __weak PINOperationQueueTests *weakSelf = self;
   for (NSUInteger count = 0; count < operationCount; count++) {
     [self.queue addOperation:^{
-      operationsRun += 1;
+      __strong PINOperationQueueTests *strongSelf = weakSelf;
+      @synchronized (strongSelf) {
+        operationsRun += 1;
+      }
     } withPriority:PINOperationQueuePriorityDefault];
   }
   
@@ -82,9 +87,14 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
     __weak PINOperationQueueTests *weakSelf = self;
     [self.queue addOperation:^{
       __strong PINOperationQueueTests *strongSelf = weakSelf;
-      operationsRun += 1;
+      @synchronized (strongSelf) {
+        operationsRun += 1;
+      }
       [strongSelf.queue addOperation:^{
+        __strong PINOperationQueueTests *strongSelf = weakSelf;
+        @synchronized (strongSelf) {
           operationsRun += 1;
+        }
       } withPriority:PINOperationQueuePriorityHigh];
     } withPriority:PINOperationQueuePriorityDefault];
   }

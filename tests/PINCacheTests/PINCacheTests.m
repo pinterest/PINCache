@@ -326,7 +326,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
                 [self.cache objectForKey:key block:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
                     NSString *obj = [[NSString alloc] initWithFormat:@"obj %lu", (unsigned long)i];
                     XCTAssertTrue([object isEqualToString:obj] == YES, @"object returned was not object set");
-                    count -= 1;
+                    @synchronized (self) {
+                        count -= 1;
+                    }
                     dispatch_group_leave(group);
                 }];
             });
@@ -337,7 +339,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     NSUInteger success = dispatch_group_wait(group, [self timeout]);
 
     XCTAssert(success == 0, @"Timed out waiting on operations");
-    XCTAssertTrue(count == 0, @"one or more object blocks failed to execute, possible queue deadlock");
+    @synchronized (self) {
+        XCTAssertTrue(count == 0, @"one or more object blocks failed to execute, possible queue deadlock");
+    }
 }
 
 - (void)testMemoryWarningBlock
@@ -433,7 +437,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(PINMemoryCache *cache) {
         [cache enumerateObjectsWithBlock:^(PINMemoryCache *cache, NSString *key, id object) {
-            enumCount++;
+            @synchronized (self) {
+                enumCount++;
+            }
         } completionBlock:^(PINMemoryCache *cache) {
             dispatch_semaphore_signal(semaphore);
         }];
@@ -444,7 +450,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     dispatch_semaphore_wait(semaphore, [self timeout]);
 
-    XCTAssertTrue(objectCount == enumCount, @"some objects were not enumerated");
+    @synchronized (self) {
+        XCTAssertTrue(objectCount == enumCount, @"some objects were not enumerated");
+    }
 }
 
 - (void)testDiskCacheEnumeration
@@ -469,7 +477,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     __block NSUInteger enumCount = 0;
 
     [self.cache.diskCache enumerateObjectsWithBlock:^(NSString *key, NSURL *fileURL) {
-        enumCount++;
+        @synchronized (self) {
+            enumCount++;
+        }
     } completionBlock:^(PINDiskCache *cache) {
         dispatch_semaphore_signal(semaphore);
     }];
@@ -479,7 +489,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     dispatch_semaphore_wait(semaphore, [self timeout]);
 
-    XCTAssertTrue(objectCount == enumCount, @"some objects were not enumerated");
+    @synchronized (self) {
+        XCTAssertTrue(objectCount == enumCount, @"some objects were not enumerated");
+    }
 }
 
 - (void)testDeadlocks
@@ -489,20 +501,21 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     [self.cache setObject:[self image] forKey:key];
     dispatch_queue_t testQueue = dispatch_queue_create("test queue", DISPATCH_QUEUE_CONCURRENT);
     
-    NSLock *enumCountLock = [[NSLock alloc] init];
     __block NSUInteger enumCount = 0;
     dispatch_group_t group = dispatch_group_create();
     for (NSUInteger idx = 0; idx < objectCount; idx++) {
         dispatch_group_async(group, testQueue, ^{
             [self.cache objectForKey:key];
-            [enumCountLock lock];
-            enumCount++;
-            [enumCountLock unlock];
+            @synchronized (self) {
+                enumCount++;
+            }
         });
     }
     
     dispatch_group_wait(group, [self timeout]);
-    XCTAssertTrue(objectCount == enumCount, @"was not able to fetch 1000 objects, possibly due to deadlock.");
+    @synchronized (self) {
+        XCTAssertTrue(objectCount == enumCount, @"was not able to fetch 1000 objects, possibly due to deadlock.");
+    }
 }
 
 - (void)testAgeLimit
