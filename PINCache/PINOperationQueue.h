@@ -30,6 +30,9 @@ typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
  * @discussion When called, this method blocks the current thread and waits for the receiver’s current and queued
  * operations to finish executing. While the current thread is blocked, the receiver continues to launch already
  * queued operations and monitor those that are executing.
+ *
+ * @warning This should never be called from within an operation submitted to the PINOperationQueue as this will result
+ * in a deadlock.
  */
 - (void)waitUntilAllOperationsAreFinished;
 

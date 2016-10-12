@@ -141,7 +141,7 @@
       NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
       [queue removeObject:operation];
       [_queuedOperations removeObject:operation];
-      dispatch_group_leave(_group); // Add operation to queue
+      dispatch_group_leave(_group);
     }
   [self unlock];
 }
