@@ -61,7 +61,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
 - (void)testWaitUntilAllOperationsFinished
 {
   const NSUInteger operationCount = 100;
-  __block NSInteger operationsRun = 0;;
+  __block NSInteger operationsRun = 0;
   for (NSUInteger count = 0; count < operationCount; count++) {
     [self.queue addOperation:^{
       operationsRun += 1;
@@ -77,21 +77,21 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
 {
   const NSUInteger operationCount = 100;
     
-  __block NSInteger runnedOperations = 0;;
+  __block NSInteger operationsRun = 0;
   for (NSUInteger count = 0; count < operationCount; count++) {
     __weak PINOperationQueueTests *weakSelf = self;
     [self.queue addOperation:^{
       __strong PINOperationQueueTests *strongSelf = weakSelf;
-      runnedOperations += 1;
+      operationsRun += 1;
       [strongSelf.queue addOperation:^{
-          runnedOperations += 1;
+          operationsRun += 1;
       } withPriority:PINOperationQueuePriorityHigh];
     } withPriority:PINOperationQueuePriorityDefault];
   }
 
   [self.queue waitUntilAllOperationsAreFinished];
 
-  XCTAssert(runnedOperations == (operationCount*2), @"Timed out before completing 100 operations");
+  XCTAssert(operationsRun == (operationCount*2), @"Timed out before completing 100 operations");
 }
 
 - (void)testMaximumNumberOfConcurrentOperations
