@@ -19,8 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)asyncOperationGroupWithQueue:(PINOperationQueue *)operationQueue;
 
-- (__nullable id <PINGroupOperationReference>)addOperation:(dispatch_block_t)operation;
-- (__nullable id <PINGroupOperationReference>)addOperation:(dispatch_block_t)operation withPriority:(PINOperationQueuePriority)priority;
+- (nullable id <PINGroupOperationReference>)addOperation:(dispatch_block_t)operation;
+- (nullable id <PINGroupOperationReference>)addOperation:(dispatch_block_t)operation withPriority:(PINOperationQueuePriority)priority;
 - (void)start;
 - (void)cancel;
 - (void)setCompletion:(dispatch_block_t)completion;
