@@ -67,7 +67,7 @@
 
 - (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations
 {
-  return [self initWithMaxConcurrentOperations:maxConcurrentOperations concurrentQueue:dispatch_queue_create("PINOperationQueue Unprioritized Serial Queue", DISPATCH_QUEUE_CONCURRENT)];
+  return [self initWithMaxConcurrentOperations:maxConcurrentOperations concurrentQueue:dispatch_queue_create("PINOperationQueue Concurrent Queue", DISPATCH_QUEUE_CONCURRENT)];
 }
 
 - (instancetype)initWithMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations concurrentQueue:(dispatch_queue_t)concurrentQueue
@@ -78,7 +78,7 @@
     
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
-    //mutex must be recursive to allow scheduling of operations from operations
+    //mutex must be recursive to allow scheduling of operations from within operations
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&_lock, &attr);
     
@@ -107,12 +107,27 @@
   pthread_mutex_destroy(&_lock);
 }
 
++ (instancetype)sharedOperationQueue
+{
+    static PINOperationQueue *sharedOperationQueue = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedOperationQueue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:[[NSProcessInfo processInfo] activeProcessorCount]];
+    });
+    return sharedOperationQueue;
+}
+
 - (id <PINOperationReference>)nextOperationReference
 {
   [self lock];
     id <PINOperationReference> reference = [NSNumber numberWithUnsignedInteger:++_operationReferenceCount];
   [self unlock];
   return reference;
+}
+
+- (id <PINOperationReference>)addOperation:(dispatch_block_t)block
+{
+    return [self addOperation:block withPriority:PINOperationQueuePriorityDefault];
 }
 
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)block withPriority:(PINOperationQueuePriority)priority
@@ -145,22 +160,28 @@
 }
 
 
-- (void)cancelOperation:(id <PINOperationReference>)operationReference
+- (BOOL)cancelOperation:(id <PINOperationReference>)operationReference
 {
   [self lock];
-    [self locked_cancelOperation:operationReference];
+    BOOL success = [self locked_cancelOperation:operationReference];
   [self unlock];
+  return success;
 }
 
-- (void)locked_cancelOperation:(id <PINOperationReference>)operationReference
+- (BOOL)locked_cancelOperation:(id <PINOperationReference>)operationReference
 {
+  BOOL success = NO;
   PINOperation *operation = [_referenceToOperations objectForKey:operationReference];
   if (operation) {
     NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
-    [queue removeObject:operation];
-    [_queuedOperations removeObject:operation];
-    dispatch_group_leave(_group);
+    if ([queue containsObject:operation]) {
+      success = YES;
+      [queue removeObject:operation];
+      [_queuedOperations removeObject:operation];
+      dispatch_group_leave(_group);
+    }
   }
+  return success;
 }
 
 - (void)setOperationPriority:(PINOperationQueuePriority)priority withReference:(id <PINOperationReference>)operationReference
