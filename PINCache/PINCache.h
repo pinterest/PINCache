@@ -55,11 +55,6 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 @property (readonly) NSString *name;
 
 /**
- A concurrent queue on which blocks passed to the asynchronous access methods are run.
- */
-@property (readonly) dispatch_queue_t concurrentQueue;
-
-/**
  Synchronously retrieves the total byte count of the <diskCache> on the shared disk queue.
  */
 @property (readonly) NSUInteger diskByteCount;
