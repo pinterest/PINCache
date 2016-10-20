@@ -1,7 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'PINCache'
   s.version       = '3.0.1-beta.2'
-  s.source_files  = 'PINCache/*.{h,m}'
   s.homepage      = 'https://github.com/pinterest/PINCache'
   s.summary       = 'Fast, thread safe, parallel object cache for iOS and OS X.'
   s.authors       = { 'Garrett Moon' => 'garrett@pinterest.com', 'Justin Ouellette' => 'jstn@tumblr.com' }
@@ -21,7 +20,11 @@ Pod::Spec.new do |s|
 #endif
 EOS
   s.prefix_header_contents = pch_PIN
-  s.subspec 'arc-exception-safe' do |sp|
+  s.subspec 'Core' do |sp|
+      sp.source_files  = 'PINCache/*.{h,m}'
+  end
+  s.subspec 'Arc-exception-safe' do |sp|
+      sp.dependency 'PINCache/Core'
       sp.source_files = 'PINCache/PINDiskCache.m'
       sp.compiler_flags = '-fobjc-arc-exceptions'
   end
