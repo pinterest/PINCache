@@ -94,6 +94,7 @@
           dispatch_block_t completion;
           [self lock];
             completion = _completion;
+            _completion = nil;
           [self unlock];
           
           if (completion) {
