@@ -531,7 +531,8 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_ageLimit * NSEC_PER_SEC));
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self.operationQueue addOperation:^{
+        PINDiskCache *strongSelf = weakSelf;
+        [strongSelf.operationQueue addOperation:^{
             PINDiskCache *strongSelf = weakSelf;
             [strongSelf trimToAgeLimitRecursively];
         } withPriority:PINOperationQueuePriorityLow];

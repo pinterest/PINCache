@@ -111,7 +111,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
             
             if (memoryCacheObject) {
                 [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:NULL];
-                [strongSelf.operationQueue addOperation:^{
+                [strongSelf->_operationQueue addOperation:^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
                         block(strongSelf, memoryCacheKey, memoryCacheObject);
@@ -124,7 +124,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                     
                     [strongSelf->_memoryCache setObject:diskCacheObject forKey:diskCacheKey block:nil];
                     
-                    [strongSelf.operationQueue addOperation:^{
+                    [strongSelf->_operationQueue addOperation:^{
                         PINCache *strongSelf = weakSelf;
                         if (strongSelf)
                             block(strongSelf, diskCacheKey, diskCacheObject);
@@ -142,7 +142,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     if (!key || !object)
         return;
   
-    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:self.operationQueue];
+    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
         [_memoryCache setObject:object forKey:key];
@@ -150,10 +150,9 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [_diskCache setObject:object forKey:key];
     }];
-    __weak PINCache *weakSelf = self;
+  
     [group setCompletion:^{
-        PINCache *strongSelf = weakSelf;
-        block(strongSelf, key, object);
+        block(self, key, object);
     }];
     
     [group start];
@@ -164,7 +163,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     if (!key)
         return;
     
-    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:self.operationQueue];
+    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
         [_memoryCache removeObjectForKey:key];
@@ -172,10 +171,9 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [_diskCache removeObjectForKey:key];
     }];
-    __weak PINCache *weakSelf = self;
+
     [group setCompletion:^{
-        PINCache *strongSelf = weakSelf;
-        block(strongSelf, key, nil);
+        block(self, key, nil);
     }];
     
     [group start];
@@ -183,7 +181,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)removeAllObjects:(PINCacheBlock)block
 {
-    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:self.operationQueue];
+    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
         [_memoryCache removeAllObjects];
@@ -191,10 +189,9 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [_diskCache removeAllObjects];
     }];
-    __weak PINCache *weakSelf = self;
+
     [group setCompletion:^{
-        PINCache *strongSelf = weakSelf;
-        block(strongSelf);
+        block(self);
     }];
     
     [group start];
@@ -205,7 +202,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     if (!date)
         return;
     
-    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:self.operationQueue];
+    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
         [_memoryCache trimToDate:date];
@@ -213,10 +210,9 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [_diskCache trimToDate:date];
     }];
-    __weak PINCache *weakSelf = self;
+  
     [group setCompletion:^{
-        PINCache *strongSelf = weakSelf;
-        block(strongSelf);
+        block(self);
     }];
     
     [group start];
