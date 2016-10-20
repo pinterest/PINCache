@@ -56,14 +56,6 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 #pragma mark - Initialization -
 
-- (void)dealloc
-{
-#if !OS_OBJECT_USE_OBJC
-    dispatch_release(_asyncQueue);
-    _asyncQueue = nil;
-#endif
-}
-
 - (instancetype)init
 {
     @throw [NSException exceptionWithName:@"Must initialize with a name" reason:@"PINDiskCache must be initialized with a name. Call initWithName: instead." userInfo:nil];
