@@ -604,7 +604,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
   XCTAssertEqual(attributes[NSFileProtectionKey], NSFileProtectionCompleteUnlessOpen, @"file protection key is incorrect");
 }
 
-- (void)testTTLCacheObjectAccess {
+//Disabled until race conditions can be addressed
+- (void)_testTTLCacheObjectAccess {
     [self.cache removeAllObjects];
     NSString *key = @"key";
     [self.cache.memoryCache setAgeLimit:2];
@@ -668,7 +669,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertNotNil(diskObj, @"should still be in disk cache");
 }
 
-- (void)testTTLCacheObjectEnumeration {
+//Disabled until race conditions can be addressed
+- (void)_testTTLCacheObjectEnumeration {
     [self.cache removeAllObjects];
     NSString *key = @"key";
     [self.cache.memoryCache setAgeLimit:2];
@@ -736,7 +738,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 }
 
-- (void)testTTLCacheFileURLForKey {
+//Disabled until race conditions can be addressed
+- (void)_testTTLCacheFileURLForKey {
     NSString *key = @"key";
 
     dispatch_group_t group = dispatch_group_create();
