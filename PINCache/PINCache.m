@@ -151,9 +151,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
         [_diskCache setObject:object forKey:key];
     }];
   
-    [group setCompletion:^{
-        block(self, key, object);
-    }];
+    if (block) {
+        [group setCompletion:^{
+            block(self, key, object);
+        }];
+    }
     
     [group start];
 }
@@ -172,9 +174,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
         [_diskCache removeObjectForKey:key];
     }];
 
-    [group setCompletion:^{
-        block(self, key, nil);
-    }];
+    if (block) {
+        [group setCompletion:^{
+            block(self, key, nil);
+        }];
+    }
     
     [group start];
 }
@@ -190,9 +194,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
         [_diskCache removeAllObjects];
     }];
 
-    [group setCompletion:^{
-        block(self);
-    }];
+    if (block) {
+        [group setCompletion:^{
+            block(self);
+        }];
+    }
     
     [group start];
 }
@@ -211,9 +217,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
         [_diskCache trimToDate:date];
     }];
   
-    [group setCompletion:^{
-        block(self);
-    }];
+    if (block) {
+        [group setCompletion:^{
+            block(self);
+        }];
+    }
     
     [group start];
 }
