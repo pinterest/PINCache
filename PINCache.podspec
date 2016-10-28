@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name          = 'PINCache'
-  s.version       = '3.0.1-beta.2'
+  s.version       = '3.0.1-beta'
   s.homepage      = 'https://github.com/pinterest/PINCache'
   s.summary       = 'Fast, thread safe, parallel object cache for iOS and OS X.'
   s.authors       = { 'Garrett Moon' => 'garrett@pinterest.com', 'Justin Ouellette' => 'jstn@tumblr.com' }
