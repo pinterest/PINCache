@@ -112,7 +112,7 @@
     static PINOperationQueue *sharedOperationQueue = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedOperationQueue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:[[NSProcessInfo processInfo] activeProcessorCount]];
+        sharedOperationQueue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:MAX([[NSProcessInfo processInfo] activeProcessorCount], 2)];
     });
     return sharedOperationQueue;
 }
