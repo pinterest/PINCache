@@ -35,28 +35,35 @@
   NSMutableOrderedSet<PINOperation *> *_highPriorityOperations;
   
   NSMapTable<id<PINOperationReference>, PINOperation *> *_referenceToOperations;
+  NSMapTable<NSString *, PINOperation *> *_identifierToOperations;
 }
 
 @end
 
 @interface PINOperation : NSObject
 
-@property (nonatomic, strong) dispatch_block_t block;
+@property (nonatomic, strong) PINOperationBlock block;
 @property (nonatomic, strong) id <PINOperationReference> reference;
 @property (nonatomic, assign) PINOperationQueuePriority priority;
+@property (nonatomic, strong) dispatch_block_t completion;
+@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, strong) id data;
 
-+ (instancetype)operationWithBlock:(dispatch_block_t)block reference:(id <PINOperationReference>)reference priority:(PINOperationQueuePriority)priority;
++ (instancetype)operationWithBlock:(PINOperationBlock)block reference:(id <PINOperationReference>)reference priority:(PINOperationQueuePriority)priority identifier:(nullable NSString *)identifier data:(nullable id)data completion:(nullable dispatch_block_t)completion;
 
 @end
 
 @implementation PINOperation
 
-+ (instancetype)operationWithBlock:(dispatch_block_t)block reference:(id<PINOperationReference>)reference priority:(PINOperationQueuePriority)priority
++ (instancetype)operationWithBlock:(PINOperationBlock)block reference:(id<PINOperationReference>)reference priority:(PINOperationQueuePriority)priority identifier:(NSString *)identifier data:(id)data completion:(dispatch_block_t)completion
 {
   PINOperation *operation = [[self alloc] init];
   operation.block = block;
   operation.reference = reference;
   operation.priority = priority;
+  operation.identifier = identifier;
+  operation.data = data;
+  operation.completion = completion;
 
   return operation;
 }
@@ -98,6 +105,7 @@
     _highPriorityOperations = [[NSMutableOrderedSet alloc] init];
     
     _referenceToOperations = [NSMapTable weakToWeakObjectsMapTable];
+    _identifierToOperations = [NSMapTable weakToWeakObjectsMapTable];
   }
   return self;
 }
@@ -127,27 +135,79 @@
 
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)block
 {
-    return [self addOperation:block withPriority:PINOperationQueuePriorityDefault];
+  return [self addOperation:block withPriority:PINOperationQueuePriorityDefault];
 }
 
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)block withPriority:(PINOperationQueuePriority)priority
 {
-  id <PINOperationReference> reference = [self nextOperationReference];
-  
-  NSMutableOrderedSet *queue = [self operationQueueWithPriority:priority];
-  
-  PINOperation *operation = [PINOperation operationWithBlock:block reference:reference priority:priority];
-  
+  PINOperation *operation = [PINOperation operationWithBlock:^(id data) { block(); }
+                                                   reference:[self nextOperationReference]
+                                                    priority:priority
+                                                  identifier:nil
+                                                        data:nil
+                                                  completion:nil];
   [self lock];
-    dispatch_group_enter(_group);
-    [queue addObject:operation];
-    [_queuedOperations addObject:operation];
-    [_referenceToOperations setObject:operation forKey:reference];
+    [self locked_addOperation:operation];
   [self unlock];
   
   [self scheduleNextOperations:NO];
   
-  return reference;
+  return operation.reference;
+}
+
+- (id<PINOperationReference>)addOperation:(PINOperationBlock)block withPriority:(PINOperationQueuePriority)priority identifier:(NSString *)identifier data:(id)data dataCoallescingBlock:(PINOperationDataCoallescingBlock)dataCoallescingBlock completion:(dispatch_block_t)completion
+{
+  PINOperation *operation = nil;
+  BOOL isNewOperation = NO;
+  
+  [self lock];
+    if (identifier != nil && (operation = [_identifierToOperations objectForKey:identifier]) != nil) {
+      // There is an exisiting operation with the provided identifier, let's coallescing these operations
+      if (dataCoallescingBlock != nil) {
+        operation.data = dataCoallescingBlock(operation.data, data);
+      }
+      
+      if (completion != nil) {
+        dispatch_block_t initialCompletion = operation.completion;
+        if (initialCompletion == nil) {
+          operation.completion = completion;
+        } else {
+          operation.completion = ^{
+            initialCompletion();
+            completion();
+          };
+        }
+      }
+    } else {
+      isNewOperation = YES;
+      operation = [PINOperation operationWithBlock:block
+                                         reference:[self nextOperationReference]
+                                          priority:priority
+                                        identifier:identifier
+                                              data:data
+                                        completion:completion];
+      [self locked_addOperation:operation];
+    }
+  [self unlock];
+  
+  if (isNewOperation) {
+    [self scheduleNextOperations:NO];
+  }
+  
+  return operation.reference;
+}
+
+- (void)locked_addOperation:(PINOperation *)operation
+{
+  NSMutableOrderedSet *queue = [self operationQueueWithPriority:operation.priority];
+  
+  dispatch_group_enter(_group);
+  [queue addObject:operation];
+  [_queuedOperations addObject:operation];
+  [_referenceToOperations setObject:operation forKey:operation.reference];
+  if (operation.identifier != nil) {
+    [_identifierToOperations setObject:operation forKey:operation.identifier];
+  }
 }
 
 - (void)cancelAllOperations
@@ -213,7 +273,10 @@
       if (operation) {
         _serialQueueBusy = YES;
         dispatch_async(_serialQueue, ^{
-          operation.block();
+          operation.block(operation.data);
+          if (operation.completion) {
+            operation.completion();
+          }
           dispatch_group_leave(_group);
           
           [self lock];
@@ -239,7 +302,10 @@
     
       if (operation) {
         dispatch_async(_concurrentQueue, ^{
-          operation.block();
+          operation.block(operation.data);
+          if (operation.completion) {
+            operation.completion();
+          }
           dispatch_group_leave(_group);
           dispatch_semaphore_signal(_concurrentSemaphore);
         });

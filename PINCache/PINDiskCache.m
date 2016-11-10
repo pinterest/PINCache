@@ -19,9 +19,18 @@ __LINE__, [error localizedDescription]); }
 static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
+static NSString * const PINDiskCacheOperationIdentifierTrimToDate = @"PINDiskCacheOperationIdentifierTrimToDate";
+static NSString * const PINDiskCacheOperationIdentifierTrimToSize = @"PINDiskCacheOperationIdentifierTrimToSize";
+static NSString * const PINDiskCacheOperationIdentifierTrimToSizeByDate = @"PINDiskCacheOperationIdentifierTrimToSizeByDate";
+
 typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     PINDiskCacheConditionNotReady = 0,
     PINDiskCacheConditionReady = 1,
+};
+
+static PINOperationDataCoallescingBlock PINTrimmingDataCoallescingBlock = ^id(id existingData, id newData) {
+    NSComparisonResult result = [existingData compare:newData];
+    return (result == NSOrderedDescending) ? newData : existingData;
 };
 
 @interface PINDiskCache () {
@@ -647,43 +656,76 @@ static NSURL *_sharedTrashURL;
 - (void)trimToSize:(NSUInteger)trimByteCount block:(PINDiskCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
+  
+    PINOperationBlock operation = ^(id data) {
         PINDiskCache *strongSelf = weakSelf;
-        [strongSelf trimToSize:trimByteCount];
-        
-        if (block) {
+        [strongSelf trimToSize:((NSNumber *)data).unsignedIntegerValue];
+    };
+  
+    dispatch_block_t completion = nil;
+    if (block) {
+        completion = ^{
+            PINDiskCache *strongSelf = weakSelf;
             block(strongSelf);
-        }
-    } withPriority:PINOperationQueuePriorityLow];
+        };
+    }
+    
+    [self.operationQueue addOperation:operation
+                         withPriority:PINOperationQueuePriorityLow
+                           identifier:PINDiskCacheOperationIdentifierTrimToSize
+                                 data:[NSNumber numberWithUnsignedInteger:trimByteCount]
+                  dataCoallescingBlock:PINTrimmingDataCoallescingBlock
+                           completion:completion];
 }
 
 - (void)trimToDate:(NSDate *)trimDate block:(PINDiskCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
+
+    PINOperationBlock operation = ^(id data){
         PINDiskCache *strongSelf = weakSelf;
-        [strongSelf trimToDate:trimDate];
-        
-        if (block) {
+        [strongSelf trimToDate:(NSDate *)data];
+    };
+    
+    dispatch_block_t completion = nil;
+    if (block) {
+        completion = ^{
+            PINDiskCache *strongSelf = weakSelf;
             block(strongSelf);
-        }
-    } withPriority:PINOperationQueuePriorityLow];
+        };
+    }
+    
+    [self.operationQueue addOperation:operation
+                         withPriority:PINOperationQueuePriorityLow
+                           identifier:PINDiskCacheOperationIdentifierTrimToDate
+                                 data:trimDate
+                  dataCoallescingBlock:PINTrimmingDataCoallescingBlock
+                           completion:completion];
 }
 
 - (void)trimToSizeByDate:(NSUInteger)trimByteCount block:(PINDiskCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
-    [self.operationQueue addOperation:^{
+    PINOperationBlock operation = ^(id data){
         PINDiskCache *strongSelf = weakSelf;
-        [strongSelf trimToSizeByDate:trimByteCount];
-        
-        if (block) {
+        [strongSelf trimToSizeByDate:((NSNumber *)data).unsignedIntegerValue];
+    };
+    
+    dispatch_block_t completion = nil;
+    if (block) {
+        completion = ^{
+            PINDiskCache *strongSelf = weakSelf;
             block(strongSelf);
-        }
-    } withPriority:PINOperationQueuePriorityLow];
+        };
+    }
+    
+    [self.operationQueue addOperation:operation
+                         withPriority:PINOperationQueuePriorityLow
+                           identifier:PINDiskCacheOperationIdentifierTrimToSizeByDate
+                                 data:[NSNumber numberWithUnsignedInteger:trimByteCount]
+                  dataCoallescingBlock:PINTrimmingDataCoallescingBlock
+                           completion:completion];
 }
 
 - (void)removeAllObjects:(PINDiskCacheBlock)block

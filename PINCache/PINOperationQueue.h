@@ -16,6 +16,9 @@ typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
   PINOperationQueuePriorityHigh,
 };
 
+typedef void(^PINOperationBlock)(id _Nullable data);
+typedef _Nullable id(^PINOperationDataCoallescingBlock)(id _Nullable existingData, id _Nullable newData);
+
 @protocol PINOperationReference;
 
 @interface PINOperationQueue : NSObject
@@ -27,6 +30,7 @@ typedef NS_ENUM(NSUInteger, PINOperationQueuePriority) {
 
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)operation;
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)operation withPriority:(PINOperationQueuePriority)priority;
+- (id <PINOperationReference>)addOperation:(PINOperationBlock)operation withPriority:(PINOperationQueuePriority)priority identifier:(NSString *)identifier data:(nullable id)data dataCoallescingBlock:(nullable PINOperationDataCoallescingBlock)dataCoallescingBlock completion:(nullable dispatch_block_t)completion;
 
 /**
  * Marks the operation as cancelled
