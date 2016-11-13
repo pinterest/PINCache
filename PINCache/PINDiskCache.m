@@ -40,6 +40,8 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 @implementation PINDiskCache
 
+static NSURL *_sharedTrashURL = nil;
+
 @synthesize willAddObjectBlock = _willAddObjectBlock;
 @synthesize willRemoveObjectBlock = _willRemoveObjectBlock;
 @synthesize willRemoveAllObjectsBlock = _willRemoveAllObjectsBlock;
@@ -270,23 +272,19 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 
 + (NSURL *)sharedTrashURL
 {
-    static NSURL *sharedTrashURL;
-    static dispatch_once_t predicate;
-    
-    dispatch_once(&predicate, ^{
-        sharedTrashURL = [[[NSURL alloc] initFileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:PINDiskCachePrefix isDirectory:YES];
+    if (_sharedTrashURL == nil) {
+        NSString *uniqueString = [[NSProcessInfo processInfo] globallyUniqueString];
+        _sharedTrashURL = [[[NSURL alloc] initFileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:uniqueString isDirectory:YES];
         
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[sharedTrashURL path]]) {
-            NSError *error = nil;
-            [[NSFileManager defaultManager] createDirectoryAtURL:sharedTrashURL
-                                     withIntermediateDirectories:YES
-                                                      attributes:nil
-                                                           error:&error];
-            PINDiskCacheError(error);
-        }
-    });
+        NSError *error = nil;
+        [[NSFileManager defaultManager] createDirectoryAtURL:_sharedTrashURL
+                                 withIntermediateDirectories:YES
+                                                  attributes:nil
+                                                       error:&error];
+        PINDiskCacheError(error);
+    }
     
-    return sharedTrashURL;
+    return _sharedTrashURL;
 }
 
 + (BOOL)moveItemAtURLToTrash:(NSURL *)itemURL
@@ -305,17 +303,11 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
 + (void)emptyTrash
 {
     dispatch_async([self sharedTrashQueue], ^{
-        NSError *searchTrashedItemsError = nil;
-        NSArray *trashedItems = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self sharedTrashURL]
-                                                              includingPropertiesForKeys:nil
-                                                                                 options:0
-                                                                                   error:&searchTrashedItemsError];
-        PINDiskCacheError(searchTrashedItemsError);
-        
-        for (NSURL *trashedItemURL in trashedItems) {
+        if (_sharedTrashURL != nil) {
             NSError *removeTrashedItemError = nil;
-            [[NSFileManager defaultManager] removeItemAtURL:trashedItemURL error:&removeTrashedItemError];
+            [[NSFileManager defaultManager] removeItemAtURL:_sharedTrashURL error:&removeTrashedItemError];
             PINDiskCacheError(removeTrashedItemError);
+            _sharedTrashURL = nil;
         }
     });
 }
