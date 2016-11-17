@@ -10,6 +10,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 @interface PINDiskCache()
 
++ (dispatch_queue_t)sharedTrashQueue;
 - (NSString *)encodedString:(NSString *)string;
 
 @end
@@ -32,8 +33,17 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)tearDown
 {
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+
     [self.cache removeAllObjects];
 
+    // Wait for disk cache to clean up its trash
+    dispatch_async([PINDiskCache sharedTrashQueue], ^{
+        dispatch_group_leave(group);
+    });
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+  
     self.cache = nil;
 
     XCTAssertNil(self.cache, @"test cache did not deallocate");
@@ -876,6 +886,48 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
       [testCache objectForKey:[@(idx) stringValue]];
     }
   }];
+}
+
+- (void)testDiskCacheEmptyTrash
+{
+    const NSUInteger fileCount = 100;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *tempDirPath = NSTemporaryDirectory();
+    
+    dispatch_group_t group = dispatch_group_create();
+    
+    NSError *error = nil;
+    unsigned long long originalTempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
+    XCTAssertNil(error);
+    
+    for (int i = 0; i < fileCount; i++) {
+        NSString *key = [NSString stringWithFormat:@"key%d", i];
+        self.cache.diskCache[key] = key;
+    }
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache removeAllObjects:^(PINDiskCache * _Nonnull cache) {
+        // Temporary directory should be bigger now since the trash directory is still inside it
+        NSError *error = nil;
+        unsigned long long tempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
+        XCTAssertNil(error);
+        XCTAssertLessThan(originalTempDirSize, tempDirSize);
+        
+        // Temporary directory should get back to its original size at the end of the trash queue
+        dispatch_group_enter(group);
+        dispatch_async([PINDiskCache sharedTrashQueue], ^{
+            NSError *error = nil;
+            unsigned long long tempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
+            XCTAssertNil(error);
+            XCTAssertEqual(originalTempDirSize, tempDirSize);
+            dispatch_group_leave(group);
+        });
+        
+        dispatch_group_leave(group);
+    }];
+    
+    NSUInteger success = dispatch_group_wait(group, [self timeout]);
+    XCTAssert(success == 0, @"Timed out");
 }
 
 @end
