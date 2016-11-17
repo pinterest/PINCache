@@ -294,4 +294,172 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   XCTAssert(success == 0, @"Timed out");
 }
 
+- (void)testCoallescingOperations
+{
+    self.queue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:PINOperationQueueTestsMaxOperations];
+    
+    const NSUInteger totalOperationCount = 100;
+    dispatch_group_t group = dispatch_group_create();
+    
+    NSString *normalDesc = @"Normal";
+    NSString *coallescedDesc = @"Coallesced";
+    NSArray<NSString *> *descs = @[normalDesc, coallescedDesc];
+    
+    __block NSMutableDictionary<NSString *, NSNumber *> *operationCount = [NSMutableDictionary dictionaryWithObjectsAndKeys:@(0), normalDesc, @(0), coallescedDesc, nil];
+    __block NSMutableDictionary<NSString *, NSNumber *> *operationRun = [NSMutableDictionary dictionaryWithObjectsAndKeys:@(0), normalDesc, @(0), coallescedDesc, nil];
+    __block NSMutableDictionary<NSString *, NSNumber *> *operationComplete = [NSMutableDictionary dictionaryWithObjectsAndKeys:@(0), normalDesc, @(0), coallescedDesc, nil];
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+    // Fill up the queue with dummy operations so we have time to add real ones without them being unexpectedly executed
+    for (NSUInteger i = 0; i < PINOperationQueueTestsMaxOperations * 2; i++) {
+        dispatch_group_enter(group);
+        [self.queue addOperation:^{
+            usleep(1000);
+            dispatch_group_leave(group);
+        }];
+    }
+    
+    for (NSUInteger i = 0; i < totalOperationCount; i++) {
+        dispatch_group_enter(group);
+
+        NSString *desc = descs[i % descs.count];
+        BOOL isNormalOperation = [desc isEqualToString:normalDesc];
+        
+        NSString *identifier = desc;
+        if (isNormalOperation) {
+            identifier = [NSString stringWithFormat:@"%@ %ld", desc, i];
+        }
+        
+        operationCount[desc] = @([operationCount[desc] intValue] + 1);
+        
+        PINOperationBlock operation = ^(id  _Nullable data) {
+            @synchronized (self) {
+                operationRun[desc] = @([operationRun[desc] intValue] + 1);
+            }
+        };
+        
+        dispatch_block_t completion = ^{
+            @synchronized (self) {
+                operationComplete[desc] = @([operationComplete[desc] intValue] + 1);
+            }
+            dispatch_group_leave(group);
+        };
+        
+        [self.queue addOperation:operation
+                    withPriority:PINOperationQueuePriorityLow
+                      identifier:identifier
+                  coalescingData:nil
+            dataCoallescingBlock:nil
+                      completion:completion];
+    }
+#pragma clang diagnostic pop
+    
+    NSUInteger success = dispatch_group_wait(group, [self timeout]);
+    XCTAssert(success == 0, @"Timed out");
+    XCTAssert([operationRun[normalDesc] intValue] == [operationCount[normalDesc] intValue]);
+    XCTAssert([operationComplete[normalDesc] intValue] == [operationCount[normalDesc] intValue]);
+    XCTAssert([operationRun[coallescedDesc] intValue] == 1);
+    XCTAssert([operationComplete[coallescedDesc] intValue] == [operationCount[coallescedDesc] intValue]);
+}
+
+- (void)testCoallescingOperationCompletions
+{
+    dispatch_group_t group = dispatch_group_create();
+    
+    NSArray<NSNumber *> *completionFlags = @[@(NO), @(NO), @(YES), @(NO), @(YES)];
+    NSIndexSet *expectedCompletedIndexSet = [completionFlags indexesOfObjectsPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) { return [obj boolValue]; }];
+    NSMutableIndexSet *completedIndexSet = [NSMutableIndexSet indexSet];
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+    // Fill up the queue with dummy operations so we have time to add real ones without them being unexpectedly executed
+    for (NSUInteger i = 0; i < PINOperationQueueTestsMaxOperations * 2; i++) {
+        dispatch_group_enter(group);
+        [self.queue addOperation:^{
+            usleep(1000);
+            dispatch_group_leave(group);
+        }];
+    }
+    
+    for (NSUInteger i = 0; i < completionFlags.count; i++) {
+        dispatch_group_enter(group);
+        
+        PINOperationBlock operation = ^(id  _Nullable data) {
+            for (NSNumber *hasCompletion in completionFlags) {
+                if ([hasCompletion boolValue] == NO) {
+                    dispatch_group_leave(group);
+                }
+            }
+        };
+        
+        dispatch_block_t completion = [completionFlags[i] boolValue] == NO ? nil : ^{
+            XCTAssert([expectedCompletedIndexSet containsIndex:i]);
+            @synchronized (self) {
+                [completedIndexSet addIndex:i];
+            }
+            dispatch_group_leave(group);
+        };
+        
+        [self.queue addOperation:operation
+                    withPriority:PINOperationQueuePriorityLow
+                      identifier:@"Identifier"
+                  coalescingData:nil
+            dataCoallescingBlock:nil
+                      completion:completion];
+    }
+#pragma clang diagnostic pop
+    
+    NSUInteger success = dispatch_group_wait(group, [self timeout]);
+    XCTAssert(success == 0, @"Timed out");
+    XCTAssert([completedIndexSet isEqual:expectedCompletedIndexSet]);
+}
+
+- (void)testCoallescingOperationData
+{
+    dispatch_group_t group = dispatch_group_create();
+    
+    NSArray<NSNumber *> *dataset = @[@(100), @(50), @(50), @(100), @(10)];
+    NSNumber *expectedData = [dataset sortedArrayUsingSelector:@selector(compare:)][0];
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+    // Fill up the queue with dummy operations so we have time to add real ones without them being unexpectedly executed
+    for (NSUInteger i = 0; i < PINOperationQueueTestsMaxOperations * 2; i++) {
+        dispatch_group_enter(group);
+        [self.queue addOperation:^{
+            usleep(1000);
+            dispatch_group_leave(group);
+        }];
+    }
+    
+    for (NSNumber *data in dataset) {
+        dispatch_group_enter(group);
+        
+        PINOperationBlock operation = ^(id _Nullable obj) {
+            XCTAssert([expectedData compare:obj] == NSOrderedSame);
+        };
+        
+        PINOperationDataCoallescingBlock dataCoallescingBlock = ^id(id existingData, id newData) {
+            NSComparisonResult result = [existingData compare:newData];
+            return (result == NSOrderedDescending) ? newData : existingData;
+        };
+        
+        dispatch_block_t completion = ^{
+            dispatch_group_leave(group);
+        };
+        
+        [self.queue addOperation:operation
+                    withPriority:PINOperationQueuePriorityLow
+                      identifier:@"Identifier"
+                  coalescingData:data
+            dataCoallescingBlock:dataCoallescingBlock
+                      completion:completion];
+    }
+#pragma clang diagnostic pop
+    
+    NSUInteger success = dispatch_group_wait(group, [self timeout]);
+    XCTAssert(success == 0, @"Timed out");
+}
+
 @end
