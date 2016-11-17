@@ -282,7 +282,7 @@ static NSURL *_sharedTrashURL;
 
 + (NSURL *)sharedTrashURL
 {
-    NSURL *trashURL;
+    NSURL *trashURL = nil;
     
     [[PINDiskCache sharedLock] lock];
         if (_sharedTrashURL == nil) {
@@ -318,8 +318,11 @@ static NSURL *_sharedTrashURL;
 + (void)emptyTrash
 {
     dispatch_async([PINDiskCache sharedTrashQueue], ^{
-        NSURL *trashURL;
-        
+        NSURL *trashURL = nil;
+      
+        // If _sharedTrashURL is unset, there's nothing left to do because it hasn't been accessed and therefore items haven't been added to it.
+        // If it is set, we can just remove it.
+        // We also need to nil out _sharedTrashURL so that a new one will be created if there's an attempt to move a new file to the trash.
         [[PINDiskCache sharedLock] lock];
             if (_sharedTrashURL != nil) {
                 trashURL = _sharedTrashURL;
