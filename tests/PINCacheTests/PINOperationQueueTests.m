@@ -349,7 +349,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
         [self.queue addOperation:operation
                     withPriority:PINOperationQueuePriorityLow
                       identifier:identifier
-                            data:nil
+                  coalescingData:nil
             dataCoallescingBlock:nil
                       completion:completion];
     }
@@ -404,7 +404,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
         [self.queue addOperation:operation
                     withPriority:PINOperationQueuePriorityLow
                       identifier:@"Identifier"
-                            data:nil
+                  coalescingData:nil
             dataCoallescingBlock:nil
                       completion:completion];
     }
@@ -452,7 +452,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
         [self.queue addOperation:operation
                     withPriority:PINOperationQueuePriorityLow
                       identifier:@"Identifier"
-                            data:data
+                  coalescingData:data
             dataCoallescingBlock:dataCoallescingBlock
                       completion:completion];
     }
