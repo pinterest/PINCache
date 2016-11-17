@@ -28,9 +28,14 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     PINDiskCacheConditionReady = 1,
 };
 
-static PINOperationDataCoallescingBlock PINTrimmingDataCoallescingBlock = ^id(id existingData, id newData) {
-    NSComparisonResult result = [existingData compare:newData];
-    return (result == NSOrderedDescending) ? newData : existingData;
+static PINOperationDataCoallescingBlock PINDiskTrimmingSizeCoallescingBlock = ^id(NSNumber *existingSize, NSNumber *newSize) {
+    NSComparisonResult result = [existingSize compare:newSize];
+    return (result == NSOrderedDescending) ? newSize : existingSize;
+};
+
+static PINOperationDataCoallescingBlock PINDiskTrimmingDateCoallescingBlock = ^id(NSDate *existingDate, NSDate *newDate) {
+    NSComparisonResult result = [existingDate compare:newDate];
+    return (result == NSOrderedDescending) ? newDate : existingDate;
 };
 
 @interface PINDiskCache () {
@@ -655,76 +660,64 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimToSize:(NSUInteger)trimByteCount block:(PINDiskCacheBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-  
     PINOperationBlock operation = ^(id data) {
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf trimToSize:((NSNumber *)data).unsignedIntegerValue];
+        [self trimToSize:((NSNumber *)data).unsignedIntegerValue];
     };
   
     dispatch_block_t completion = nil;
     if (block) {
         completion = ^{
-            PINDiskCache *strongSelf = weakSelf;
-            block(strongSelf);
+            block(self);
         };
     }
     
     [self.operationQueue addOperation:operation
                          withPriority:PINOperationQueuePriorityLow
                            identifier:PINDiskCacheOperationIdentifierTrimToSize
-                                 data:[NSNumber numberWithUnsignedInteger:trimByteCount]
-                  dataCoallescingBlock:PINTrimmingDataCoallescingBlock
+                       coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
+                  dataCoallescingBlock:PINDiskTrimmingSizeCoallescingBlock
                            completion:completion];
 }
 
 - (void)trimToDate:(NSDate *)trimDate block:(PINDiskCacheBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-
     PINOperationBlock operation = ^(id data){
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf trimToDate:(NSDate *)data];
+        [self trimToDate:(NSDate *)data];
     };
     
     dispatch_block_t completion = nil;
     if (block) {
         completion = ^{
-            PINDiskCache *strongSelf = weakSelf;
-            block(strongSelf);
+            block(self);
         };
     }
     
     [self.operationQueue addOperation:operation
                          withPriority:PINOperationQueuePriorityLow
                            identifier:PINDiskCacheOperationIdentifierTrimToDate
-                                 data:trimDate
-                  dataCoallescingBlock:PINTrimmingDataCoallescingBlock
+                       coalescingData:trimDate
+                  dataCoallescingBlock:PINDiskTrimmingDateCoallescingBlock
                            completion:completion];
 }
 
 - (void)trimToSizeByDate:(NSUInteger)trimByteCount block:(PINDiskCacheBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
     PINOperationBlock operation = ^(id data){
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf trimToSizeByDate:((NSNumber *)data).unsignedIntegerValue];
+        [self trimToSizeByDate:((NSNumber *)data).unsignedIntegerValue];
     };
     
     dispatch_block_t completion = nil;
     if (block) {
         completion = ^{
-            PINDiskCache *strongSelf = weakSelf;
-            block(strongSelf);
+            block(self);
         };
     }
     
     [self.operationQueue addOperation:operation
                          withPriority:PINOperationQueuePriorityLow
                            identifier:PINDiskCacheOperationIdentifierTrimToSizeByDate
-                                 data:[NSNumber numberWithUnsignedInteger:trimByteCount]
-                  dataCoallescingBlock:PINTrimmingDataCoallescingBlock
+                       coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
+                  dataCoallescingBlock:PINDiskTrimmingSizeCoallescingBlock
                            completion:completion];
 }
 

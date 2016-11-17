@@ -30,7 +30,12 @@ typedef _Nullable id(^PINOperationDataCoallescingBlock)(id _Nullable existingDat
 
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)operation;
 - (id <PINOperationReference>)addOperation:(dispatch_block_t)operation withPriority:(PINOperationQueuePriority)priority;
-- (id <PINOperationReference>)addOperation:(PINOperationBlock)operation withPriority:(PINOperationQueuePriority)priority identifier:(NSString *)identifier data:(nullable id)data dataCoallescingBlock:(nullable PINOperationDataCoallescingBlock)dataCoallescingBlock completion:(nullable dispatch_block_t)completion;
+- (id <PINOperationReference>)addOperation:(PINOperationBlock)operation
+                              withPriority:(PINOperationQueuePriority)priority
+                                identifier:(NSString *)identifier
+                            coalescingData:(nullable id)coalescingData
+                      dataCoallescingBlock:(nullable PINOperationDataCoallescingBlock)dataCoallescingBlock
+                                completion:(nullable dispatch_block_t)completion;
 
 /**
  * Marks the operation as cancelled

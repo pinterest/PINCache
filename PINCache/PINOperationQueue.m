@@ -45,11 +45,13 @@
 @property (nonatomic, strong) PINOperationBlock block;
 @property (nonatomic, strong) id <PINOperationReference> reference;
 @property (nonatomic, assign) PINOperationQueuePriority priority;
-@property (nonatomic, strong) dispatch_block_t completion;
+@property (nonatomic, strong) NSMutableArray<dispatch_block_t> *completions;
 @property (nonatomic, strong) NSString *identifier;
 @property (nonatomic, strong) id data;
 
 + (instancetype)operationWithBlock:(PINOperationBlock)block reference:(id <PINOperationReference>)reference priority:(PINOperationQueuePriority)priority identifier:(nullable NSString *)identifier data:(nullable id)data completion:(nullable dispatch_block_t)completion;
+
+- (void)addCompletion:(nullable dispatch_block_t)completion;
 
 @end
 
@@ -63,9 +65,20 @@
   operation.priority = priority;
   operation.identifier = identifier;
   operation.data = data;
-  operation.completion = completion;
-
+  [operation addCompletion:completion];
+  
   return operation;
+}
+
+- (void)addCompletion:(dispatch_block_t)completion
+{
+  if (completion == nil) {
+    return;
+  }
+  if (_completions == nil) {
+    _completions = [NSMutableArray array];
+  }
+  [_completions addObject:completion];
 }
 
 @end
@@ -155,46 +168,43 @@
   return operation.reference;
 }
 
-- (id<PINOperationReference>)addOperation:(PINOperationBlock)block withPriority:(PINOperationQueuePriority)priority identifier:(NSString *)identifier data:(id)data dataCoallescingBlock:(PINOperationDataCoallescingBlock)dataCoallescingBlock completion:(dispatch_block_t)completion
+- (id<PINOperationReference>)addOperation:(PINOperationBlock)block
+                             withPriority:(PINOperationQueuePriority)priority
+                               identifier:(NSString *)identifier
+                           coalescingData:(id)coalescingData
+                     dataCoallescingBlock:(PINOperationDataCoallescingBlock)dataCoallescingBlock
+                               completion:(dispatch_block_t)completion
 {
-  PINOperation *operation = nil;
+  id<PINOperationReference> reference = nil;
   BOOL isNewOperation = NO;
   
   [self lock];
+    PINOperation *operation = nil;
     if (identifier != nil && (operation = [_identifierToOperations objectForKey:identifier]) != nil) {
-      // There is an exisiting operation with the provided identifier, let's coallescing these operations
+      // There is an exisiting operation with the provided identifier, let's coallesce these operations
       if (dataCoallescingBlock != nil) {
-        operation.data = dataCoallescingBlock(operation.data, data);
+        operation.data = dataCoallescingBlock(operation.data, coalescingData);
       }
       
-      if (completion != nil) {
-        dispatch_block_t initialCompletion = operation.completion;
-        if (initialCompletion == nil) {
-          operation.completion = completion;
-        } else {
-          operation.completion = ^{
-            initialCompletion();
-            completion();
-          };
-        }
-      }
+      [operation addCompletion:completion];
     } else {
       isNewOperation = YES;
       operation = [PINOperation operationWithBlock:block
                                          reference:[self nextOperationReference]
                                           priority:priority
                                         identifier:identifier
-                                              data:data
+                                              data:coalescingData
                                         completion:completion];
       [self locked_addOperation:operation];
     }
+    reference = operation.reference;
   [self unlock];
   
   if (isNewOperation) {
     [self scheduleNextOperations:NO];
   }
   
-  return operation.reference;
+  return reference;
 }
 
 - (void)locked_addOperation:(PINOperation *)operation
@@ -274,8 +284,8 @@
         _serialQueueBusy = YES;
         dispatch_async(_serialQueue, ^{
           operation.block(operation.data);
-          if (operation.completion) {
-            operation.completion();
+          for (dispatch_block_t completion in operation.completions) {
+            completion();
           }
           dispatch_group_leave(_group);
           
@@ -303,8 +313,8 @@
       if (operation) {
         dispatch_async(_concurrentQueue, ^{
           operation.block(operation.data);
-          if (operation.completion) {
-            operation.completion();
+          for (dispatch_block_t completion in operation.completions) {
+            completion();
           }
           dispatch_group_leave(_group);
           dispatch_semaphore_signal(_concurrentSemaphore);
