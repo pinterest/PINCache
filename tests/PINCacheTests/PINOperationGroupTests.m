@@ -11,7 +11,7 @@
 #import <pthread.h>
 
 #import "PINCacheTests.h"
-#import "PINOperationGroup.h"
+#import <PINCache/PINOperationGroup.h>
 
 @interface PINOperationGroupTests : XCTestCase
 

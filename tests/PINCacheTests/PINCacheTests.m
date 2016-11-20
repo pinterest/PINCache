@@ -3,7 +3,7 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import "PINCacheTests.h"
-#import "PINCache.h"
+#import <PINCache/PINCache.h>
 
 static NSString * const PINCacheTestName = @"PINCacheTest";
 const NSTimeInterval PINCacheTestBlockTimeout = 20.0;

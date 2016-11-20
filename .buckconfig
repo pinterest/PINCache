@@ -1,0 +1,13 @@
+[cxx]
+  default_platform = iphonesimulator-x86_64
+  combined_preprocess_and_compile = true
+
+[alias]
+  library = //:PINCache
+
+[project]
+  ide = xcode
+  ignore = .buckd, \
+           .hg, \
+           .git, \
+           buck-out, \

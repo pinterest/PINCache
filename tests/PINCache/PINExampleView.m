@@ -3,7 +3,7 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import "PINExampleView.h"
-#import "PINCache.h"
+#import <PINCache/PINCache.h>
 
 @implementation PINExampleView
 
