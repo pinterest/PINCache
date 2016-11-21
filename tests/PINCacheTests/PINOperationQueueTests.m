@@ -58,6 +58,35 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   XCTAssert(success == 0, @"Timed out before completing 100 operations");
 }
 
+- (void)testAllOperationsReleased
+{
+  const NSUInteger operationCount = 100;
+  NSPointerArray *weakOperationPointers = [NSPointerArray weakObjectsPointerArray];
+  
+  for (int i = 0; i < operationCount; i++) {
+    @autoreleasepool {
+      dispatch_block_t operation = ^{
+        usleep(i);
+      };
+      
+      [weakOperationPointers addPointer:(__bridge void * _Nullable)(operation)];
+      [self.queue addOperation:operation withPriority:PINOperationQueuePriorityDefault];
+    }
+  }
+  
+  [self.queue waitUntilAllOperationsAreFinished];
+  
+  // Autorelease pool is drained at the end of each run loop
+  // Dispatch to the next loop before asserting that all blocks are gone
+  XCTestExpectation *expectation = [self expectationWithDescription:@"next run loop expectation"];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [expectation fulfill];
+  });
+  
+  [self waitForExpectationsWithTimeout:10 handler:nil];
+  XCTAssertEqual(0, weakOperationPointers.allObjects.count);
+}
+
 - (void)testWaitUntilAllOperationsFinished
 {
   const NSUInteger operationCount = 100;
@@ -328,7 +357,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
         
         NSString *identifier = desc;
         if (isNormalOperation) {
-            identifier = [NSString stringWithFormat:@"%@ %ld", desc, i];
+            identifier = [NSString stringWithFormat:@"%@ %tu", desc, i];
         }
         
         operationCount[desc] = @([operationCount[desc] intValue] + 1);
