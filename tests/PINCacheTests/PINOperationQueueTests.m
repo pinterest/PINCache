@@ -357,7 +357,7 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
         
         NSString *identifier = desc;
         if (isNormalOperation) {
-            identifier = [NSString stringWithFormat:@"%@ %ld", desc, i];
+            identifier = [NSString stringWithFormat:@"%@ %tu", desc, i];
         }
         
         operationCount[desc] = @([operationCount[desc] intValue] + 1);
