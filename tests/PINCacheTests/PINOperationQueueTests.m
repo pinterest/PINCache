@@ -58,6 +58,35 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   XCTAssert(success == 0, @"Timed out before completing 100 operations");
 }
 
+- (void)testAllOperationsReleased
+{
+  const NSUInteger operationCount = 100;
+  NSPointerArray *weakOperationPointers = [NSPointerArray weakObjectsPointerArray];
+  
+  @autoreleasepool {
+    for (int i = 0; i < operationCount; i++) {
+      dispatch_block_t operation = ^{
+        usleep(i);
+      };
+      
+      [weakOperationPointers addPointer:(__bridge void * _Nullable)(operation)];
+      [self.queue addOperation:operation withPriority:PINOperationQueuePriorityDefault];
+    }
+  }
+  
+  [self.queue waitUntilAllOperationsAreFinished];
+  
+  // Autorelease pool is drained at the end of each run loop
+  // Dispatch to the next loop before asserting that all blocks are gone
+  XCTestExpectation *exp = [self expectationWithDescription:@"main"];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    XCTAssertEqual(0, weakOperationPointers.allObjects.count);
+    [exp fulfill];
+  });
+  
+  [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
 - (void)testWaitUntilAllOperationsFinished
 {
   const NSUInteger operationCount = 100;
