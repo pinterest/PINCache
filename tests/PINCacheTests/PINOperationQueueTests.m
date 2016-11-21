@@ -63,8 +63,8 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   const NSUInteger operationCount = 100;
   NSPointerArray *weakOperationPointers = [NSPointerArray weakObjectsPointerArray];
   
-  @autoreleasepool {
-    for (int i = 0; i < operationCount; i++) {
+  for (int i = 0; i < operationCount; i++) {
+    @autoreleasepool {
       dispatch_block_t operation = ^{
         usleep(i);
       };
@@ -78,13 +78,13 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   
   // Autorelease pool is drained at the end of each run loop
   // Dispatch to the next loop before asserting that all blocks are gone
-  XCTestExpectation *exp = [self expectationWithDescription:@"main"];
+  XCTestExpectation *expectation = [self expectationWithDescription:@"next run loop expectation"];
   dispatch_async(dispatch_get_main_queue(), ^{
-    XCTAssertEqual(0, weakOperationPointers.allObjects.count);
-    [exp fulfill];
+    [expectation fulfill];
   });
   
   [self waitForExpectationsWithTimeout:10 handler:nil];
+  XCTAssertEqual(0, weakOperationPointers.allObjects.count);
 }
 
 - (void)testWaitUntilAllOperationsFinished
