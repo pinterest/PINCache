@@ -220,7 +220,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+- (void)setObject:(__nullable id <NSCoding>)object forKey:(NSString *)key;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
