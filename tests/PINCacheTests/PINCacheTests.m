@@ -125,6 +125,25 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertNotNil(image, @"object was not set");
 }
 
+- (void)testObjectSetWithCost
+{
+    NSString *key = @"key";
+    __block UIImage *image = nil;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    UIImage *srcImage = [self image];
+    NSUInteger cost = (NSUInteger)(srcImage.size.width * srcImage.size.height);
+    
+    [self.cache setObject:srcImage forKey:key withCost:cost block:^(PINCache *cache, NSString *key, id object) {
+        image = (UIImage *)object;
+        dispatch_semaphore_signal(semaphore);
+    }];
+    
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertNotNil(image, @"object was not set");
+    XCTAssertTrue(self.cache.memoryCache.totalCost == cost, @"memory cache total cost was incorrect");
+}
+
 - (void)testObjectSetWithDuplicateKey
 {
     NSString *key = @"key";
@@ -166,6 +185,29 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     dispatch_semaphore_wait(semaphore, [self timeout]);
     
     XCTAssertTrue(cacheContainsObject, @"object was gone");
+}
+
+- (void)testObjectContainsWithCost
+{
+    NSString *key = @"key";
+    NSString *value = @"value";
+    
+    [self.cache setObject:value forKey:key withCost:1];
+    
+    // Synchronously
+    XCTAssertTrue([self.cache containsObjectForKey:key], @"object was gone");
+    
+    // Asynchronously
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block BOOL cacheContainsObject = NO;
+    [self.cache containsObjectForKey:key block:^(BOOL containsObject) {
+        cacheContainsObject = containsObject;
+        dispatch_semaphore_signal(semaphore);
+    }];
+    dispatch_semaphore_wait(semaphore, [self timeout]);
+    
+    XCTAssertTrue(cacheContainsObject, @"object was gone");
+    XCTAssertTrue(self.cache.memoryCache.totalCost == 1, @"memory cache total cost was incorrect");
 }
 
 - (void)testObjectGet
