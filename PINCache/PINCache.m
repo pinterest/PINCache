@@ -143,7 +143,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [self setObject:object forKey:key withCost:0 block:block];
 }
 
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINCacheObjectBlock)block
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINCacheObjectBlock)block
 {
     if (!key || !object)
         return;
@@ -278,7 +278,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [self setObject:object forKey:key withCost:0];
 }
 
-- (void)setObject:(nullable id)object forKey:(nullable NSString *)key withCost:(NSUInteger)cost
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost
 {
     if (!key || !object)
         return;
