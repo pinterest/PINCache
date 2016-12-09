@@ -1,10 +1,11 @@
 COMMON_PREPROCESSOR_FLAGS = ['-fobjc-arc', '-Wno-deprecated-declarations', '-Wignored-attributes']
 
 apple_library(
-  name = 'PINCache',
+  name = 'PINCacheCore',
   exported_headers = glob([
     'PINCache/*.h',
   ]),
+  header_path_prefix = 'PINCache',
   srcs = glob([
     'PINCache/*.m',
   ]),
@@ -15,8 +16,32 @@ apple_library(
   preprocessor_flags = COMMON_PREPROCESSOR_FLAGS,
   frameworks = [
     '$SDKROOT/System/Library/Frameworks/Foundation.framework',
-    '$SDKROOT/System/Library/Frameworks/UIKit.framework',
-    '$SDKROOT/System/Library/Frameworks/CoreGraphics.framework',
+  ],
+  visibility = [
+    'PUBLIC',
+  ],
+)
+
+#PINCache iOS
+apple_library(
+  name = 'PINCache',
+  deps = [':PINCacheCore'],
+  linker_flags = [
+    '-weak_framework',
+    'UIKit',
+  ],
+  visibility = [
+    'PUBLIC',
+  ],
+)
+
+#PINCache MacOS
+apple_library(
+  name = 'PINCacheMacOS',
+  deps = [':PINCacheCore'],
+  linker_flags = [
+    '-weak_framework',
+    'AppKit',
   ],
   visibility = [
     'PUBLIC',
