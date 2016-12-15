@@ -20,3 +20,9 @@ xcuserdata
 build
 
 .gitattributes
+
+# Buck
+/buck-out
+/.buckconfig.local
+/.buckd
+
