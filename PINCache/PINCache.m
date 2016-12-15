@@ -140,13 +140,18 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
+    [self setObject:object forKey:key withCost:0 block:block];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINCacheObjectBlock)block
+{
     if (!key || !object)
         return;
   
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
-        [_memoryCache setObject:object forKey:key];
+        [_memoryCache setObject:object forKey:key withCost:cost];
     }];
     [group addOperation:^{
         [_diskCache setObject:object forKey:key];
@@ -270,10 +275,15 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key
 {
+    [self setObject:object forKey:key withCost:0];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost
+{
     if (!key || !object)
         return;
     
-    [_memoryCache setObject:object forKey:key];
+    [_memoryCache setObject:object forKey:key withCost:cost];
     [_diskCache setObject:object forKey:key];
 }
 

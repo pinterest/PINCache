@@ -165,6 +165,19 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
+ Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
+ to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method returns immediately
+ and executes the passed block after the object has been stored, potentially in parallel with other blocks
+ on the <concurrentQueue>.
+ 
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param cost An amount to add to the <memoryCache.totalCost>.
+ @param block A block to be executed concurrently after the object has been stored, or nil.
+ */
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
+
+/**
  Removes the object for the specified key. This method returns immediately and executes the passed
  block after the object has been removed, potentially in parallel with other blocks on the <concurrentQueue>.
  
@@ -221,6 +234,17 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+
+/**
+ Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
+ to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method blocks the calling thread
+ until the object has been stored.
+ 
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param cost An amount to add to the <memoryCache.totalCost>.
+ */
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
