@@ -133,28 +133,32 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   XCTAssert(operationsRun == (operationCount*2), @"Timed out before completing 100 operations");
 }
 
-- (void)testMaximumNumberOfConcurrentOperations
+- (void)helperConfirmMaxOperations:(NSUInteger)maxOperations queue:(PINOperationQueue *)queue
 {
   const NSUInteger operationCount = 100;
   dispatch_group_t group = dispatch_group_create();
   
   __block NSUInteger runningOperationCount = 0;
+  __block BOOL operationCountMaxedOut = NO;
   
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
   for (NSUInteger count = 0; count < operationCount; count++) {
     dispatch_group_enter(group);
-    [self.queue addOperation:^{
+    [queue addOperation:^{
       @synchronized (self) {
         runningOperationCount++;
-        XCTAssert(runningOperationCount <= PINOperationQueueTestsMaxOperations, @"Running too many operations at once.");
+        if (runningOperationCount == maxOperations) {
+          operationCountMaxedOut = YES;
+        }
+        XCTAssert(runningOperationCount <= maxOperations, @"Running too many operations at once: %lu", (unsigned long)runningOperationCount);
       }
       
       usleep(1000);
       
       @synchronized (self) {
         runningOperationCount--;
-        XCTAssert(runningOperationCount <= PINOperationQueueTestsMaxOperations, @"Running too many operations at once.");
+        XCTAssert(runningOperationCount <= maxOperations, @"Running too many operations at once: %lu", (unsigned long)runningOperationCount);
       }
       
       dispatch_group_leave(group);
@@ -164,6 +168,12 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
   
   NSUInteger success = dispatch_group_wait(group, [self timeout]);
   XCTAssert(success == 0, @"Timed out before completing 100 operations");
+  XCTAssert(operationCountMaxedOut == YES, @"Never reached maximum number of concurrent operations: %lu", (unsigned long)maxOperations);
+}
+
+- (void)testMaximumNumberOfConcurrentOperations
+{
+  [self helperConfirmMaxOperations:PINOperationQueueTestsMaxOperations queue:self.queue];
 }
 
 //We expect operations to run in priority order when added in that order as well
@@ -489,6 +499,18 @@ static const NSUInteger PINOperationQueueTestsMaxOperations = 5;
     
     NSUInteger success = dispatch_group_wait(group, [self timeout]);
     XCTAssert(success == 0, @"Timed out");
+}
+
+- (void)testChangingMaximumNumberOfOperations
+{
+  PINOperationQueue *queue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:2];
+  [self helperConfirmMaxOperations:2 queue:queue];
+  queue.maxConcurrentOperations = 4;
+  usleep(1000);
+  [self helperConfirmMaxOperations:4 queue:queue];
+  queue.maxConcurrentOperations = 2;
+  usleep(1000);
+  [self helperConfirmMaxOperations:2 queue:queue];
 }
 
 @end

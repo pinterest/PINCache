@@ -19,6 +19,7 @@
   pthread_mutex_t _lock;
   //increments with every operation to allow cancelation
   NSUInteger _operationReferenceCount;
+  NSUInteger _maxConcurrentOperations;
   
   dispatch_group_t _group;
   
@@ -94,6 +95,7 @@
 {
   if (self = [super init]) {
     NSAssert(maxConcurrentOperations > 1, @"Max concurrent operations must be greater than 1. If it's one, just use a serial queue!");
+    _maxConcurrentOperations = maxConcurrentOperations;
     _operationReferenceCount = 0;
     
     pthread_mutexattr_t attr;
@@ -109,7 +111,7 @@
     _concurrentQueue = concurrentQueue;
     
     //Create a queue with max - 1 because this plus the serial queue add up to max.
-    _concurrentSemaphore = dispatch_semaphore_create(maxConcurrentOperations - 1);
+    _concurrentSemaphore = dispatch_semaphore_create(_maxConcurrentOperations - 1);
     _semaphoreQueue = dispatch_queue_create("PINOperationQueue Serial Semaphore Queue", DISPATCH_QUEUE_SERIAL);
     
     _queuedOperations = [[NSMutableOrderedSet alloc] init];
@@ -237,6 +239,36 @@
   [self unlock];
   return success;
 }
+
+- (NSUInteger)maxConcurrentOperations
+{
+  [self lock];
+    NSUInteger maxConcurrentOperations = _maxConcurrentOperations;
+  [self unlock];
+  return maxConcurrentOperations;
+}
+
+- (void)setMaxConcurrentOperations:(NSUInteger)maxConcurrentOperations
+{
+  NSAssert(maxConcurrentOperations > 1, @"Max concurrent operations must be greater than 1. If it's one, just use a serial queue!");
+  [self lock];
+    __block NSInteger difference = maxConcurrentOperations - _maxConcurrentOperations;
+    _maxConcurrentOperations = maxConcurrentOperations;
+  [self unlock];
+  dispatch_async(_semaphoreQueue, ^{
+    while (difference != 0) {
+      if (difference > 0) {
+        dispatch_semaphore_signal(_concurrentSemaphore);
+        difference--;
+      } else {
+        dispatch_semaphore_wait(_concurrentSemaphore, DISPATCH_TIME_FOREVER);
+        difference++;
+      }
+    }
+  });
+}
+
+#pragma mark - private methods
 
 - (BOOL)locked_cancelOperation:(id <PINOperationReference>)operationReference
 {
