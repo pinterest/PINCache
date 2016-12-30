@@ -6,11 +6,14 @@
   iphonesimulator_target_sdk_version = 5.0
   iphoneos_target_sdk_version = 5.0
   macosx_target_sdk_version = 10.7
+  xctool_default_destination_specifier = platform=iOS Simulator, name=iPhone 6, OS=10.2
 
 [alias]
-  library = //:PINCache
+  lib = //:PINCache
+  tests = //tests:Tests
 
 [project]
+  parallel_parsing = true
   ide = xcode
   ignore = .buckd, \
            .hg, \
