@@ -37,6 +37,8 @@ typedef _Nullable id(^PINOperationDataCoallescingBlock)(id _Nullable existingDat
                       dataCoallescingBlock:(nullable PINOperationDataCoallescingBlock)dataCoallescingBlock
                                 completion:(nullable dispatch_block_t)completion;
 
+@property (nonatomic, assign) NSUInteger maxConcurrentOperations;
+
 /**
  * Marks the operation as cancelled
  */
