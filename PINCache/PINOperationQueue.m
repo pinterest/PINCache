@@ -255,6 +255,11 @@
     __block NSInteger difference = maxConcurrentOperations - _maxConcurrentOperations;
     _maxConcurrentOperations = maxConcurrentOperations;
   [self unlock];
+  
+  if (difference == 0) {
+    return;
+  }
+  
   dispatch_async(_semaphoreQueue, ^{
     while (difference != 0) {
       if (difference > 0) {
