@@ -273,7 +273,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return object;
 }
 
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key
+- (void)setObject:(__nullable id <NSCoding>)object forKey:(NSString *)key
 {
     [self setObject:object forKey:key withCost:0];
 }
