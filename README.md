@@ -2,7 +2,7 @@
 
 [![CocoaPods](https://img.shields.io/cocoapods/v/PINCache.svg)](http://cocoadocs.org/docsets/PINCache/)
 [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
-[![Tavis CI build](https://img.shields.io/travis/pinterest/PINCache.svg?style=flat)](https://travis-ci.org/pinterest/PINCache)
+[![Build status](https://badge.buildkite.com/03e247305c96c3371f2ff2766e9c8c1efdd5fdb3a7eceaff43.svg?branch=master&style=flat)](https://buildkite.com/pinterest/pincache)
 
 ## Fast, non-deadlocking parallel object cache for iOS and OS X.
 
