@@ -11,6 +11,6 @@ test:
 	xcodebuild clean test -destination ${PLATFORM} -sdk ${SDK} -project tests/PINCache.xcodeproj -scheme PINCacheTests ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	carthage update --no-skip-current
+	carthage update
 
 all: lint test carthage
