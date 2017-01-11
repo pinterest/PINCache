@@ -8,7 +8,7 @@
 
 #import "ActionRequestHandler.h"
 #import <MobileCoreServices/MobileCoreServices.h>
-#import "PINCache.h"
+#import <PINCache/PINCache.h>
 
 @interface ActionRequestHandler ()
 

@@ -30,7 +30,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D07F1EB1171AFB7A001DBA02"
                BuildableName = "PINCache.app"
-               BlueprintName = "PINCache"
+               BlueprintName = "PINCacheTestHost"
                ReferencedContainer = "container:PINCache.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -154,7 +154,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D07F1EB1171AFB7A001DBA02"
             BuildableName = "PINCache.app"
-            BlueprintName = "PINCache"
+            BlueprintName = "PINCacheTestHost"
             ReferencedContainer = "container:PINCache.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -177,7 +177,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D07F1EB1171AFB7A001DBA02"
             BuildableName = "PINCache.app"
-            BlueprintName = "PINCache"
+            BlueprintName = "PINCacheTestHost"
             ReferencedContainer = "container:PINCache.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

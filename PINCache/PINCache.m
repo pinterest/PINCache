@@ -4,8 +4,7 @@
 
 #import "PINCache.h"
 
-#import "PINOperationQueue.h"
-#import "PINOperationGroup.h"
+#import <PINOperation/PINOperation.h>
 
 static NSString * const PINCachePrefix = @"com.pinterest.PINCache";
 static NSString * const PINCacheSharedName = @"PINCacheShared";
