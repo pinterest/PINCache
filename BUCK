@@ -1,10 +1,10 @@
 apple_library(
   name = 'PINCache',
-  exported_headers = glob(['PINCache/*.h']),
+  exported_headers = glob(['Source/*.h']),
   # PINDiskCache.m should be compiled with '-fobjc-arc-exceptions' (#105)
   srcs =
-    glob(['PINCache/*.m'], excludes = ['PINCache/PINDiskCache.m']) +
-    [('PINCache/PINDiskCache.m', ['-fobjc-arc-exceptions'])],
+    glob(['Source/*.m'], excludes = ['Source/PINDiskCache.m']) +
+    [('Source/PINDiskCache.m', ['-fobjc-arc-exceptions'])],
   preprocessor_flags = ['-fobjc-arc'],
   lang_preprocessor_flags = {
     'C': ['-std=gnu99'],
