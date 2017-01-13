@@ -3,7 +3,6 @@
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import <Foundation/Foundation.h>
-#import "Nullability.h"
 
 #import "PINCacheObjectSubscripting.h"
 

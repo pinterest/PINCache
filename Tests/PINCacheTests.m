@@ -5,6 +5,12 @@
 #import "PINCacheTests.h"
 #import <PINCache/PINCache.h>
 
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+  typedef UIImage PINImage;
+#else
+  typedef NSImage PINImage;
+#endif
+
 static NSString * const PINCacheTestName = @"PINCacheTest";
 const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
@@ -53,17 +59,17 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 #pragma mark - Private Methods
 
-- (UIImage *)image
+- (PINImage *)image
 {
-    static UIImage *image = nil;
+    static PINImage *image = nil;
     
     if (!image) {
         NSError *error = nil;
-        NSURL *imageURL = [[NSBundle mainBundle] URLForResource:@"Default-568h@2x" withExtension:@"png"];
+        NSURL *imageURL = [[NSBundle bundleForClass:self.class] URLForResource:@"Default-568h@2x" withExtension:@"png"];
         NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
                                                           options:NSDataReadingUncached
                                                             error:&error];
-        image = [[UIImage alloc] initWithData:imageData scale:2.f];
+		image = [[PINImage alloc] initWithData:imageData];
     }
 
     NSAssert(image, @"test image does not exist");
@@ -112,11 +118,11 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 - (void)testObjectSet
 {
     NSString *key = @"key";
-    __block UIImage *image = nil;
+    __block PINImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
     [self.cache setObject:[self image] forKey:key block:^(PINCache *cache, NSString *key, id object) {
-        image = (UIImage *)object;
+        image = (PINImage *)object;
         dispatch_semaphore_signal(semaphore);
     }];
 
@@ -128,13 +134,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 - (void)testObjectSetWithCost
 {
     NSString *key = @"key";
-    __block UIImage *image = nil;
+    __block PINImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    UIImage *srcImage = [self image];
+    PINImage *srcImage = [self image];
     NSUInteger cost = (NSUInteger)(srcImage.size.width * srcImage.size.height);
     
     [self.cache setObject:srcImage forKey:key withCost:cost block:^(PINCache *cache, NSString *key, id object) {
-        image = (UIImage *)object;
+        image = (PINImage *)object;
         dispatch_semaphore_signal(semaphore);
     }];
     
@@ -213,13 +219,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 - (void)testObjectGet
 {
     NSString *key = @"key";
-    __block UIImage *image = nil;
+    __block PINImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
     self.cache[key] = [self image];
     
     [self.cache objectForKey:key block:^(PINCache *cache, NSString *key, id object) {
-        image = (UIImage *)object;
+        image = (PINImage *)object;
         dispatch_semaphore_signal(semaphore);
     }];
 
@@ -232,13 +238,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 {
     NSString *key = @"key";
     NSString *invalidKey = @"invalid";
-    __block UIImage *image = nil;
+    __block PINImage *image = nil;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
     self.cache[key] = [self image];
 
     [self.cache objectForKey:invalidKey block:^(PINCache *cache, NSString *key, id object) {
-        image = (UIImage *)object;
+        image = (PINImage *)object;
         dispatch_semaphore_signal(semaphore);
     }];
 
@@ -396,6 +402,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }
 }
 
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 - (void)testMemoryWarningBlock
 {
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
@@ -545,6 +552,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
         XCTAssertTrue(objectCount == enumCount, @"some objects were not enumerated");
     }
 }
+#endif
 
 - (void)testDeadlocks
 {
@@ -623,17 +631,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssert(diskObj == nil, @"should not be in disk cache");
 }
 
+#if TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
 - (void)testWritingProtectionOption
 {
-  #if !TARGET_OS_IPHONE
-    return;
-  #endif
-  
-  #if TARGET_OS_SIMULATOR
-    NSLog(@"Warning: file protection can't be tested on iPhone simulator");
-    return;
-  #endif
-  
   self.cache.diskCache.writingProtectionOption = NSDataWritingFileProtectionCompleteUnlessOpen;
   
   NSString *key = @"key";
@@ -653,8 +653,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
   NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:diskFileURL.path error:&error];
   
   XCTAssertNil(error, @"error getting attributes of file");
-  XCTAssertEqual(attributes[NSFileProtectionKey], NSFileProtectionCompleteUnlessOpen, @"file protection key is incorrect");
+  XCTAssertEqualObjects(attributes[NSFileProtectionKey], NSFileProtectionCompleteUnlessOpen, @"file protection key is incorrect");
 }
+#endif
 
 //Disabled until race conditions can be addressed
 - (void)_testTTLCacheObjectAccess {

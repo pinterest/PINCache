@@ -10,7 +10,7 @@
 
 #import <pthread.h>
 
-#import "PINOperationQueue.h"
+#import <PINOperation/PINOperation.h>
 
 #define PINDiskCacheError(error) if (error) { NSLog(@"%@ (%d) ERROR: %@", \
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], \
@@ -28,12 +28,12 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     PINDiskCacheConditionReady = 1,
 };
 
-static PINOperationDataCoallescingBlock PINDiskTrimmingSizeCoallescingBlock = ^id(NSNumber *existingSize, NSNumber *newSize) {
+static PINOperationDataCoalescingBlock PINDiskTrimmingSizeCoalescingBlock = ^id(NSNumber *existingSize, NSNumber *newSize) {
     NSComparisonResult result = [existingSize compare:newSize];
     return (result == NSOrderedDescending) ? newSize : existingSize;
 };
 
-static PINOperationDataCoallescingBlock PINDiskTrimmingDateCoallescingBlock = ^id(NSDate *existingDate, NSDate *newDate) {
+static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(NSDate *existingDate, NSDate *newDate) {
     NSComparisonResult result = [existingDate compare:newDate];
     return (result == NSOrderedDescending) ? newDate : existingDate;
 };
@@ -678,7 +678,7 @@ static NSURL *_sharedTrashURL;
                          withPriority:PINOperationQueuePriorityLow
                            identifier:PINDiskCacheOperationIdentifierTrimToSize
                        coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
-                  dataCoallescingBlock:PINDiskTrimmingSizeCoallescingBlock
+                  dataCoalescingBlock:PINDiskTrimmingSizeCoalescingBlock
                            completion:completion];
 }
 
@@ -699,7 +699,7 @@ static NSURL *_sharedTrashURL;
                          withPriority:PINOperationQueuePriorityLow
                            identifier:PINDiskCacheOperationIdentifierTrimToDate
                        coalescingData:trimDate
-                  dataCoallescingBlock:PINDiskTrimmingDateCoallescingBlock
+                  dataCoalescingBlock:PINDiskTrimmingDateCoalescingBlock
                            completion:completion];
 }
 
@@ -720,7 +720,7 @@ static NSURL *_sharedTrashURL;
                          withPriority:PINOperationQueuePriorityLow
                            identifier:PINDiskCacheOperationIdentifierTrimToSizeByDate
                        coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
-                  dataCoallescingBlock:PINDiskTrimmingSizeCoallescingBlock
+                  dataCoalescingBlock:PINDiskTrimmingSizeCoalescingBlock
                            completion:completion];
 }
 

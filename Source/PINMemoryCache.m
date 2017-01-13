@@ -5,7 +5,7 @@
 #import "PINMemoryCache.h"
 
 #import <pthread.h>
-#import "PINOperationQueue.h"
+#import <PINOperation/PINOperation.h>
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
 #import <UIKit/UIKit.h>
