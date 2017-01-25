@@ -169,7 +169,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object.
  @param block A block to be executed concurrently after the containment check happened
  */
-- (void)containsObjectForKey:(NSString *)key block:(PINMemoryCacheContainmentBlock)block;
+- (void)containsObjectForKey:(NSString *)key block:(null_unspecified PINMemoryCacheContainmentBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -178,7 +178,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
+- (void)objectForKey:(NSString *)key block:(null_unspecified PINMemoryCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -188,7 +188,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id)object forKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key block:(null_unspecified PINMemoryCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key and the specified cost. If the cost causes the total
@@ -201,7 +201,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param cost An amount to add to the <totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINMemoryCacheObjectBlock)block;
+- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(null_unspecified PINMemoryCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -210,7 +210,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block;
+- (void)removeObjectForKey:(NSString *)key block:(null_unspecified PINMemoryCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date.
@@ -220,7 +220,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(PINMemoryCacheBlock)block;
+- (void)trimToDate:(NSDate *)date block:(null_unspecified PINMemoryCacheBlock)block;
 
 /**
  Removes objects from the cache, costliest objects first, until the <totalCost> is below the specified
@@ -230,7 +230,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToCost:(NSUInteger)cost block:(PINMemoryCacheBlock)block;
+- (void)trimToCost:(NSUInteger)cost block:(null_unspecified PINMemoryCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the <totalCost> is below
@@ -240,7 +240,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToCostByDate:(NSUInteger)cost block:(PINMemoryCacheBlock)block;
+- (void)trimToCostByDate:(NSUInteger)cost block:(null_unspecified PINMemoryCacheBlock)block;
 
 /**
  Removes all objects from the cache. This method returns immediately and executes the passed block after
@@ -248,7 +248,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  
  @param block A block to be executed concurrently after the cache has been cleared, or nil.
  */
-- (void)removeAllObjects:(PINMemoryCacheBlock)block;
+- (void)removeAllObjects:(null_unspecified PINMemoryCacheBlock)block;
 
 /**
  Loops through all objects in the cache with reads and writes suspended. Calling serial methods which
@@ -257,7 +257,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed concurrently when the enumeration is complete.
  */
-- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(PINMemoryCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(null_unspecified PINMemoryCacheObjectBlock)block completionBlock:(null_unspecified PINMemoryCacheBlock)completionBlock;
 
 #pragma mark -
 /// @name Synchronous Methods
@@ -279,7 +279,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object.
  @result The object for the specified key.
  */
-- (__nullable id)objectForKey:(nullable NSString *)key;
+- (__nullable id)objectForKey:(NSString *)key;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object
@@ -350,7 +350,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
  
  */
-- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block;
+- (void)enumerateObjectsWithBlock:(null_unspecified PINMemoryCacheObjectBlock)block;
 
 @end
 
