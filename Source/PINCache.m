@@ -294,7 +294,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key
 {
-    [self setObject:obj forKey:key];
+    if (obj == nil) {
+        [self removeObjectForKey:key];
+    } else {
+        [self setObject:obj forKey:key];
+    }
 }
 
 - (void)removeObjectForKey:(NSString *)key

@@ -855,7 +855,11 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObject:(id)object forKeyedSubscript:(NSString *)key
 {
-    [self setObject:object forKey:key];
+    if (object == nil) {
+        [self removeObjectForKey:key];
+    } else {
+        [self setObject:object forKey:key];
+    }
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL
