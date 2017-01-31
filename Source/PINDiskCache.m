@@ -165,13 +165,13 @@ static NSURL *_sharedTrashURL;
     return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINDiskCachePrefix, _name, (void *)self];
 }
 
-+ (instancetype)sharedCache
++ (PINDiskCache *)sharedCache
 {
-    static id cache;
+    static PINDiskCache *cache;
     static dispatch_once_t predicate;
     
     dispatch_once(&predicate, ^{
-        cache = [[self alloc] initWithName:PINDiskCacheSharedName];
+        cache = [[PINDiskCache alloc] initWithName:PINDiskCacheSharedName];
     });
     
     return cache;
@@ -575,15 +575,16 @@ static NSURL *_sharedTrashURL;
 
 - (void)lockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block
 {
+    if (!block) {
+        return;
+    }
     __weak PINDiskCache *weakSelf = self;
-    
+
     [self.operationQueue addOperation:^{
         PINDiskCache *strongSelf = weakSelf;
-        if (block) {
-            [strongSelf lock];
-                block(strongSelf);
-            [strongSelf unlock];
-        }
+        [strongSelf lock];
+            block(strongSelf);
+        [strongSelf unlock];
     } withPriority:PINOperationQueuePriorityLow];
 }
 
@@ -618,16 +619,14 @@ static NSURL *_sharedTrashURL;
 - (void)fileURLForKey:(NSString *)key block:(PINDiskCacheFileURLBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
-    
+
     [self.operationQueue addOperation:^{
         PINDiskCache *strongSelf = weakSelf;
         NSURL *fileURL = [strongSelf fileURLForKey:key];
-        
-        if (block) {
-            [strongSelf lock];
-                block(key, fileURL);
-            [strongSelf unlock];
-        }
+
+        [strongSelf lock];
+            block(key, fileURL);
+        [strongSelf unlock];
     } withPriority:PINOperationQueuePriorityLow];
 }
 
@@ -768,7 +767,7 @@ static NSURL *_sharedTrashURL;
     return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
 }
 
-- (__nullable id<NSCoding>)objectForKey:(NSString *)key
+- (nullable id<NSCoding>)objectForKey:(NSString *)key
 {
     return [self objectForKey:key fileURL:nil];
 }
@@ -778,7 +777,7 @@ static NSURL *_sharedTrashURL;
     return [self objectForKey:key];
 }
 
-- (__nullable id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (nullable id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
 {
     NSDate *now = [[NSDate alloc] init];
     

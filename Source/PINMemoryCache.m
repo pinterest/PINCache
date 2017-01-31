@@ -96,13 +96,13 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     return self;
 }
 
-+ (instancetype)sharedCache
++ (PINMemoryCache *)sharedCache
 {
-    static id cache;
+    static PINMemoryCache *cache;
     static dispatch_once_t predicate;
 
     dispatch_once(&predicate, ^{
-        cache = [[self alloc] init];
+        cache = [[PINMemoryCache alloc] init];
     });
 
     return cache;
@@ -290,14 +290,16 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
 
 - (void)objectForKey:(NSString *)key block:(PINMemoryCacheObjectBlock)block
 {
+    if (!block) {
+        return;
+    }
     __weak PINMemoryCache *weakSelf = self;
     
     [self.operationQueue addOperation:^{
         PINMemoryCache *strongSelf = weakSelf;
         id object = [strongSelf objectForKey:key];
-        
-        if (block)
-            block(strongSelf, key, object);
+
+        block(strongSelf, key, object);
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -410,7 +412,7 @@ static NSString * const PINMemoryCachePrefix = @"com.pinterest.PINMemoryCache";
     return containsObject;
 }
 
-- (__nullable id)objectForKey:(NSString *)key
+- (nullable id)objectForKey:(NSString *)key
 {
     if (!key)
         return nil;

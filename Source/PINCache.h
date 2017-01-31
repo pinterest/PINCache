@@ -4,8 +4,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "PINDiskCache.h"
-#import "PINMemoryCache.h"
+#import <PINCache/PINCacheMacros.h>
+#import <PINCache/PINDiskCache.h>
+#import <PINCache/PINMemoryCache.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,7 +20,7 @@ typedef void (^PINCacheBlock)(PINCache *cache);
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id __nullable object);
+typedef void (^PINCacheObjectBlock)(PINCache *cache, NSString *key, id _Nullable object);
 
 /**
  A callback block which provides a BOOL value as argument
@@ -44,6 +45,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @warning when using in extension or watch extension, define PIN_APP_EXTENSIONS=1
  */
 
+PIN_SUBCLASSING_RESTRICTED
 @interface PINCache : NSObject <PINCacheObjectSubscripting>
 
 #pragma mark -
@@ -77,7 +79,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
+@property (class, strong, readonly) PINCache *sharedCache;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -223,7 +225,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object.
  @result The object for the specified key.
  */
-- (__nullable id)objectForKey:(NSString *)key;
+- (nullable id)objectForKey:(NSString *)key;
 
 /**
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
