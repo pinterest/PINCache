@@ -110,6 +110,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                 return;
             
             if (memoryCacheObject) {
+                // Update file modification date. TODO: Make this a separate method?
                 [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) { }];
                 [strongSelf->_operationQueue addOperation:^{
                     PINCache *strongSelf = weakSelf;
