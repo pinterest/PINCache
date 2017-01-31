@@ -80,12 +80,26 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 
 
 #pragma mark -
+
+/**
+ @param rootPath The path for where the cache should be stored.
+ @param prefix The prefix for the cache name.
+ @param name The name of the cache.
+ @result The full URL of the cache.
+ */
++ (NSURL *)cacheURLWithRootPath:(NSString *)rootPath prefix:(NSString *)prefix name:(NSString *)name;
+
 /// @name Core
 
 /**
  The name of this cache, used to create a directory under Library/Caches and also appearing in stack traces.
  */
 @property (readonly) NSString *name;
+
+/**
+ The prefix to the name of this cache, used to create a directory under Library/Caches and also appearing in stack traces.
+ */
+@property (readonly) NSString *prefix;
 
 /**
  The URL of the directory used by this cache, usually `Library/Caches/com.pinterest.PINDiskCache.(name)`
@@ -265,7 +279,22 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  @param operationQueue A PINOperationQueue to run asynchronous operations
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension operationQueue:(nonnull PINOperationQueue *)operationQueue __attribute__((deprecated));
+
+/**
+ The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
+ 
+ @see name
+ @param name The name of the cache.
+ @param prefix The prefix for the cache name. Defaults to com.pinterest.PINDiskCache
+ @param rootPath The path of the cache.
+ @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
+ @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
+ @param fileExtension The file extension for files on disk.
+ @param operationQueue A PINOperationQueue to run asynchronous operations
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(nonnull NSString *)name prefix:(nonnull NSString *)prefix rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
 
 #pragma mark -
 /// @name Asynchronous Methods
