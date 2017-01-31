@@ -98,7 +98,23 @@ static NSURL *_sharedTrashURL;
     return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:[PINOperationQueue sharedOperationQueue]];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension operationQueue:(PINOperationQueue *)operationQueue
+- (instancetype)initWithName:(NSString *)name
+                    rootPath:(NSString *)rootPath
+                  serializer:(PINDiskCacheSerializerBlock)serializer
+                deserializer:(PINDiskCacheDeserializerBlock)deserializer
+               fileExtension:(NSString *)fileExtension
+              operationQueue:(PINOperationQueue *)operationQueue
+{
+  return [self initWithName:name prefix:PINDiskCachePrefix rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:operationQueue];
+}
+
+- (instancetype)initWithName:(NSString *)name
+                      prefix:(NSString *)prefix
+                    rootPath:(NSString *)rootPath
+                  serializer:(PINDiskCacheSerializerBlock)serializer
+                deserializer:(PINDiskCacheDeserializerBlock)deserializer
+               fileExtension:(NSString *)fileExtension
+              operationQueue:(PINOperationQueue *)operationQueue
 {
     if (!name)
         return nil;
@@ -111,6 +127,7 @@ static NSURL *_sharedTrashURL;
     
     if (self = [super init]) {
         _name = [name copy];
+        _prefix = [prefix copy];
         _fileExtension = [fileExtension copy];
         _operationQueue = operationQueue;
         _instanceLock = [[NSConditionLock alloc] initWithCondition:PINDiskCacheConditionNotReady];
@@ -131,9 +148,8 @@ static NSURL *_sharedTrashURL;
         
         _dates = [[NSMutableDictionary alloc] init];
         _sizes = [[NSMutableDictionary alloc] init];
-        
-        NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", PINDiskCachePrefix, _name];
-        _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
+      
+        _cacheURL = [[self class] cacheURLWithRootPath:rootPath prefix:_prefix name:_name];
         
         //setup serializers
         if(serializer) {
@@ -175,6 +191,12 @@ static NSURL *_sharedTrashURL;
     });
     
     return cache;
+}
+
++ (NSURL *)cacheURLWithRootPath:(NSString *)rootPath prefix:(NSString *)prefix name:(NSString *)name
+{
+    NSString *pathComponent = [[NSString alloc] initWithFormat:@"%@.%@", prefix, name];
+    return [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
 }
 
 #pragma mark - Private Methods -
