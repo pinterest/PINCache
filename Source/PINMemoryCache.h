@@ -211,4 +211,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+
+#pragma mark - Deprecated
+
+typedef void (^PINMemoryCacheBlock)(PINMemoryCache *cache);
+typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, id __nullable object);
+typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
+
+@interface PINMemoryCache (Deprecated)
+- (void)containsObjectForKey:(NSString *)key block:(PINMemoryCacheContainmentBlock)block __attribute__((deprecated));
+- (void)objectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block __attribute__((deprecated));
+- (void)setObject:(id)object forKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block __attribute__((deprecated));
+- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINMemoryCacheObjectBlock)block __attribute__((deprecated));
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block __attribute__((deprecated));
+- (void)trimToDate:(NSDate *)date block:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
+- (void)trimToCost:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
+- (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
+- (void)removeAllObjects:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock __attribute__((deprecated));
+@end
+
 NS_ASSUME_NONNULL_END

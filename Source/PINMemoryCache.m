@@ -768,3 +768,60 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 }
 
 @end
+
+
+#pragma mark - Deprecated
+
+@implementation PINMemoryCache (Deprecated)
+
+- (void)containsObjectForKey:(NSString *)key block:(PINMemoryCacheContainmentBlock)block
+{
+    [self asyncContainsObjectForKey:key block:block];
+}
+
+- (void)objectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block
+{
+    [self asyncObjectForKey:key block:block];
+}
+
+- (void)setObject:(id)object forKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block
+{
+    [self asyncSetObject:object forKey:key block:block];
+}
+
+- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINMemoryCacheObjectBlock)block
+{
+    [self asyncSetObject:object forKey:key withCost:cost block:block];
+}
+
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block
+{
+    [self asyncRemoveObjectForKey:key block:block];
+}
+
+- (void)trimToDate:(NSDate *)date block:(nullable PINMemoryCacheBlock)block
+{
+    [self asyncTrimToDate:date block:block];
+}
+
+- (void)trimToCost:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block
+{
+    [self asyncTrimToCost:cost block:block];
+}
+
+- (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block
+{
+    [self asyncTrimToCostByDate:cost block:block];
+}
+
+- (void)removeAllObjects:(nullable PINMemoryCacheBlock)block
+{
+    [self asyncRemoveAllObjects:block];
+}
+
+- (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock
+{
+    [self asyncEnumerateObjectsWithBlock:block completionBlock:completionBlock];
+}
+
+@end
