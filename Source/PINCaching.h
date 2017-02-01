@@ -51,7 +51,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object.
  @param block A block to be executed concurrently after the containment check happened
  */
-- (void)containsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block;
+- (void)asyncContainsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -60,7 +60,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
+- (void)asyncObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -70,7 +70,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
@@ -83,7 +83,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param cost An amount to add to the <memoryCache.totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
+- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -92,7 +92,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)asyncRemoveObjectForKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date. This method returns immediately and
@@ -101,7 +101,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDate:(NSDate *)date block:(nullable PINCacheBlock)block;
+- (void)asyncTrimToDate:(NSDate *)date block:(nullable PINCacheBlock)block;
 
 /**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
@@ -109,23 +109,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  
  @param block A block to be executed concurrently after the cache has been cleared, or nil.
  */
-- (void)removeAllObjects:(nullable PINCacheBlock)block;
-
-/**
- Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually
- read from disk, the `object` parameter of the block will be `nil` but the `fileURL` will be available.
- This method returns immediately.
-
- @param block A block to be executed for every object in the cache.
- @param completionBlock An optional block to be executed after the enumeration is complete.
- 
- @warning The PINDiskCache lock is held while block is executed. Any synchronous calls to the diskcache
- or a cache which owns the instance of the disk cache are likely to cause a deadlock. This is why the block is
- *not* passed the instance of the disk cache. You should also avoid doing extensive work while this
- lock is held.
- 
- */
-//- (void)enumerateObjectsWithBlock:(PINCacheObjectBlock)block completionBlock:(nullable PINCacheBlock)completionBlock;
+- (void)asyncRemoveAllObjects:(nullable PINCacheBlock)block;
 
 
 #pragma mark - Synchronous Methods
@@ -194,19 +178,6 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  Uses a lock to achieve synchronicity on the disk cache.
  */
 - (void)removeAllObjects;
-
-/**
- Loops through all objects in the cache within a memory lock (reads and writes are suspended during the enumeration).
- This method blocks the calling thread until all objects have been enumerated.
- Calling synchronous methods on the cache within this callback will likely cause a deadlock.
- 
- @param block A block to be executed for every object in the cache.
- 
- @warning Do not call this method within the event blocks (<didReceiveMemoryWarningBlock>, etc.)
- Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
- 
- */
-//- (void)enumerateObjectsWithBlock:(nullable PINCacheBlock)block;
 
 @end
 

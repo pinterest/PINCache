@@ -121,7 +121,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (void)didReceiveMemoryWarningNotification:(NSNotification *)notification {
     if (self.removeAllObjectsOnMemoryWarning)
-        [self removeAllObjects:nil];
+        [self asyncRemoveAllObjects:nil];
 
     __weak PINMemoryCache *weakSelf = self;
 
@@ -143,7 +143,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 - (void)didReceiveEnterBackgroundNotification:(NSNotification *)notification
 {
     if (self.removeAllObjectsOnEnteringBackground)
-        [self removeAllObjects:nil];
+        [self asyncRemoveAllObjects:nil];
 
     __weak PINMemoryCache *weakSelf = self;
 
@@ -282,7 +282,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)containsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block
+- (void)asyncContainsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block
 {
     if (!key || !block)
         return;
@@ -297,7 +297,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block
+- (void)asyncObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -310,12 +310,12 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)setObject:(id)object forKey:(NSString *)key block:(PINCacheObjectBlock)block
+- (void)asyncSetObject:(id)object forKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
-    [self setObject:object forKey:key withCost:0 block:block];
+    [self asyncSetObject:object forKey:key withCost:0 block:block];
 }
 
-- (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINCacheObjectBlock)block
+- (void)asyncSetObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINCacheObjectBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -328,7 +328,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)removeObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block
+- (void)asyncRemoveObjectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -341,7 +341,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)trimToDate:(NSDate *)trimDate block:(PINCacheBlock)block
+- (void)asyncTrimToDate:(NSDate *)trimDate block:(PINCacheBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -354,7 +354,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)trimToCost:(NSUInteger)cost block:(PINCacheBlock)block
+- (void)asyncTrimToCost:(NSUInteger)cost block:(PINCacheBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -367,7 +367,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)trimToCostByDate:(NSUInteger)cost block:(PINCacheBlock)block
+- (void)asyncTrimToCostByDate:(NSUInteger)cost block:(PINCacheBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -380,7 +380,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)removeAllObjects:(PINCacheBlock)block
+- (void)asyncRemoveAllObjects:(PINCacheBlock)block
 {
     __weak PINMemoryCache *weakSelf = self;
     
@@ -393,7 +393,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (void)enumerateObjectsWithBlock:(PINCacheObjectBlock)block completionBlock:(PINCacheBlock)completionBlock
+- (void)asyncEnumerateObjectsWithBlock:(PINCacheObjectBlock)block completionBlock:(PINCacheBlock)completionBlock
 {
     __weak PINMemoryCache *weakSelf = self;
     
