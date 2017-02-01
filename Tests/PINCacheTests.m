@@ -21,6 +21,12 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 @end
 
+@interface PINMemoryCache ()
+
+- (void)didReceiveEnterBackgroundNotification:(NSNotification *)notification;
+
+@end
+
 @interface PINCacheTests ()
 @property (strong, nonatomic) PINCache *cache;
 @end

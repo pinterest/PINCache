@@ -48,8 +48,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
       
         //10 may actually be a bit high, but currently much of our threads are blocked on empyting the trash. Until we can resolve that, lets bump this up.
         _operationQueue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:10];
-      
-        _diskCache = [[PINDiskCache alloc] initWithName:_name rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:_operationQueue];
+        _diskCache = [[PINDiskCache alloc] initWithName:_name prefix:PINDiskCachePrefix rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:_operationQueue];
         _memoryCache = [[PINMemoryCache alloc] initWithOperationQueue:_operationQueue];
     }
     return self;

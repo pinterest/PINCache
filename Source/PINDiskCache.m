@@ -16,7 +16,7 @@
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], \
 __LINE__, [error localizedDescription]); }
 
-static NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
+NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
 static NSString * const PINDiskCacheOperationIdentifierTrimToDate = @"PINDiskCacheOperationIdentifierTrimToDate";
@@ -95,7 +95,10 @@ static NSURL *_sharedTrashURL;
 
 - (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:[PINOperationQueue sharedOperationQueue]];
+#pragma clang diagnostic pop
 }
 
 - (instancetype)initWithName:(NSString *)name

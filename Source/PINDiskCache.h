@@ -11,6 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class PINDiskCache;
 @class PINOperationQueue;
 
+extern NSString * const PINDiskCachePrefix;
+
 /**
  A callback block which provides only the cache as an argument
  */
