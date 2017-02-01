@@ -321,3 +321,42 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 }
 
 @end
+
+@implementation PINCache (Deprecated)
+
+- (void)containsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block
+{
+    [self asyncContainsObjectForKey:key block:block];
+}
+
+- (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block
+{
+    [self asyncObjectForKey:key block:block];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block
+{
+    [self asyncSetObject:object forKey:key block:block];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block
+{
+    [self asyncSetObject:object forKey:key withCost:cost block:block];
+}
+
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINCacheObjectBlock)block
+{
+    [self asyncRemoveObjectForKey:key block:block];
+}
+
+- (void)trimToDate:(NSDate *)date block:(nullable PINCacheBlock)block
+{
+    [self asyncTrimToDate:date block:block];
+}
+
+- (void)removeAllObjects:(nullable PINCacheBlock)block
+{
+    [self asyncRemoveAllObjects:block];
+}
+
+@end
