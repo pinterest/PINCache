@@ -297,7 +297,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  
  @param block A block to be executed when a lock is available.
  */
-- (void)lockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block;
+- (void)asyncLockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -464,6 +464,33 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  */
 - (void)enumerateObjectsWithBlock:(nullable PINDiskCacheFileURLBlock)block;
 
+@end
+
+
+#pragma mark - Deprecated
+
+/**
+ A callback block which provides only the cache as an argument
+ */
+typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
+
+/**
+ A callback block which provides the cache, key and object as arguments
+ */
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object);
+
+@interface PINDiskCache (Deprecated)
+- (void)lockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block __attribute__((deprecated));
+- (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block __attribute__((deprecated));
+- (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block __attribute__((deprecated));
+- (void)fileURLForKey:(NSString *)key block:(nullable PINDiskCacheFileURLBlock)block __attribute__((deprecated));
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block __attribute__((deprecated));
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block __attribute__((deprecated));
+- (void)trimToDate:(NSDate *)date block:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
+- (void)trimToSize:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
+- (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
+- (void)removeAllObjects:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
+- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock __attribute__((deprecated));
 @end
 
 NS_ASSUME_NONNULL_END

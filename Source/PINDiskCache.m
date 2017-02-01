@@ -599,7 +599,7 @@ static NSURL *_sharedTrashURL;
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)lockFileAccessWhileExecutingBlock:(PINCacheBlock)block
+- (void)asyncLockFileAccessWhileExecutingBlock:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -1340,6 +1340,65 @@ static NSURL *_sharedTrashURL;
 - (void)unlock
 {
     [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
+}
+
+@end
+
+@implementation PINDiskCache (Deprecated)
+
+- (void)lockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block
+{
+    [self asyncLockFileAccessWhileExecutingBlock:block];
+}
+
+- (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block
+{
+    [self asyncContainsObjectForKey:key block:block];
+}
+
+- (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block
+{
+    [self asyncObjectForKey:key block:block];
+}
+
+- (void)fileURLForKey:(NSString *)key block:(nullable PINDiskCacheFileURLBlock)block
+{
+    [self asyncFileURLForKey:key block:block];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block
+{
+    [self asyncSetObject:object forKey:key block:block];
+}
+
+- (void)removeObjectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block
+{
+    [self asyncRemoveObjectForKey:key block:block];
+}
+
+- (void)trimToDate:(NSDate *)date block:(nullable PINDiskCacheBlock)block
+{
+    [self asyncTrimToDate:date block:block];
+}
+
+- (void)trimToSize:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block
+{
+    [self asyncTrimToSize:byteCount block:block];
+}
+
+- (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block
+{
+    [self asyncTrimToSize:byteCount block:block];
+}
+
+- (void)removeAllObjects:(nullable PINDiskCacheBlock)block
+{
+    [self asyncRemoveAllObjects:block];
+}
+
+- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock
+{
+    [self asyncEnumerateObjectsWithBlock:block completionBlock:completionBlock];
 }
 
 @end
