@@ -45,6 +45,7 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
     PINDiskCacheDeserializerBlock _deserializer;
 }
 
+@property (copy, nonatomic) NSString *name;
 @property (assign) NSUInteger byteCount;
 @property (strong, nonatomic) NSURL *cacheURL;
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
@@ -473,7 +474,7 @@ static NSURL *_sharedTrashURL;
             return NO;
         }
     
-        PINDiskCacheObjectBlock willRemoveObjectBlock = _willRemoveObjectBlock;
+        PINCacheObjectBlock willRemoveObjectBlock = _willRemoveObjectBlock;
         if (willRemoveObjectBlock) {
             [self unlock];
             willRemoveObjectBlock(self, key, nil);
@@ -495,7 +496,7 @@ static NSURL *_sharedTrashURL;
         [_sizes removeObjectForKey:key];
         [_dates removeObjectForKey:key];
     
-        PINDiskCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
+        PINCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
         if (didRemoveObjectBlock) {
             [self unlock];
             _didRemoveObjectBlock(self, key, nil);
@@ -598,7 +599,7 @@ static NSURL *_sharedTrashURL;
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)lockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block
+- (void)lockFileAccessWhileExecutingBlock:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -671,6 +672,11 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block
+{
+    [self setObject:object forKey:key block:(PINDiskCacheObjectBlock)block];
+}
+
 - (void)removeObjectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
@@ -686,7 +692,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)trimToSize:(NSUInteger)trimByteCount block:(PINDiskCacheBlock)block
+- (void)trimToSize:(NSUInteger)trimByteCount block:(PINCacheBlock)block
 {
     PINOperationBlock operation = ^(id data) {
         [self trimToSize:((NSNumber *)data).unsignedIntegerValue];
@@ -707,7 +713,7 @@ static NSURL *_sharedTrashURL;
                            completion:completion];
 }
 
-- (void)trimToDate:(NSDate *)trimDate block:(PINDiskCacheBlock)block
+- (void)trimToDate:(NSDate *)trimDate block:(PINCacheBlock)block
 {
     PINOperationBlock operation = ^(id data){
         [self trimToDate:(NSDate *)data];
@@ -728,7 +734,7 @@ static NSURL *_sharedTrashURL;
                            completion:completion];
 }
 
-- (void)trimToSizeByDate:(NSUInteger)trimByteCount block:(PINDiskCacheBlock)block
+- (void)trimToSizeByDate:(NSUInteger)trimByteCount block:(PINCacheBlock)block
 {
     PINOperationBlock operation = ^(id data){
         [self trimToSizeByDate:((NSNumber *)data).unsignedIntegerValue];
@@ -749,7 +755,7 @@ static NSURL *_sharedTrashURL;
                            completion:completion];
 }
 
-- (void)removeAllObjects:(PINDiskCacheBlock)block
+- (void)removeAllObjects:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -763,7 +769,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(PINDiskCacheBlock)completionBlock
+- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(PINCacheBlock)completionBlock
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -779,7 +785,7 @@ static NSURL *_sharedTrashURL;
 
 #pragma mark - Public Synchronous Methods -
 
-- (void)synchronouslyLockFileAccessWhileExecutingBlock:(void(^)(PINDiskCache *diskCache))block
+- (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINCacheBlock)block
 {
     if (block) {
         [self lock];
@@ -879,6 +885,11 @@ static NSURL *_sharedTrashURL;
     [self setObject:object forKey:key fileURL:nil];
 }
 
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost
+{
+    [self setObject:object forKey:key];
+}
+
 - (void)setObject:(id)object forKeyedSubscript:(NSString *)key
 {
     [self setObject:object forKey:key];
@@ -898,7 +909,7 @@ static NSURL *_sharedTrashURL;
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
     [self lock];
-        PINDiskCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
+        PINCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
         if (willAddObjectBlock) {
             [self unlock];
                 willAddObjectBlock(self, key, object);
@@ -940,7 +951,7 @@ static NSURL *_sharedTrashURL;
             fileURL = nil;
         }
     
-        PINDiskCacheObjectBlock didAddObjectBlock = self->_didAddObjectBlock;
+        PINCacheObjectBlock didAddObjectBlock = self->_didAddObjectBlock;
         if (didAddObjectBlock) {
             [self unlock];
                 didAddObjectBlock(self, key, object);
@@ -1010,7 +1021,7 @@ static NSURL *_sharedTrashURL;
 - (void)removeAllObjects
 {
     [self lock];
-        PINDiskCacheBlock willRemoveAllObjectsBlock = self->_willRemoveAllObjectsBlock;
+        PINCacheBlock willRemoveAllObjectsBlock = self->_willRemoveAllObjectsBlock;
         if (willRemoveAllObjectsBlock) {
             [self unlock];
             willRemoveAllObjectsBlock(self);
@@ -1026,7 +1037,7 @@ static NSURL *_sharedTrashURL;
         [self->_sizes removeAllObjects];
         self.byteCount = 0; // atomic
     
-        PINDiskCacheBlock didRemoveAllObjectsBlock = self->_didRemoveAllObjectsBlock;
+        PINCacheBlock didRemoveAllObjectsBlock = self->_didRemoveAllObjectsBlock;
         if (didRemoveAllObjectsBlock) {
             [self unlock];
             didRemoveAllObjectsBlock(self);
@@ -1108,9 +1119,9 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (PINDiskCacheBlock)willRemoveAllObjectsBlock
+- (PINCacheBlock)willRemoveAllObjectsBlock
 {
-    PINDiskCacheBlock block = nil;
+    PINCacheBlock block = nil;
     
     [self lock];
         block = _willRemoveAllObjectsBlock;
@@ -1119,7 +1130,7 @@ static NSURL *_sharedTrashURL;
     return block;
 }
 
-- (void)setWillRemoveAllObjectsBlock:(PINDiskCacheBlock)block
+- (void)setWillRemoveAllObjectsBlock:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -1186,9 +1197,9 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (PINDiskCacheBlock)didRemoveAllObjectsBlock
+- (PINCacheBlock)didRemoveAllObjectsBlock
 {
-    PINDiskCacheBlock block = nil;
+    PINCacheBlock block = nil;
     
     [self lock];
         block = _didRemoveAllObjectsBlock;
@@ -1197,7 +1208,7 @@ static NSURL *_sharedTrashURL;
     return block;
 }
 
-- (void)setDidRemoveAllObjectsBlock:(PINDiskCacheBlock)block
+- (void)setDidRemoveAllObjectsBlock:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     

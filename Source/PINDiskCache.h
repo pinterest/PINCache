@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "PINCaching.h"
 #import "PINCacheObjectSubscripting.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -12,11 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class PINOperationQueue;
 
 extern NSString * const PINDiskCachePrefix;
-
-/**
- A callback block which provides only the cache as an argument
- */
-typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 
 /**
  A callback block which provides the cache, key and object as arguments
@@ -77,11 +73,9 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  <ageLimit> will trigger a GCD timer to periodically to trim the cache with <trimToDate:>.
  */
 
-@interface PINDiskCache : NSObject <PINCacheObjectSubscripting>
+@interface PINDiskCache : NSObject <PINCaching, PINCacheObjectSubscripting>
 
-
-
-#pragma mark -
+#pragma mark - Class
 
 /**
  @param rootPath The path for where the cache should be stored.
@@ -91,12 +85,8 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  */
 + (NSURL *)cacheURLWithRootPath:(NSString *)rootPath prefix:(NSString *)prefix name:(NSString *)name;
 
+#pragma mark - Properties
 /// @name Core
-
-/**
- The name of this cache, used to create a directory under Library/Caches and also appearing in stack traces.
- */
-@property (readonly) NSString *name;
 
 /**
  The prefix to the name of this cache, used to create a directory under Library/Caches and also appearing in stack traces.
@@ -173,7 +163,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  */
 @property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache;
 
-#pragma mark -
+#pragma mark - Event Blocks
 /// @name Event Blocks
 
 /**
@@ -190,7 +180,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  A block to be executed just before all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-@property (copy) PINDiskCacheBlock __nullable willRemoveAllObjectsBlock;
+@property (copy) PINCacheBlock __nullable willRemoveAllObjectsBlock;
 
 /**
  A block to be executed just after an object is added to the cache. The queue waits during execution.
@@ -206,9 +196,9 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  A block to be executed just after all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-@property (copy) PINDiskCacheBlock __nullable didRemoveAllObjectsBlock;
+@property (copy) PINCacheBlock __nullable didRemoveAllObjectsBlock;
 
-#pragma mark -
+#pragma mark - Lifecycle
 /// @name Initialization
 
 /**
@@ -298,7 +288,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  */
 - (instancetype)initWithName:(nonnull NSString *)name prefix:(nonnull NSString *)prefix rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
 
-#pragma mark -
+#pragma mark - Asynchronous Methods
 /// @name Asynchronous Methods
 /**
  Locks access to ivars and allows safe interaction with files on disk. This method returns immediately.
@@ -307,18 +297,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  
  @param block A block to be executed when a lock is available.
  */
-- (void)lockFileAccessWhileExecutingBlock:(nullable PINDiskCacheBlock)block;
-
-/**
- This method determines whether an object is present for the given key in the cache. This method returns immediately
- and executes the passed block after the object is available, potentially in parallel with other blocks on the
- <concurrentQueue>.
- 
- @see containsObjectForKey:
- @param key The key associated with the object.
- @param block A block to be executed concurrently after the containment check happened
- */
-- (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block;
+- (void)lockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -366,22 +345,13 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 - (void)removeObjectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
- Removes all objects from the cache that have not been used since the specified date.
- This method returns immediately and executes the passed block as soon as the cache has been trimmed.
-
- @param date Objects that haven't been accessed since this date are removed from the cache.
- @param block A block to be executed serially after the cache has been trimmed, or nil.
- */
-- (void)trimToDate:(NSDate *)date block:(nullable PINDiskCacheBlock)block;
-
-/**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the specified byteCount.
  This method returns immediately and executes the passed block as soon as the cache has been trimmed.
  
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToSize:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block;
+- (void)trimToSize:(NSUInteger)byteCount block:(nullable PINCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the cache is equal to or smaller
@@ -391,15 +361,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block;
-
-/**
- Removes all objects from the cache. This method returns immediately and executes the passed block as soon as the
- cache has been cleared.
- 
- @param block A block to be executed serially after the cache has been cleared, or nil.
- */
-- (void)removeAllObjects:(nullable PINDiskCacheBlock)block;
+- (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINCacheBlock)block;
 
 /**
  Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually
@@ -415,9 +377,9 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  lock is held.
  
  */
-- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINCacheBlock)completionBlock;
 
-#pragma mark -
+#pragma mark - Synchronous Methods
 /// @name Synchronous Methods
 
 /**
@@ -428,7 +390,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  
  @param block A block to be executed when a lock is available.
  */
-- (void)synchronouslyLockFileAccessWhileExecutingBlock:(nullable PINDiskCacheBlock)block;
+- (void)synchronouslyLockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block;
 
 /**
  This method determines whether an object is present for the given key in the cache.
@@ -437,7 +399,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  @param key The key associated with the object.
  @result YES if an object is present for the given key in the cache, otherwise NO.
  */
-- (BOOL)containsObjectForKey:(NSString *)key;
+//- (BOOL)containsObjectForKey:(NSString *)key;
 
 /**
  Retrieves the object for the specified key. This method blocks the calling thread until the
@@ -471,21 +433,6 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
 
 /**
- Removes the object for the specified key. This method blocks the calling thread until the object
- has been removed.
- 
- @param key The key associated with the object to be removed.
- */
-- (void)removeObjectForKey:(NSString *)key;
-
-/**
- Removes all objects from the cache that have not been used since the specified date.
- This method blocks the calling thread until the cache has been trimmed.
- @param date Objects that haven't been accessed since this date are removed from the cache.
- */
-- (void)trimToDate:(nullable NSDate *)date;
-
-/**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the
  specified byteCount. This method blocks the calling thread until the cache has been trimmed.
  
@@ -499,11 +446,6 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  */
 - (void)trimToSizeByDate:(NSUInteger)byteCount;
-
-/**
- Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
- */
-- (void)removeAllObjects;
 
 /**
  Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually

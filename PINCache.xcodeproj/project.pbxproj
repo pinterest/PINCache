@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6928EED31E4160EE00B5D975 /* PINCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 6928EED21E4160EE00B5D975 /* PINCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6928EED41E4160FE00B5D975 /* PINCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 6928EED21E4160EE00B5D975 /* PINCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6928EED51E41610700B5D975 /* PINCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 6928EED21E4160EE00B5D975 /* PINCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CC0105DF1E271A5C00890935 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105B11E271A1600890935 /* PINCache.framework */; };
 		CC0105EE1E271A6400890935 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105C11E271A4000890935 /* PINCache.framework */; };
 		CC0105FD1E271A7300890935 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105CE1E271A4900890935 /* PINCache.framework */; };
@@ -102,6 +105,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6928EED21E4160EE00B5D975 /* PINCaching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCaching.h; sourceTree = "<group>"; };
 		CC0105B11E271A1600890935 /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC0105C11E271A4000890935 /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC0105CE1E271A4900890935 /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -264,6 +268,7 @@
 			isa = PBXGroup;
 			children = (
 				CC0106441E281B0E00890935 /* Info.plist */,
+				6928EED21E4160EE00B5D975 /* PINCaching.h */,
 				CC0106051E271A9000890935 /* PINCache.h */,
 				CC0106061E271A9000890935 /* PINCache.m */,
 				CC0106071E271A9000890935 /* PINCacheObjectSubscripting.h */,
@@ -591,6 +596,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6928EED31E4160EE00B5D975 /* PINCaching.h in Headers */,
 				CC0106171E271AAF00890935 /* PINCache.h in Headers */,
 				CC0106181E271AAF00890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC01061A1E271AAF00890935 /* PINMemoryCache.h in Headers */,
@@ -602,6 +608,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6928EED41E4160FE00B5D975 /* PINCaching.h in Headers */,
 				CC01061B1E271AB000890935 /* PINCache.h in Headers */,
 				CC01061C1E271AB000890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC01061E1E271AB000890935 /* PINMemoryCache.h in Headers */,
@@ -613,6 +620,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6928EED51E41610700B5D975 /* PINCaching.h in Headers */,
 				CC01061F1E271AB000890935 /* PINCache.h in Headers */,
 				CC0106201E271AB000890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC0106221E271AB000890935 /* PINMemoryCache.h in Headers */,

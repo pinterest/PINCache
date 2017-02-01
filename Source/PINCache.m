@@ -10,6 +10,7 @@ static NSString * const PINCachePrefix = @"com.pinterest.PINCache";
 static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 @interface PINCache ()
+@property (copy, nonatomic) NSString *name;
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
 @end
 
