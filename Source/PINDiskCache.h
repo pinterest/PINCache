@@ -4,8 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "PINCaching.h"
-#import "PINCacheObjectSubscripting.h"
+#import <PINCache/PINCaching.h>
+#import <PINCache/PINCacheObjectSubscripting.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,12 +17,12 @@ extern NSString * const PINDiskCachePrefix;
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  __nullable object);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  _Nullable object);
 
 /**
  A callback block which provides the key and fileURL of the object
  */
-typedef void (^PINDiskCacheFileURLBlock)(NSString *key, NSURL * __nullable fileURL);
+typedef void (^PINDiskCacheFileURLBlock)(NSString *key, NSURL * _Nullable fileURL);
 
 /**
  A callback block which provides a BOOL value as argument
@@ -37,7 +37,7 @@ typedef void (^PINDiskCacheContainsBlock)(BOOL containsObject);
  *
  *  @return Serialized object representation
  */
-typedef NSData* __nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object, NSString *key);
+typedef NSData* _Nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object, NSString *key);
 
 /**
  *  A block used to deserialize objects
@@ -47,7 +47,7 @@ typedef NSData* __nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object, NSS
  *
  *  @return Deserialized object
  */
-typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSString *key);
+typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSString *key);
 
 
 /**
@@ -137,7 +137,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 /**
  Extension for all cache files on disk. Defaults to no extension. 
  */
-@property (readonly) NSString * __nullable fileExtension;
+@property (nullable, readonly) NSString * fileExtension;
 
 /**
  The writing protection option used when writing a file on disk. This value is used every time an object is set.
@@ -169,34 +169,34 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 /**
  A block to be executed just before an object is added to the cache. The queue waits during execution.
  */
-@property (copy) PINDiskCacheObjectBlock __nullable willAddObjectBlock;
+@property (nullable, copy) PINDiskCacheObjectBlock willAddObjectBlock;
 
 /**
  A block to be executed just before an object is removed from the cache. The queue waits during execution.
  */
-@property (copy) PINDiskCacheObjectBlock __nullable willRemoveObjectBlock;
+@property (nullable, copy) PINDiskCacheObjectBlock willRemoveObjectBlock;
 
 /**
  A block to be executed just before all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-@property (copy) PINCacheBlock __nullable willRemoveAllObjectsBlock;
+@property (nullable, copy) PINCacheBlock willRemoveAllObjectsBlock;
 
 /**
  A block to be executed just after an object is added to the cache. The queue waits during execution.
  */
-@property (copy) PINDiskCacheObjectBlock __nullable didAddObjectBlock;
+@property (nullable, copy) PINDiskCacheObjectBlock didAddObjectBlock;
 
 /**
  A block to be executed just after an object is removed from the cache. The queue waits during execution.
  */
-@property (copy) PINDiskCacheObjectBlock __nullable didRemoveObjectBlock;
+@property (nullable, copy) PINDiskCacheObjectBlock didRemoveObjectBlock;
 
 /**
  A block to be executed just after all objects are removed from the cache as a result of <removeAllObjects:>.
  The queue waits during execution.
  */
-@property (copy) PINCacheBlock __nullable didRemoveAllObjectsBlock;
+@property (nullable, copy) PINCacheBlock didRemoveAllObjectsBlock;
 
 #pragma mark - Lifecycle
 /// @name Initialization
@@ -336,6 +336,19 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
 - (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
 
 /**
+ Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
+ to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method returns immediately
+ and executes the passed block after the object has been stored, potentially in parallel with other blocks
+ on the <concurrentQueue>.
+ 
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param cost An amount to add to the <memoryCache.totalCost>.
+ @param block A block to be executed concurrently after the object has been stored, or nil.
+ */
+- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
+
+/**
  Removes the object for the specified key. This method returns immediately and executes the passed block
  as soon as the object has been removed.
  
@@ -409,7 +422,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  @param key The key associated with the object.
  @result The object for the specified key.
  */
-- (__nullable id <NSCoding>)objectForKey:(NSString *)key;
+- (nullable id <NSCoding>)objectForKey:(NSString *)key;
 
 /**
  Retrieves the file URL for the specified key. This method blocks the calling thread until the
@@ -430,7 +443,7 @@ typedef id<NSCoding> __nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSS
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+- (void)setObject:(nullable id <NSCoding>)object forKey:(NSString *)key;
 
 /**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the

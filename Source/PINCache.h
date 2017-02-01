@@ -4,9 +4,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "PINCaching.h"
-#import "PINDiskCache.h"
-#import "PINMemoryCache.h"
+#import <PINCache/PINCaching.h>
+#import <PINCache/PINDiskCache.h>
+#import <PINCache/PINMemoryCache.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

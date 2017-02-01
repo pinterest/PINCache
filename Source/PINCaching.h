@@ -22,7 +22,7 @@ typedef void (^PINCacheBlock)(id<PINCaching> cache);
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINCacheObjectBlock)(id<PINCaching> cache, NSString *key, id __nullable object);
+typedef void (^PINCacheObjectBlock)(id<PINCaching> cache, NSString *key, id _Nullable object);
 
 /**
  A callback block which provides a BOOL value as argument
@@ -70,7 +70,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)asyncSetObject:(id)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
@@ -83,7 +83,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param cost An amount to add to the <memoryCache.totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
+- (void)asyncSetObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -142,7 +142,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key;
+- (void)setObject:(nullable id)object forKey:(NSString *)key;
 
 /**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
@@ -153,7 +153,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key A key to associate with the object. This string will be copied.
  @param cost An amount to add to the <memoryCache.totalCost>.
  */
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost;
+- (void)setObject:(nullable id)object forKey:(NSString *)key withCost:(NSUInteger)cost;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object

@@ -646,8 +646,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
   __block NSURL *diskFileURL = nil;
   dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 
-  [self.cache.diskCache setObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
-    [cache fileURLForKey:key block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
+  [self.cache.diskCache asyncSetObject:[self image] forKey:key block:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [cache asyncFileURLForKey:key block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
         diskFileURL = fileURL;
         dispatch_semaphore_signal(semaphore);
     }];
@@ -764,7 +764,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
     objCount = 0;
-    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache *cache, NSString *key, id __nullable object) {
+    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache *cache, NSString *key, id _Nullable object) {
       objCount++;
     }];
 

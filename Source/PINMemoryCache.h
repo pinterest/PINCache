@@ -4,8 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "PINCaching.h"
-#import "PINCacheObjectSubscripting.h"
+#import <PINCache/PINCaching.h>
+#import <PINCache/PINCacheObjectSubscripting.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -82,54 +82,54 @@ NS_ASSUME_NONNULL_BEGIN
  a lock, i.e. all reads and writes are suspended for the duration of the block.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  */
-@property (copy) PINCacheObjectBlock __nullable willAddObjectBlock;
+@property (nullable, copy) PINCacheObjectBlock willAddObjectBlock;
 
 /**
  A block to be executed just before an object is removed from the cache. This block will be excuted
  within a lock, i.e. all reads and writes are suspended for the duration of the block.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  */
-@property (copy) PINCacheObjectBlock __nullable willRemoveObjectBlock;
+@property (nullable, copy) PINCacheObjectBlock willRemoveObjectBlock;
 
 /**
  A block to be executed just before all objects are removed from the cache as a result of <removeAllObjects:>.
  This block will be excuted within a lock, i.e. all reads and writes are suspended for the duration of the block.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  */
-@property (copy) PINCacheBlock __nullable willRemoveAllObjectsBlock;
+@property (nullable, copy) PINCacheBlock willRemoveAllObjectsBlock;
 
 /**
  A block to be executed just after an object is added to the cache. This block will be excuted within
  a lock, i.e. all reads and writes are suspended for the duration of the block.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  */
-@property (copy) PINCacheObjectBlock __nullable didAddObjectBlock;
+@property (nullable, copy) PINCacheObjectBlock didAddObjectBlock;
 
 /**
  A block to be executed just after an object is removed from the cache. This block will be excuted
  within a lock, i.e. all reads and writes are suspended for the duration of the block.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  */
-@property (copy) PINCacheObjectBlock __nullable didRemoveObjectBlock;
+@property (nullable, copy) PINCacheObjectBlock didRemoveObjectBlock;
 
 /**
  A block to be executed just after all objects are removed from the cache as a result of <removeAllObjects:>.
  This block will be excuted within a lock, i.e. all reads and writes are suspended for the duration of the block.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  */
-@property (copy) PINCacheBlock __nullable didRemoveAllObjectsBlock;
+@property (nullable, copy) PINCacheBlock didRemoveAllObjectsBlock;
 
 /**
  A block to be executed upon receiving a memory warning (iOS only) potentially in parallel with other blocks on the <queue>.
  This block will be executed regardless of the value of <removeAllObjectsOnMemoryWarning>. Defaults to `nil`.
  */
-@property (copy) PINCacheBlock __nullable didReceiveMemoryWarningBlock;
+@property (nullable, copy) PINCacheBlock didReceiveMemoryWarningBlock;
 
 /**
  A block to be executed when the app enters the background (iOS only) potentially in parallel with other blocks on the <concurrentQueue>.
  This block will be executed regardless of the value of <removeAllObjectsOnEnteringBackground>. Defaults to `nil`.
  */
-@property (copy) PINCacheBlock __nullable didEnterBackgroundBlock;
+@property (nullable, copy) PINCacheBlock didEnterBackgroundBlock;
 
 #pragma mark - Lifecycle
 /// @name Shared Cache

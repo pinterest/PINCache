@@ -305,8 +305,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         PINMemoryCache *strongSelf = weakSelf;
         id object = [strongSelf objectForKey:key];
         
-        if (block)
-            block(strongSelf, key, object);
+        block(strongSelf, key, object);
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -419,7 +418,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     return containsObject;
 }
 
-- (__nullable id)objectForKey:(NSString *)key
+- (nullable id)objectForKey:(NSString *)key
 {
     if (!key)
         return nil;

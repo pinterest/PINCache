@@ -252,7 +252,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return [_memoryCache containsObjectForKey:key] || [_diskCache containsObjectForKey:key];
 }
 
-- (__nullable id)objectForKey:(NSString *)key
+- (nullable id)objectForKey:(NSString *)key
 {
     if (!key)
         return nil;
@@ -286,14 +286,18 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [_diskCache setObject:object forKey:key];
 }
 
-- (id)objectForKeyedSubscript:(NSString *)key
+- (nullable id)objectForKeyedSubscript:(NSString *)key
 {
     return [self objectForKey:key];
 }
 
-- (void)setObject:(id)obj forKeyedSubscript:(NSString *)key
+- (void)setObject:(nullable id)obj forKeyedSubscript:(NSString *)key
 {
-    [self setObject:obj forKey:key];
+    if (obj == nil) {
+        [self removeObjectForKey:key];
+    } else {
+        [self setObject:obj forKey:key];
+    }
 }
 
 - (void)removeObjectForKey:(NSString *)key

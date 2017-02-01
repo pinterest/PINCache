@@ -635,9 +635,7 @@ static NSURL *_sharedTrashURL;
         NSURL *fileURL = nil;
         id <NSCoding> object = [strongSelf objectForKey:key fileURL:&fileURL];
         
-        if (block) {
-            block(strongSelf, key, object);
-        }
+        block(strongSelf, key, object);
     } withPriority:PINOperationQueuePriorityLow];
 }
 
@@ -809,7 +807,7 @@ static NSURL *_sharedTrashURL;
     return [self objectForKey:key];
 }
 
-- (__nullable id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (nullable id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
 {
     NSDate *now = [[NSDate alloc] init];
     
@@ -892,7 +890,11 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObject:(id)object forKeyedSubscript:(NSString *)key
 {
-    [self setObject:object forKey:key];
+    if (object == nil) {
+        [self removeObjectForKey:key];
+    } else {
+        [self setObject:object forKey:key];
+    }
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL
