@@ -40,6 +40,9 @@
 		CC0106CC1E28249C00890935 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		CC0106CD1E28249C00890935 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		CC0106CE1E28249D00890935 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
+		CCBD05DA1E4136D800D18509 /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBD05D91E4136D000D18509 /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCBD05DB1E4136D900D18509 /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBD05D91E4136D000D18509 /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CCBD05DC1E4136D900D18509 /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = CCBD05D91E4136D000D18509 /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -183,6 +186,7 @@
 		CC0106C51E281D6900890935 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CC0106C91E28228300890935 /* PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheTests.h; sourceTree = "<group>"; };
 		CC0106CA1E28248800890935 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		CCBD05D91E4136D000D18509 /* PINCacheMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -246,6 +250,7 @@
 				CC0105B21E271A1600890935 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		CC0105B21E271A1600890935 /* Products */ = {
 			isa = PBXGroup;
@@ -264,6 +269,7 @@
 			isa = PBXGroup;
 			children = (
 				CC0106441E281B0E00890935 /* Info.plist */,
+				CCBD05D91E4136D000D18509 /* PINCacheMacros.h */,
 				CC0106051E271A9000890935 /* PINCache.h */,
 				CC0106061E271A9000890935 /* PINCache.m */,
 				CC0106071E271A9000890935 /* PINCacheObjectSubscripting.h */,
@@ -595,6 +601,7 @@
 				CC0106181E271AAF00890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC01061A1E271AAF00890935 /* PINMemoryCache.h in Headers */,
 				CC0106191E271AAF00890935 /* PINDiskCache.h in Headers */,
+				CCBD05DA1E4136D800D18509 /* PINCacheMacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -606,6 +613,7 @@
 				CC01061C1E271AB000890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC01061E1E271AB000890935 /* PINMemoryCache.h in Headers */,
 				CC01061D1E271AB000890935 /* PINDiskCache.h in Headers */,
+				CCBD05DB1E4136D900D18509 /* PINCacheMacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -617,6 +625,7 @@
 				CC0106201E271AB000890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC0106221E271AB000890935 /* PINMemoryCache.h in Headers */,
 				CC0106211E271AB000890935 /* PINDiskCache.h in Headers */,
+				CCBD05DC1E4136D900D18509 /* PINCacheMacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

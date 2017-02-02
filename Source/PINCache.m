@@ -59,13 +59,13 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINCachePrefix, _name, (void *)self];
 }
 
-+ (instancetype)sharedCache
++ (PINCache *)sharedCache
 {
-    static id cache;
+    static PINCache *cache;
     static dispatch_once_t predicate;
     
     dispatch_once(&predicate, ^{
-        cache = [[self alloc] initWithName:PINCacheSharedName];
+        cache = [[PINCache alloc] initWithName:PINCacheSharedName];
     });
     
     return cache;
@@ -109,7 +109,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                 return;
             
             if (memoryCacheObject) {
-                [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:NULL];
+                // Update file modification date. TODO: Make this a separate method?
+                [strongSelf->_diskCache fileURLForKey:memoryCacheKey block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) { }];
                 [strongSelf->_operationQueue addOperation:^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
@@ -251,7 +252,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return [_memoryCache containsObjectForKey:key] || [_diskCache containsObjectForKey:key];
 }
 
-- (__nullable id)objectForKey:(NSString *)key
+- (nullable id)objectForKey:(NSString *)key
 {
     if (!key)
         return nil;
@@ -262,7 +263,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     
     if (object) {
         // update the access time on disk
-        [_diskCache fileURLForKey:key block:NULL];
+        [_diskCache fileURLForKey:key block:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) { }];
     } else {
         object = [_diskCache objectForKey:key];
         [_memoryCache setObject:object forKey:key];
@@ -292,7 +293,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)setObject:(id)obj forKeyedSubscript:(NSString *)key
 {
-    [self setObject:obj forKey:key];
+    if (obj == nil) {
+        [self removeObjectForKey:key];
+    } else {
+        [self setObject:obj forKey:key];
+    }
 }
 
 - (void)removeObjectForKey:(NSString *)key
