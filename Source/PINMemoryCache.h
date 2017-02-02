@@ -156,7 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)asyncTrimToCost:(NSUInteger)cost block:(nullable PINCacheBlock)block;
+- (void)trimToCostAsync:(NSUInteger)cost block:(nullable PINCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the <totalCost> is below
@@ -166,7 +166,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)asyncTrimToCostByDate:(NSUInteger)cost block:(nullable PINCacheBlock)block;
+- (void)trimToCostByDateAsync:(NSUInteger)cost block:(nullable PINCacheBlock)block;
 
 /**
  Loops through all objects in the cache with reads and writes suspended. Calling serial methods which
@@ -175,7 +175,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param block A block to be executed for every object in the cache.
  @param completionBlock An optional block to be executed concurrently when the enumeration is complete.
  */
-- (void)asyncEnumerateObjectsWithBlock:(PINCacheObjectBlock)block completionBlock:(nullable PINCacheBlock)completionBlock;
+- (void)enumerateObjectsWithBlockAsync:(PINCacheObjectBlock)block completionBlock:(nullable PINCacheBlock)completionBlock;
 
 #pragma mark - Synchronous Methods
 /// @name Synchronous Methods

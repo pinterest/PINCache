@@ -599,7 +599,7 @@ static NSURL *_sharedTrashURL;
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)asyncLockFileAccessWhileExecutingBlock:(PINCacheBlock)block
+- (void)lockFileAccessWhileExecutingBlockAsync:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -613,7 +613,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncContainsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block
+- (void)containsObjectForKeyAsync:(NSString *)key block:(PINDiskCacheContainsBlock)block
 {
     if (!key || !block)
         return;
@@ -626,7 +626,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncObjectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+- (void)objectForKeyAsync:(NSString *)key block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -639,7 +639,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncFileURLForKey:(NSString *)key block:(PINDiskCacheFileURLBlock)block
+- (void)fileURLForKeyAsync:(NSString *)key block:(PINDiskCacheFileURLBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -655,7 +655,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -670,12 +670,12 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncSetObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block
 {
-    [self asyncSetObject:object forKey:key block:(PINDiskCacheObjectBlock)block];
+    [self setObjectAsync:object forKey:key block:(PINDiskCacheObjectBlock)block];
 }
 
-- (void)asyncRemoveObjectForKey:(NSString *)key block:(PINDiskCacheObjectBlock)block
+- (void)removeObjectForKeyAsync:(NSString *)key block:(PINDiskCacheObjectBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -690,7 +690,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncTrimToSize:(NSUInteger)trimByteCount block:(PINCacheBlock)block
+- (void)trimToSizeAsync:(NSUInteger)trimByteCount block:(PINCacheBlock)block
 {
     PINOperationBlock operation = ^(id data) {
         [self trimToSize:((NSNumber *)data).unsignedIntegerValue];
@@ -711,7 +711,7 @@ static NSURL *_sharedTrashURL;
                            completion:completion];
 }
 
-- (void)asyncTrimToDate:(NSDate *)trimDate block:(PINCacheBlock)block
+- (void)trimToDateAsync:(NSDate *)trimDate block:(PINCacheBlock)block
 {
     PINOperationBlock operation = ^(id data){
         [self trimToDate:(NSDate *)data];
@@ -732,7 +732,7 @@ static NSURL *_sharedTrashURL;
                            completion:completion];
 }
 
-- (void)asyncTrimToSizeByDate:(NSUInteger)trimByteCount block:(PINCacheBlock)block
+- (void)trimToSizeByDateAsync:(NSUInteger)trimByteCount block:(PINCacheBlock)block
 {
     PINOperationBlock operation = ^(id data){
         [self trimToSizeByDate:((NSNumber *)data).unsignedIntegerValue];
@@ -753,7 +753,7 @@ static NSURL *_sharedTrashURL;
                            completion:completion];
 }
 
-- (void)asyncRemoveAllObjects:(PINCacheBlock)block
+- (void)removeAllObjectsAsync:(PINCacheBlock)block
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -767,7 +767,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)asyncEnumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(PINCacheBlock)completionBlock
+- (void)enumerateObjectsWithBlockAsync:(PINDiskCacheFileURLBlock)block completionBlock:(PINCacheBlock)completionBlock
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -948,7 +948,7 @@ static NSURL *_sharedTrashURL;
             }
             
             if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
-                [self asyncTrimToSizeByDate:self->_byteLimit block:nil];
+                [self trimToSizeByDateAsync:self->_byteLimit block:nil];
         } else {
             fileURL = nil;
         }
@@ -1350,57 +1350,57 @@ static NSURL *_sharedTrashURL;
 
 - (void)lockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block
 {
-    [self asyncLockFileAccessWhileExecutingBlock:block];
+    [self lockFileAccessWhileExecutingBlockAsync:block];
 }
 
 - (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block
 {
-    [self asyncContainsObjectForKey:key block:block];
+    [self containsObjectForKeyAsync:key block:block];
 }
 
 - (void)objectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block
 {
-    [self asyncObjectForKey:key block:block];
+    [self objectForKeyAsync:key block:block];
 }
 
 - (void)fileURLForKey:(NSString *)key block:(nullable PINDiskCacheFileURLBlock)block
 {
-    [self asyncFileURLForKey:key block:block];
+    [self fileURLForKeyAsync:key block:block];
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block
 {
-    [self asyncSetObject:object forKey:key block:block];
+    [self setObjectAsync:object forKey:key block:block];
 }
 
 - (void)removeObjectForKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block
 {
-    [self asyncRemoveObjectForKey:key block:block];
+    [self removeObjectForKeyAsync:key block:block];
 }
 
 - (void)trimToDate:(NSDate *)date block:(nullable PINDiskCacheBlock)block
 {
-    [self asyncTrimToDate:date block:block];
+    [self trimToDateAsync:date block:block];
 }
 
 - (void)trimToSize:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block
 {
-    [self asyncTrimToSize:byteCount block:block];
+    [self trimToSizeAsync:byteCount block:block];
 }
 
 - (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block
 {
-    [self asyncTrimToSize:byteCount block:block];
+    [self trimToSizeAsync:byteCount block:block];
 }
 
 - (void)removeAllObjects:(nullable PINDiskCacheBlock)block
 {
-    [self asyncRemoveAllObjects:block];
+    [self removeAllObjectsAsync:block];
 }
 
 - (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock
 {
-    [self asyncEnumerateObjectsWithBlock:block completionBlock:completionBlock];
+    [self enumerateObjectsWithBlockAsync:block completionBlock:completionBlock];
 }
 
 @end
