@@ -13,4 +13,4 @@ test:
 carthage:
 	carthage update
 
-all: lint test carthage
+all: carthage lint test
