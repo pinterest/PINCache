@@ -74,7 +74,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 #pragma mark - Public Asynchronous Methods -
 
-- (void)containsObjectForKeyAsync:(NSString *)key block:(PINCacheObjectContainmentBlock)block
+- (void)containsObjectForKeyAsync:(NSString *)key completion:(PINCacheObjectContainmentBlock)block
 {
     if (!key || !block) {
         return;
@@ -93,7 +93,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wshadow"
 
-- (void)objectForKeyAsync:(NSString *)key block:(PINCacheObjectBlock)block
+- (void)objectForKeyAsync:(NSString *)key completion:(PINCacheObjectBlock)block
 {
     if (!key || !block)
         return;
@@ -104,25 +104,25 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
         PINCache *strongSelf = weakSelf;
         if (!strongSelf)
             return;
-        [strongSelf->_memoryCache objectForKeyAsync:key block:^(PINMemoryCache *memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
+        [strongSelf->_memoryCache objectForKeyAsync:key completion:^(PINMemoryCache *memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
             PINCache *strongSelf = weakSelf;
             if (!strongSelf)
                 return;
             
             if (memoryCacheObject) {
-                [strongSelf->_diskCache fileURLForKeyAsync:memoryCacheKey block:NULL];
+                [strongSelf->_diskCache fileURLForKeyAsync:memoryCacheKey completion:NULL];
                 [strongSelf->_operationQueue addOperation:^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
                         block(strongSelf, memoryCacheKey, memoryCacheObject);
                 }];
             } else {
-                [strongSelf->_diskCache objectForKeyAsync:memoryCacheKey block:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject) {
+                [strongSelf->_diskCache objectForKeyAsync:memoryCacheKey completion:^(PINDiskCache *diskCache, NSString *diskCacheKey, id <NSCoding> diskCacheObject) {
                     PINCache *strongSelf = weakSelf;
                     if (!strongSelf)
                         return;
                     
-                    [strongSelf->_memoryCache setObjectAsync:diskCacheObject forKey:diskCacheKey block:nil];
+                    [strongSelf->_memoryCache setObjectAsync:diskCacheObject forKey:diskCacheKey completion:nil];
                     
                     [strongSelf->_operationQueue addOperation:^{
                         PINCache *strongSelf = weakSelf;
@@ -137,12 +137,12 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 #pragma clang diagnostic pop
 
-- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key block:(PINCacheObjectBlock)block
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key completion:(PINCacheObjectBlock)block
 {
-    [self setObjectAsync:object forKey:key withCost:0 block:block];
+    [self setObjectAsync:object forKey:key withCost:0 completion:block];
 }
 
-- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(PINCacheObjectBlock)block
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(PINCacheObjectBlock)block
 {
     if (!key || !object)
         return;
@@ -165,7 +165,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group start];
 }
 
-- (void)removeObjectForKeyAsync:(NSString *)key block:(PINCacheObjectBlock)block
+- (void)removeObjectForKeyAsync:(NSString *)key completion:(PINCacheObjectBlock)block
 {
     if (!key)
         return;
@@ -208,7 +208,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group start];
 }
 
-- (void)trimToDateAsync:(NSDate *)date block:(PINCacheBlock)block
+- (void)trimToDateAsync:(NSDate *)date completion:(PINCacheBlock)block
 {
     if (!date)
         return;
@@ -263,7 +263,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     
     if (object) {
         // update the access time on disk
-        [_diskCache fileURLForKeyAsync:key block:NULL];
+        [_diskCache fileURLForKeyAsync:key completion:NULL];
     } else {
         object = [_diskCache objectForKey:key];
         [_memoryCache setObject:object forKey:key];
@@ -330,32 +330,32 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (void)containsObjectForKey:(NSString *)key block:(PINCacheObjectContainmentBlock)block
 {
-    [self containsObjectForKeyAsync:key block:block];
+    [self containsObjectForKeyAsync:key completion:block];
 }
 
 - (void)objectForKey:(NSString *)key block:(PINCacheObjectBlock)block
 {
-    [self objectForKeyAsync:key block:block];
+    [self objectForKeyAsync:key completion:block];
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block
 {
-    [self setObjectAsync:object forKey:key block:block];
+    [self setObjectAsync:object forKey:key completion:block];
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block
 {
-    [self setObjectAsync:object forKey:key withCost:cost block:block];
+    [self setObjectAsync:object forKey:key withCost:cost completion:block];
 }
 
 - (void)removeObjectForKey:(NSString *)key block:(nullable PINCacheObjectBlock)block
 {
-    [self removeObjectForKeyAsync:key block:block];
+    [self removeObjectForKeyAsync:key completion:block];
 }
 
 - (void)trimToDate:(NSDate *)date block:(nullable PINCacheBlock)block
 {
-    [self trimToDateAsync:date block:block];
+    [self trimToDateAsync:date completion:block];
 }
 
 - (void)removeAllObjects:(nullable PINCacheBlock)block

@@ -306,7 +306,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the object is available.
  */
-- (void)objectForKeyAsync:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)objectForKeyAsync:(NSString *)key completion:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Retrieves the fileURL for the specified key without actually reading the data from disk. This method
@@ -323,7 +323,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param key The key associated with the requested object.
  @param block A block to be executed serially when the file URL is available.
  */
-- (void)fileURLForKeyAsync:(NSString *)key block:(nullable PINDiskCacheFileURLBlock)block;
+- (void)fileURLForKeyAsync:(NSString *)key completion:(nullable PINDiskCacheFileURLBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -333,7 +333,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed serially after the object has been stored, or nil.
  */
-- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key completion:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
@@ -346,7 +346,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param cost An amount to add to the <memoryCache.totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
@@ -355,7 +355,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param key The key associated with the object to be removed.
  @param block A block to be executed serially after the object has been removed, or nil.
  */
-- (void)removeObjectForKeyAsync:(NSString *)key block:(nullable PINDiskCacheObjectBlock)block;
+- (void)removeObjectForKeyAsync:(NSString *)key completion:(nullable PINDiskCacheObjectBlock)block;
 
 /**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the specified byteCount.
@@ -364,7 +364,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToSizeAsync:(NSUInteger)byteCount block:(nullable PINCacheBlock)block;
+- (void)trimToSizeAsync:(NSUInteger)byteCount completion:(nullable PINCacheBlock)block;
 
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the cache is equal to or smaller
@@ -374,7 +374,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
  */
-- (void)trimToSizeByDateAsync:(NSUInteger)byteCount block:(nullable PINCacheBlock)block;
+- (void)trimToSizeByDateAsync:(NSUInteger)byteCount completion:(nullable PINCacheBlock)block;
 
 /**
  Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually

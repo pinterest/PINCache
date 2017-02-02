@@ -51,7 +51,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object.
  @param block A block to be executed concurrently after the containment check happened
  */
-- (void)containsObjectForKeyAsync:(NSString *)key block:(PINCacheObjectContainmentBlock)block;
+- (void)containsObjectForKeyAsync:(NSString *)key completion:(PINCacheObjectContainmentBlock)block;
 
 /**
  Retrieves the object for the specified key. This method returns immediately and executes the passed
@@ -60,7 +60,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the requested object.
  @param block A block to be executed concurrently when the object is available.
  */
-- (void)objectForKeyAsync:(NSString *)key block:(PINCacheObjectBlock)block;
+- (void)objectForKeyAsync:(NSString *)key completion:(PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key. This method returns immediately and executes the
@@ -70,7 +70,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key A key to associate with the object. This string will be copied.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObjectAsync:(id)object forKey:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)setObjectAsync:(id)object forKey:(NSString *)key completion:(nullable PINCacheObjectBlock)block;
 
 /**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
@@ -83,7 +83,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param cost An amount to add to the <memoryCache.totalCost>.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
-- (void)setObjectAsync:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINCacheObjectBlock)block;
+- (void)setObjectAsync:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -92,7 +92,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param key The key associated with the object to be removed.
  @param block A block to be executed concurrently after the object has been removed, or nil.
  */
-- (void)removeObjectForKeyAsync:(NSString *)key block:(nullable PINCacheObjectBlock)block;
+- (void)removeObjectForKeyAsync:(NSString *)key completion:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes all objects from the cache that have not been used since the specified date. This method returns immediately and
@@ -101,7 +101,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param date Objects that haven't been accessed since this date are removed from the cache.
  @param block A block to be executed concurrently after the cache has been trimmed, or nil.
  */
-- (void)trimToDateAsync:(NSDate *)date block:(nullable PINCacheBlock)block;
+- (void)trimToDateAsync:(NSDate *)date completion:(nullable PINCacheBlock)block;
 
 /**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
