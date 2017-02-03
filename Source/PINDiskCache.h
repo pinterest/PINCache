@@ -406,19 +406,10 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
 - (void)synchronouslyLockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block;
 
 /**
- This method determines whether an object is present for the given key in the cache.
- 
- @see containsObjectForKey:block:
- @param key The key associated with the object.
- @result YES if an object is present for the given key in the cache, otherwise NO.
- */
-//- (BOOL)containsObjectForKey:(NSString *)key;
-
-/**
  Retrieves the object for the specified key. This method blocks the calling thread until the
  object is available.
  
- @see objectForKey:block:
+ @see objectForKeyAsync:completion:
  @param key The key associated with the object.
  @result The object for the specified key.
  */
@@ -429,7 +420,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  url is available. Do not use this URL anywhere except with <lockFileAccessWhileExecutingBlock:>. This method probably
  shouldn't even exist, just use the asynchronous one.
  
- @see fileURLForKey:block:
+ @see fileURLForKeyAsync:completion:
  @param key The key associated with the object.
  @result The file URL for the specified key.
  */
@@ -439,7 +430,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  Stores an object in the cache for the specified key. This method blocks the calling thread until
  the object has been stored.
  
- @see setObject:forKey:block:
+ @see setObjectAsync:forKey:completion:
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
@@ -449,6 +440,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the
  specified byteCount. This method blocks the calling thread until the cache has been trimmed.
  
+ @see trimToSizeAsync:
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  */
 - (void)trimToSize:(NSUInteger)byteCount;
@@ -456,6 +448,8 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
 /**
  Removes objects from the cache, ordered by date (least recently used first), until the cache is equal to or
  smaller than the specified byteCount. This method blocks the calling thread until the cache has been trimmed.
+ 
+ @see trimToSizeByDateAsync:
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  */
 - (void)trimToSizeByDate:(NSUInteger)byteCount;
@@ -464,6 +458,8 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
  Loops through all objects in the cache (reads and writes are suspended during the enumeration). Data is not actually
  read from disk, the `object` parameter of the block will be `nil` but the `fileURL` will be available.
  This method blocks the calling thread until all objects have been enumerated.
+ 
+ @see enumerateObjectsWithBlockAsync:completionBlock
  @param block A block to be executed for every object in the cache.
  
  @warning Do not call this method within the event blocks (<didRemoveObjectBlock>, etc.)

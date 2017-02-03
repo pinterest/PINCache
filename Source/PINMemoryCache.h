@@ -184,6 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
  Removes objects from the cache, costliest objects first, until the <totalCost> is below the specified
  value. This method blocks the calling thread until the cache has been trimmed.
  
+ @see trimToCostAsync:
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  */
 - (void)trimToCost:(NSUInteger)cost;
@@ -192,6 +193,7 @@ NS_ASSUME_NONNULL_BEGIN
  Removes objects from the cache, ordered by date (least recently used first), until the <totalCost> is below
  the specified value. This method blocks the calling thread until the cache has been trimmed.
  
+ @see trimToCostByDateAsync:
  @param cost The total accumulation allowed to remain after the cache has been trimmed.
  */
 - (void)trimToCostByDate:(NSUInteger)cost;
@@ -201,6 +203,7 @@ NS_ASSUME_NONNULL_BEGIN
  This method blocks the calling thread until all objects have been enumerated.
  Calling synchronous methods on the cache within this callback will likely cause a deadlock.
  
+ @see enumerateObjectsWithBlockAsync:completionBlock:
  @param block A block to be executed for every object in the cache.
  
  @warning Do not call this method within the event blocks (<didReceiveMemoryWarningBlock>, etc.)

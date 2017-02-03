@@ -118,7 +118,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 /**
  This method determines whether an object is present for the given key in the cache.
  
- @see containsObjectForKey:block:
+ @see containsObjectForKeyAsync:completion:
  @param key The key associated with the object.
  @result YES if an object is present for the given key in the cache, otherwise NO.
  */
@@ -128,7 +128,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  Retrieves the object for the specified key. This method blocks the calling thread until the object is available.
  Uses a lock to achieve synchronicity on the disk cache.
  
- @see objectForKey:block:
+ @see objectForKeyAsync:completion:
  @param key The key associated with the object.
  @result The object for the specified key.
  */
@@ -138,7 +138,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  Stores an object in the cache for the specified key. This method blocks the calling thread until the object has been set.
  Uses a lock to achieve synchronicity on the disk cache.
  
- @see setObject:forKey:block:
+ @see setObjectAsync:forKey:completion:
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  */
@@ -160,6 +160,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  has been removed.
  Uses a lock to achieve synchronicity on the disk cache.
  
+ @see removeObjectForKeyAsync:completion:
  @param key The key associated with the object to be removed.
  */
 - (void)removeObjectForKey:(NSString *)key;
@@ -169,6 +170,7 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  This method blocks the calling thread until the cache has been trimmed.
  Uses a lock to achieve synchronicity on the disk cache.
  
+ @see trimToDateAsync:completion:
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
 - (void)trimToDate:(NSDate *)date;
@@ -176,6 +178,8 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 /**
  Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.
  Uses a lock to achieve synchronicity on the disk cache.
+ 
+ @see removeAllObjectsAsync:
  */
 - (void)removeAllObjects;
 
