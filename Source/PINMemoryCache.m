@@ -105,13 +105,13 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     return self;
 }
 
-+ (instancetype)sharedCache
++ (PINMemoryCache *)sharedCache
 {
-    static id cache;
+    static PINMemoryCache *cache;
     static dispatch_once_t predicate;
 
     dispatch_once(&predicate, ^{
-        cache = [[self alloc] init];
+        cache = [[PINMemoryCache alloc] init];
     });
 
     return cache;
@@ -299,6 +299,9 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (void)objectForKeyAsync:(NSString *)key completion:(PINCacheObjectBlock)block
 {
+    if (block == nil) {
+      return;
+    }
     __weak PINMemoryCache *weakSelf = self;
     
     [self.operationQueue addOperation:^{
@@ -453,7 +456,11 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (void)setObject:(id)object forKeyedSubscript:(NSString *)key
 {
-    [self setObject:object forKey:key];
+    if (object == nil) {
+        [self removeObjectForKey:key];
+    } else {
+        [self setObject:object forKey:key];
+    }
 }
 
 - (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost
