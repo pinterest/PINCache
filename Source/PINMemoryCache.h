@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <PINCache/PINCacheMacros.h>
 #import <PINCache/PINCaching.h>
 #import <PINCache/PINCacheObjectSubscripting.h>
 
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  a memory cache backed by a disk cache.
  */
 
+PIN_SUBCLASSING_RESTRICTED
 @interface PINMemoryCache : NSObject <PINCaching, PINCacheObjectSubscripting>
 
 #pragma mark - Properties
@@ -139,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
+@property (class, strong, readonly) PINMemoryCache *sharedCache;
 
 - (instancetype)initWithOperationQueue:(PINOperationQueue *)operationQueue;
 
@@ -210,7 +212,7 @@ NS_ASSUME_NONNULL_BEGIN
  Instead use the asynchronous version, <enumerateObjectsWithBlock:completionBlock:>.
  
  */
-- (void)enumerateObjectsWithBlock:(nullable PINCacheObjectBlock)block;
+- (void)enumerateObjectsWithBlock:(PIN_NOESCAPE PINCacheObjectBlock)block;
 
 @end
 
@@ -218,7 +220,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Deprecated
 
 typedef void (^PINMemoryCacheBlock)(PINMemoryCache *cache);
-typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, id __nullable object);
+typedef void (^PINMemoryCacheObjectBlock)(PINMemoryCache *cache, NSString *key, id _Nullable object);
 typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
 
 @interface PINMemoryCache (Deprecated)

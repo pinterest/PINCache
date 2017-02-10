@@ -60,13 +60,13 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINCachePrefix, _name, (void *)self];
 }
 
-+ (instancetype)sharedCache
++ (PINCache *)sharedCache
 {
-    static id cache;
+    static PINCache *cache;
     static dispatch_once_t predicate;
     
     dispatch_once(&predicate, ^{
-        cache = [[self alloc] initWithName:PINCacheSharedName];
+        cache = [[PINCache alloc] initWithName:PINCacheSharedName];
     });
     
     return cache;
@@ -110,7 +110,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                 return;
             
             if (memoryCacheObject) {
-                [strongSelf->_diskCache fileURLForKeyAsync:memoryCacheKey completion:NULL];
+                // Update file modification date. TODO: make this a separate method?
+                [strongSelf->_diskCache fileURLForKeyAsync:memoryCacheKey completion:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {}];
                 [strongSelf->_operationQueue addOperation:^{
                     PINCache *strongSelf = weakSelf;
                     if (strongSelf)
@@ -262,8 +263,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     object = [_memoryCache objectForKey:key];
     
     if (object) {
-        // update the access time on disk
-        [_diskCache fileURLForKeyAsync:key completion:NULL];
+        // Update file modification date. TODO: make this a separate method?
+        [_diskCache fileURLForKeyAsync:key completion:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {}];
     } else {
         object = [_diskCache objectForKey:key];
         [_memoryCache setObject:object forKey:key];

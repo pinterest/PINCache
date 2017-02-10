@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <PINCache/PINCacheMacros.h>
 #import <PINCache/PINCaching.h>
 #import <PINCache/PINDiskCache.h>
 #import <PINCache/PINMemoryCache.h>
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  @warning when using in extension or watch extension, define PIN_APP_EXTENSIONS=1
  */
 
+PIN_SUBCLASSING_RESTRICTED
 @interface PINCache : NSObject <PINCaching, PINCacheObjectSubscripting>
 
 #pragma mark -
@@ -58,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @result The shared singleton cache instance.
  */
-+ (instancetype)sharedCache;
+@property (class, strong, readonly) PINCache *sharedCache;
 
 - (instancetype)init NS_UNAVAILABLE;
 
