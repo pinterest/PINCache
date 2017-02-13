@@ -26,4 +26,5 @@ build
 /.buckconfig.local
 /.buckd
 
-Carthage
+# Carthage can't be ignored or else we can't build on checkout
+# Carthage

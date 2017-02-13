@@ -8,7 +8,9 @@ lint:
 	pod lib lint --allow-warnings
 
 test:
-	xcodebuild clean test -destination ${PLATFORM} -sdk ${SDK} -project PINCache.xcodeproj -scheme PINCache ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO | xcpretty
+	xcodebuild clean test -destination ${PLATFORM} -sdk ${SDK} -project PINCache.xcodeproj -scheme PINCache \
+	ONLY_ACTIVE_ARCH=NO \
+	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
 	carthage update
