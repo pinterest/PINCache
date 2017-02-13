@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		687BB0A31E526F6E005D70C6 /* PINOperation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CC01065C1E281CD900890935 /* PINOperation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		687BB0A51E526F99005D70C6 /* PINOperation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CC0106631E281CD900890935 /* PINOperation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		687BB0A71E526FB3005D70C6 /* PINOperation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = CC01065F1E281CD900890935 /* PINOperation.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		687BB0AA1E52706B005D70C6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		68A0FC001E4D32C4000B552D /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68A0FC011E4D32C6000B552D /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68A0FC021E4D32C7000B552D /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -43,7 +47,6 @@
 		CC0106C61E28226900890935 /* PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC01060D1E271A9000890935 /* PINCacheTests.m */; };
 		CC0106C71E28226A00890935 /* PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC01060D1E271A9000890935 /* PINCacheTests.m */; };
 		CC0106C81E28226A00890935 /* PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CC01060D1E271A9000890935 /* PINCacheTests.m */; };
-		CC0106CC1E28249C00890935 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		CC0106CD1E28249C00890935 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		CC0106CE1E28249D00890935 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
@@ -106,6 +109,39 @@
 			remoteInfo = PINOperation;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		687BB0A21E526F58005D70C6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				687BB0A31E526F6E005D70C6 /* PINOperation.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		687BB0A41E526F88005D70C6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				687BB0A51E526F99005D70C6 /* PINOperation.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		687BB0A61E526FA2005D70C6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				687BB0A71E526FB3005D70C6 /* PINOperation.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheMacros.h; sourceTree = "<group>"; };
@@ -643,7 +679,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CC0105B91E271A1600890935 /* Build configuration list for PBXNativeTarget "PINCache" */;
 			buildPhases = (
+				687BB0AE1E527771005D70C6 /* ShellScript */,
 				CC0105AC1E271A1600890935 /* Sources */,
+				687BB0A21E526F58005D70C6 /* CopyFiles */,
 				CC0105AD1E271A1600890935 /* Frameworks */,
 				CC0105AE1E271A1600890935 /* Headers */,
 				CC0105AF1E271A1600890935 /* Resources */,
@@ -661,7 +699,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CC0105C61E271A4000890935 /* Build configuration list for PBXNativeTarget "PINCache-tvOS" */;
 			buildPhases = (
+				687BB0AF1E5277A2005D70C6 /* ShellScript */,
 				CC0105BC1E271A4000890935 /* Sources */,
+				687BB0A41E526F88005D70C6 /* CopyFiles */,
 				CC0105BD1E271A4000890935 /* Frameworks */,
 				CC0105BE1E271A4000890935 /* Headers */,
 				CC0105BF1E271A4000890935 /* Resources */,
@@ -679,7 +719,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CC0105D31E271A4900890935 /* Build configuration list for PBXNativeTarget "PINCache-macOS" */;
 			buildPhases = (
+				687BB0B01E5277AB005D70C6 /* ShellScript */,
 				CC0105C91E271A4900890935 /* Sources */,
+				687BB0A61E526FA2005D70C6 /* CopyFiles */,
 				CC0105CA1E271A4900890935 /* Frameworks */,
 				CC0105CB1E271A4900890935 /* Headers */,
 				CC0105CC1E271A4900890935 /* Resources */,
@@ -868,7 +910,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CC0106CC1E28249C00890935 /* Default-568h@2x.png in Resources */,
+				687BB0AA1E52706B005D70C6 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -889,6 +931,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		687BB0AE1E527771005D70C6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "carthage update";
+		};
+		687BB0AF1E5277A2005D70C6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "carthage update";
+		};
+		687BB0B01E5277AB005D70C6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "carthage update";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		CC0105AC1E271A1600890935 /* Sources */ = {
