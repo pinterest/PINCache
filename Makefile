@@ -2,7 +2,7 @@ PLATFORM="platform=iOS Simulator,OS=10.2,name=iPhone 7"
 SDK="iphonesimulator10.2"
 SHELL=/bin/bash -o pipefail
 
-.PHONY: all lint test carthage
+.PHONY: all lint test carthage analyze
 
 lint:
 	pod lib lint --allow-warnings
