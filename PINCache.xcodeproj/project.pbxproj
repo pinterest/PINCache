@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6818C1461E5501A500875DB7 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6818C1391E55000F00875DB7 /* PINOperation.framework */; };
-		6818C1471E5501E800875DB7 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6818C13D1E55000F00875DB7 /* PINOperation.framework */; };
-		6818C1481E5501F700875DB7 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6818C1411E55000F00875DB7 /* PINOperation.framework */; };
 		6818C1491E55020400875DB7 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105CE1E271A4900890935 /* PINCache.framework */; };
 		687BB0AA1E52706B005D70C6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		68A0FC001E4D32C4000B552D /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -49,69 +46,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		6818C1381E55000F00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CC01052D1E27110D00890935;
-			remoteInfo = PINOperation;
-		};
-		6818C13A1E55000F00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CC0105561E27116600890935;
-			remoteInfo = PINOperationTests;
-		};
-		6818C13C1E55000F00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CC01053D1E27113700890935;
-			remoteInfo = "PINOperation-tvOS";
-		};
-		6818C13E1E55000F00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CC0105651E27117300890935;
-			remoteInfo = "PINOperation-tvOSTests";
-		};
-		6818C1401E55000F00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CC01054A1E27114300890935;
-			remoteInfo = "PINOperation-macOS";
-		};
-		6818C1421E55000F00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CC0105741E27117F00890935;
-			remoteInfo = "PINOperation-macOSTests";
-		};
-		6818C14A1E55026A00875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CC01052C1E27110D00890935;
-			remoteInfo = PINOperation;
-		};
-		6818C14C1E55027000875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CC01053C1E27113700890935;
-			remoteInfo = "PINOperation-tvOS";
-		};
-		6818C14E1E55027400875DB7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = CC0105491E27114300890935;
-			remoteInfo = "PINOperation-macOS";
-		};
 		CC0105E01E271A5C00890935 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CC0105A81E271A1600890935 /* Project object */;
@@ -166,7 +100,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PINOperation.xcodeproj; path = Carthage/Checkouts/PINOperation/PINOperation.xcodeproj; sourceTree = "<group>"; };
 		68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheMacros.h; sourceTree = "<group>"; };
 		6928EED21E4160EE00B5D975 /* PINCaching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCaching.h; sourceTree = "<group>"; };
 		CC0105B11E271A1600890935 /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -215,7 +148,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6818C1461E5501A500875DB7 /* PINOperation.framework in Frameworks */,
 				CC0105DF1E271A5C00890935 /* PINCache.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -224,7 +156,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6818C1471E5501E800875DB7 /* PINOperation.framework in Frameworks */,
 				CC0105EE1E271A6400890935 /* PINCache.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -234,30 +165,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				6818C1491E55020400875DB7 /* PINCache.framework in Frameworks */,
-				6818C1481E5501F700875DB7 /* PINOperation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6818C1301E55000F00875DB7 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				6818C1391E55000F00875DB7 /* PINOperation.framework */,
-				6818C13B1E55000F00875DB7 /* PINOperationTests.xctest */,
-				6818C13D1E55000F00875DB7 /* PINOperation.framework */,
-				6818C13F1E55000F00875DB7 /* PINOperation-tvOSTests.xctest */,
-				6818C1411E55000F00875DB7 /* PINOperation.framework */,
-				6818C1431E55000F00875DB7 /* PINOperation-macOSTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		CC0105A71E271A1600890935 = {
 			isa = PBXGroup;
 			children = (
-				6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */,
 				CC0106031E271A9000890935 /* Source */,
 				CC01060C1E271A9000890935 /* Tests */,
 				CC0105B21E271A1600890935 /* Products */,
@@ -370,7 +286,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				6818C14B1E55026A00875DB7 /* PBXTargetDependency */,
 			);
 			name = PINCache;
 			productName = PINCache;
@@ -389,7 +304,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				6818C14D1E55027000875DB7 /* PBXTargetDependency */,
 			);
 			name = "PINCache-tvOS";
 			productName = "PINCache-tvOS";
@@ -408,7 +322,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				6818C14F1E55027400875DB7 /* PBXTargetDependency */,
 			);
 			name = "PINCache-macOS";
 			productName = "PINCache-macOS";
@@ -511,12 +424,6 @@
 			mainGroup = CC0105A71E271A1600890935;
 			productRefGroup = CC0105B21E271A1600890935 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 6818C1301E55000F00875DB7 /* Products */;
-					ProjectRef = 6818C12F1E55000F00875DB7 /* PINOperation.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				CC0105B01E271A1600890935 /* PINCache */,
@@ -528,51 +435,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		6818C1391E55000F00875DB7 /* PINOperation.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = PINOperation.framework;
-			remoteRef = 6818C1381E55000F00875DB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		6818C13B1E55000F00875DB7 /* PINOperationTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PINOperationTests.xctest;
-			remoteRef = 6818C13A1E55000F00875DB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		6818C13D1E55000F00875DB7 /* PINOperation.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = PINOperation.framework;
-			remoteRef = 6818C13C1E55000F00875DB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		6818C13F1E55000F00875DB7 /* PINOperation-tvOSTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "PINOperation-tvOSTests.xctest";
-			remoteRef = 6818C13E1E55000F00875DB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		6818C1411E55000F00875DB7 /* PINOperation.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = PINOperation.framework;
-			remoteRef = 6818C1401E55000F00875DB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		6818C1431E55000F00875DB7 /* PINOperation-macOSTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "PINOperation-macOSTests.xctest";
-			remoteRef = 6818C1421E55000F00875DB7 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		CC0105AF1E271A1600890935 /* Resources */ = {
@@ -680,21 +542,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		6818C14B1E55026A00875DB7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = PINOperation;
-			targetProxy = 6818C14A1E55026A00875DB7 /* PBXContainerItemProxy */;
-		};
-		6818C14D1E55027000875DB7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "PINOperation-tvOS";
-			targetProxy = 6818C14C1E55027000875DB7 /* PBXContainerItemProxy */;
-		};
-		6818C14F1E55027400875DB7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "PINOperation-macOS";
-			targetProxy = 6818C14E1E55027400875DB7 /* PBXContainerItemProxy */;
-		};
 		CC0105E11E271A5C00890935 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CC0105B01E271A1600890935 /* PINCache */;

@@ -8,7 +8,7 @@ lint:
 	pod lib lint
 
 analyze:
-	xcodebuild clean analyze -destination ${PLATFORM} -sdk ${SDK} -project PINCache.xcodeproj -scheme PINCache \
+	xcodebuild clean analyze -destination ${PLATFORM} -sdk ${SDK} -workspace PINCache.xcworkspace -scheme PINCache \
 	ONLY_ACTIVE_ARCH=NO \
 	CODE_SIGNING_REQUIRED=NO \
 	CLANG_ANALYZER_OUTPUT=plist-html \
