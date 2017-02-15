@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		6818C1491E55020400875DB7 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105CE1E271A4900890935 /* PINCache.framework */; };
+		6818C2881E55217D00875DB7 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6818C2871E55217D00875DB7 /* PINOperation.framework */; };
+		6818C28A1E55218400875DB7 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6818C2891E55218400875DB7 /* PINOperation.framework */; };
+		6818C28C1E55218A00875DB7 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6818C28B1E55218A00875DB7 /* PINOperation.framework */; };
 		687BB0AA1E52706B005D70C6 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CC0106CA1E28248800890935 /* Default-568h@2x.png */; };
 		68A0FC001E4D32C4000B552D /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		68A0FC011E4D32C6000B552D /* PINCacheMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -100,6 +103,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6818C2871E55217D00875DB7 /* PINOperation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PINOperation.framework; path = "../../Library/Developer/Xcode/DerivedData/PINCache-cxjnintatqynfgceozwzgezmeypl/Build/Products/Debug-iphonesimulator/PINOperation.framework"; sourceTree = "<group>"; };
+		6818C2891E55218400875DB7 /* PINOperation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PINOperation.framework; path = "../../Library/Developer/Xcode/DerivedData/PINCache-cxjnintatqynfgceozwzgezmeypl/Build/Products/Debug-appletvsimulator/PINOperation.framework"; sourceTree = "<group>"; };
+		6818C28B1E55218A00875DB7 /* PINOperation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PINOperation.framework; path = Carthage/Checkouts/PINOperation/build/Debug/PINOperation.framework; sourceTree = "<group>"; };
 		68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheMacros.h; sourceTree = "<group>"; };
 		6928EED21E4160EE00B5D975 /* PINCaching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCaching.h; sourceTree = "<group>"; };
 		CC0105B11E271A1600890935 /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6818C2881E55217D00875DB7 /* PINOperation.framework in Frameworks */,
 				CC0105DF1E271A5C00890935 /* PINCache.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -156,6 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6818C28A1E55218400875DB7 /* PINOperation.framework in Frameworks */,
 				CC0105EE1E271A6400890935 /* PINCache.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -164,6 +172,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6818C28C1E55218A00875DB7 /* PINOperation.framework in Frameworks */,
 				6818C1491E55020400875DB7 /* PINCache.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -171,12 +180,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6818C2861E55217D00875DB7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6818C28B1E55218A00875DB7 /* PINOperation.framework */,
+				6818C2891E55218400875DB7 /* PINOperation.framework */,
+				6818C2871E55217D00875DB7 /* PINOperation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		CC0105A71E271A1600890935 = {
 			isa = PBXGroup;
 			children = (
 				CC0106031E271A9000890935 /* Source */,
 				CC01060C1E271A9000890935 /* Tests */,
 				CC0105B21E271A1600890935 /* Products */,
+				6818C2861E55217D00875DB7 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -841,6 +861,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Checkouts/PINOperation/build/Debug",
+				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
@@ -855,6 +879,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Checkouts/PINOperation/build/Debug",
+				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
