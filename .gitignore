@@ -24,4 +24,4 @@ xcuserdata
 /.buckd
 
 # Carthage can't be ignored or else we can't build on checkout
-# Carthage
+/Carthage
