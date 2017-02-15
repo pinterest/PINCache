@@ -16,9 +16,6 @@ xcuserdata
 *.swp
 *~.nib
 
-#Ignore the build, since we don't want archived builds
-build
-
 .gitattributes
 
 # Buck

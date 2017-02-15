@@ -1,0 +1,662 @@
+BCSymbolMap Version: 2.0
+-[PINCache init]
+-[PINCache initWithName:]
+-[PINCache initWithName:fileExtension:]
+-[PINCache initWithName:rootPath:fileExtension:]
+-[PINCache initWithName:rootPath:serializer:deserializer:fileExtension:]
+-[PINCache description]
++[PINCache sharedCache]
+___23+[PINCache sharedCache]_block_invoke
+___copy_helper_block_
+___destroy_helper_block_
+-[PINCache containsObjectForKey:block:]
+___39-[PINCache containsObjectForKey:block:]_block_invoke
+___copy_helper_block_.42
+___destroy_helper_block_.43
+-[PINCache objectForKey:block:]
+___31-[PINCache objectForKey:block:]_block_invoke
+___31-[PINCache objectForKey:block:]_block_invoke_2
+___31-[PINCache objectForKey:block:]_block_invoke_3
+___copy_helper_block_.49
+___destroy_helper_block_.50
+___31-[PINCache objectForKey:block:]_block_invoke.52
+___31-[PINCache objectForKey:block:]_block_invoke_2.55
+___copy_helper_block_.56
+___destroy_helper_block_.57
+___copy_helper_block_.59
+___destroy_helper_block_.60
+___copy_helper_block_.65
+___destroy_helper_block_.66
+___copy_helper_block_.69
+___destroy_helper_block_.70
+-[PINCache setObject:forKey:block:]
+___35-[PINCache setObject:forKey:block:]_block_invoke
+___copy_helper_block_.77
+___destroy_helper_block_.78
+___35-[PINCache setObject:forKey:block:]_block_invoke.80
+___copy_helper_block_.81
+___destroy_helper_block_.82
+___35-[PINCache setObject:forKey:block:]_block_invoke.84
+___copy_helper_block_.85
+___destroy_helper_block_.86
+-[PINCache removeObjectForKey:block:]
+___37-[PINCache removeObjectForKey:block:]_block_invoke
+___copy_helper_block_.94
+___destroy_helper_block_.95
+___37-[PINCache removeObjectForKey:block:]_block_invoke.97
+___copy_helper_block_.98
+___destroy_helper_block_.99
+___37-[PINCache removeObjectForKey:block:]_block_invoke.101
+___copy_helper_block_.102
+___destroy_helper_block_.103
+-[PINCache removeAllObjects:]
+___29-[PINCache removeAllObjects:]_block_invoke
+___copy_helper_block_.107
+___destroy_helper_block_.108
+___29-[PINCache removeAllObjects:]_block_invoke.110
+___copy_helper_block_.111
+___destroy_helper_block_.112
+___29-[PINCache removeAllObjects:]_block_invoke.114
+___copy_helper_block_.115
+___destroy_helper_block_.116
+-[PINCache trimToDate:block:]
+___29-[PINCache trimToDate:block:]_block_invoke
+___copy_helper_block_.120
+___destroy_helper_block_.121
+___29-[PINCache trimToDate:block:]_block_invoke.123
+___copy_helper_block_.124
+___destroy_helper_block_.125
+___29-[PINCache trimToDate:block:]_block_invoke.127
+___copy_helper_block_.128
+___destroy_helper_block_.129
+-[PINCache diskByteCount]
+___25-[PINCache diskByteCount]_block_invoke
+___copy_helper_block_.133
+___destroy_helper_block_.134
+-[PINCache containsObjectForKey:]
+-[PINCache objectForKey:]
+___Block_byref_object_copy_
+___Block_byref_object_dispose_
+-[PINCache setObject:forKey:]
+-[PINCache objectForKeyedSubscript:]
+-[PINCache setObject:forKeyedSubscript:]
+-[PINCache removeObjectForKey:]
+-[PINCache trimToDate:]
+-[PINCache removeAllObjects]
+-[PINCache name]
+-[PINCache diskCache]
+-[PINCache memoryCache]
+-[PINCache operationQueue]
+-[PINCache setOperationQueue:]
+-[PINCache .cxx_destruct]
+_OBJC_IVAR_$_PINCache._name
+_OBJC_IVAR_$_PINCache._operationQueue
+_OBJC_IVAR_$_PINCache._diskCache
+_OBJC_IVAR_$_PINCache._memoryCache
+_sharedCache.cache
+_sharedCache.predicate
+___block_descriptor_tmp
+___block_descriptor_tmp.44
+___block_descriptor_tmp.51
+___block_descriptor_tmp.58
+___block_descriptor_tmp.62
+___block_descriptor_tmp.68
+___block_descriptor_tmp.71
+___block_descriptor_tmp.79
+___block_descriptor_tmp.83
+___block_descriptor_tmp.87
+___block_descriptor_tmp.96
+___block_descriptor_tmp.100
+___block_descriptor_tmp.104
+___block_descriptor_tmp.109
+___block_descriptor_tmp.113
+___block_descriptor_tmp.117
+___block_descriptor_tmp.122
+___block_descriptor_tmp.126
+___block_descriptor_tmp.130
+___block_descriptor_tmp.136
+l_OBJC_PROTOCOL_$_NSObject
+l_OBJC_LABEL_PROTOCOL_$_NSObject
+l_OBJC_PROTOCOL_$_PINCacheObjectSubscripting
+l_OBJC_LABEL_PROTOCOL_$_PINCacheObjectSubscripting
+Apple LLVM version 8.0.0 (clang-800.0.42.1)
+/Users/garrett/code/PINCache/PINCache/PINCache.m
+/Users/garrett/code/PINCache/tests
+/Users/garrett/code/PINCache/PINCache/PINCache.h
+__Block_byref_object_dispose_
+__Block_byref_object_copy_
+__destroy_helper_block_
+__copy_helper_block_
+__25-[PINCache diskByteCount]_block_invoke
+__29-[PINCache trimToDate:block:]_block_invoke.127
+__29-[PINCache trimToDate:block:]_block_invoke.123
+__29-[PINCache trimToDate:block:]_block_invoke
+__29-[PINCache removeAllObjects:]_block_invoke.114
+__29-[PINCache removeAllObjects:]_block_invoke.110
+__29-[PINCache removeAllObjects:]_block_invoke
+__37-[PINCache removeObjectForKey:block:]_block_invoke.101
+__37-[PINCache removeObjectForKey:block:]_block_invoke.97
+__37-[PINCache removeObjectForKey:block:]_block_invoke
+__35-[PINCache setObject:forKey:block:]_block_invoke.84
+__35-[PINCache setObject:forKey:block:]_block_invoke.80
+__35-[PINCache setObject:forKey:block:]_block_invoke
+__31-[PINCache objectForKey:block:]_block_invoke_2.55
+__31-[PINCache objectForKey:block:]_block_invoke.52
+__31-[PINCache objectForKey:block:]_block_invoke_3
+__31-[PINCache objectForKey:block:]_block_invoke_2
+__31-[PINCache objectForKey:block:]_block_invoke
+__39-[PINCache containsObjectForKey:block:]_block_invoke
+__23+[PINCache sharedCache]_block_invoke
+_dispatch_once
+/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS10.0.sdk/usr/include/dispatch/once.h
+-[PINMemoryCache dealloc]
+-[PINMemoryCache init]
+-[PINMemoryCache initWithOperationQueue:]
++[PINMemoryCache sharedCache]
+___29+[PINMemoryCache sharedCache]_block_invoke
+-[PINMemoryCache didReceiveMemoryWarningNotification:]
+___54-[PINMemoryCache didReceiveMemoryWarningNotification:]_block_invoke
+___copy_helper_block_.32
+___destroy_helper_block_.33
+-[PINMemoryCache didReceiveEnterBackgroundNotification:]
+___56-[PINMemoryCache didReceiveEnterBackgroundNotification:]_block_invoke
+___copy_helper_block_.39
+___destroy_helper_block_.40
+-[PINMemoryCache removeObjectAndExecuteBlocksForKey:]
+-[PINMemoryCache trimMemoryToDate:]
+-[PINMemoryCache trimToCostLimit:]
+-[PINMemoryCache trimToCostLimitByDate:]
+-[PINMemoryCache trimToAgeLimitRecursively]
+___43-[PINMemoryCache trimToAgeLimitRecursively]_block_invoke
+___43-[PINMemoryCache trimToAgeLimitRecursively]_block_invoke_2
+___copy_helper_block_.67
+___destroy_helper_block_.68
+___copy_helper_block_.70
+___destroy_helper_block_.71
+-[PINMemoryCache containsObjectForKey:block:]
+___45-[PINMemoryCache containsObjectForKey:block:]_block_invoke
+___copy_helper_block_.75
+___destroy_helper_block_.76
+-[PINMemoryCache objectForKey:block:]
+___37-[PINMemoryCache objectForKey:block:]_block_invoke
+___copy_helper_block_.80
+___destroy_helper_block_.81
+-[PINMemoryCache setObject:forKey:block:]
+-[PINMemoryCache setObject:forKey:withCost:block:]
+___50-[PINMemoryCache setObject:forKey:withCost:block:]_block_invoke
+___copy_helper_block_.87
+___destroy_helper_block_.88
+-[PINMemoryCache removeObjectForKey:block:]
+___43-[PINMemoryCache removeObjectForKey:block:]_block_invoke
+___copy_helper_block_.90
+___destroy_helper_block_.91
+-[PINMemoryCache trimToDate:block:]
+___35-[PINMemoryCache trimToDate:block:]_block_invoke
+___copy_helper_block_.95
+___destroy_helper_block_.96
+-[PINMemoryCache trimToCost:block:]
+___35-[PINMemoryCache trimToCost:block:]_block_invoke
+___copy_helper_block_.100
+___destroy_helper_block_.101
+-[PINMemoryCache trimToCostByDate:block:]
+___41-[PINMemoryCache trimToCostByDate:block:]_block_invoke
+___copy_helper_block_.105
+___destroy_helper_block_.106
+-[PINMemoryCache removeAllObjects:]
+___35-[PINMemoryCache removeAllObjects:]_block_invoke
+___copy_helper_block_.110
+___destroy_helper_block_.111
+-[PINMemoryCache enumerateObjectsWithBlock:completionBlock:]
+___60-[PINMemoryCache enumerateObjectsWithBlock:completionBlock:]_block_invoke
+-[PINMemoryCache containsObjectForKey:]
+-[PINMemoryCache objectForKey:]
+-[PINMemoryCache objectForKeyedSubscript:]
+-[PINMemoryCache setObject:forKey:]
+-[PINMemoryCache setObject:forKeyedSubscript:]
+-[PINMemoryCache setObject:forKey:withCost:]
+-[PINMemoryCache removeObjectForKey:]
+-[PINMemoryCache trimToDate:]
+-[PINMemoryCache trimToCost:]
+-[PINMemoryCache trimToCostByDate:]
+-[PINMemoryCache removeAllObjects]
+-[PINMemoryCache enumerateObjectsWithBlock:]
+-[PINMemoryCache willAddObjectBlock]
+-[PINMemoryCache setWillAddObjectBlock:]
+-[PINMemoryCache willRemoveObjectBlock]
+-[PINMemoryCache setWillRemoveObjectBlock:]
+-[PINMemoryCache willRemoveAllObjectsBlock]
+-[PINMemoryCache setWillRemoveAllObjectsBlock:]
+-[PINMemoryCache didAddObjectBlock]
+-[PINMemoryCache setDidAddObjectBlock:]
+-[PINMemoryCache didRemoveObjectBlock]
+-[PINMemoryCache setDidRemoveObjectBlock:]
+-[PINMemoryCache didRemoveAllObjectsBlock]
+-[PINMemoryCache setDidRemoveAllObjectsBlock:]
+-[PINMemoryCache didReceiveMemoryWarningBlock]
+-[PINMemoryCache setDidReceiveMemoryWarningBlock:]
+-[PINMemoryCache didEnterBackgroundBlock]
+-[PINMemoryCache setDidEnterBackgroundBlock:]
+-[PINMemoryCache ageLimit]
+-[PINMemoryCache setAgeLimit:]
+-[PINMemoryCache costLimit]
+-[PINMemoryCache setCostLimit:]
+-[PINMemoryCache totalCost]
+-[PINMemoryCache isTTLCache]
+-[PINMemoryCache setTtlCache:]
+-[PINMemoryCache lock]
+-[PINMemoryCache unlock]
+-[PINMemoryCache removeAllObjectsOnMemoryWarning]
+-[PINMemoryCache setRemoveAllObjectsOnMemoryWarning:]
+-[PINMemoryCache removeAllObjectsOnEnteringBackground]
+-[PINMemoryCache setRemoveAllObjectsOnEnteringBackground:]
+-[PINMemoryCache operationQueue]
+-[PINMemoryCache setOperationQueue:]
+-[PINMemoryCache mutex]
+-[PINMemoryCache setMutex:]
+-[PINMemoryCache dictionary]
+-[PINMemoryCache setDictionary:]
+-[PINMemoryCache dates]
+-[PINMemoryCache setDates:]
+-[PINMemoryCache costs]
+-[PINMemoryCache setCosts:]
+-[PINMemoryCache .cxx_destruct]
+_OBJC_IVAR_$_PINMemoryCache._mutex
+_OBJC_IVAR_$_PINMemoryCache._operationQueue
+_OBJC_IVAR_$_PINMemoryCache._dictionary
+_OBJC_IVAR_$_PINMemoryCache._dates
+_OBJC_IVAR_$_PINMemoryCache._costs
+_OBJC_IVAR_$_PINMemoryCache._willAddObjectBlock
+_OBJC_IVAR_$_PINMemoryCache._willRemoveObjectBlock
+_OBJC_IVAR_$_PINMemoryCache._willRemoveAllObjectsBlock
+_OBJC_IVAR_$_PINMemoryCache._didAddObjectBlock
+_OBJC_IVAR_$_PINMemoryCache._didRemoveObjectBlock
+_OBJC_IVAR_$_PINMemoryCache._didRemoveAllObjectsBlock
+_OBJC_IVAR_$_PINMemoryCache._didReceiveMemoryWarningBlock
+_OBJC_IVAR_$_PINMemoryCache._didEnterBackgroundBlock
+_OBJC_IVAR_$_PINMemoryCache._ageLimit
+_OBJC_IVAR_$_PINMemoryCache._costLimit
+_OBJC_IVAR_$_PINMemoryCache._totalCost
+_OBJC_IVAR_$_PINMemoryCache._removeAllObjectsOnMemoryWarning
+_OBJC_IVAR_$_PINMemoryCache._removeAllObjectsOnEnteringBackground
+___block_descriptor_tmp.34
+___block_descriptor_tmp.41
+___block_descriptor_tmp.69
+___block_descriptor_tmp.72
+___block_descriptor_tmp.77
+___block_descriptor_tmp.82
+___block_descriptor_tmp.89
+___block_descriptor_tmp.92
+___block_descriptor_tmp.97
+___block_descriptor_tmp.102
+___block_descriptor_tmp.107
+___block_descriptor_tmp.112
+_OBJC_IVAR_$_PINMemoryCache._ttlCache
+/Users/garrett/code/PINCache/PINCache/PINMemoryCache.m
+/Users/garrett/code/PINCache/PINCache/PINMemoryCache.h
+__60-[PINMemoryCache enumerateObjectsWithBlock:completionBlock:]_block_invoke
+__35-[PINMemoryCache removeAllObjects:]_block_invoke
+__41-[PINMemoryCache trimToCostByDate:block:]_block_invoke
+__35-[PINMemoryCache trimToCost:block:]_block_invoke
+__35-[PINMemoryCache trimToDate:block:]_block_invoke
+__43-[PINMemoryCache removeObjectForKey:block:]_block_invoke
+__50-[PINMemoryCache setObject:forKey:withCost:block:]_block_invoke
+__37-[PINMemoryCache objectForKey:block:]_block_invoke
+__45-[PINMemoryCache containsObjectForKey:block:]_block_invoke
+__43-[PINMemoryCache trimToAgeLimitRecursively]_block_invoke_2
+__43-[PINMemoryCache trimToAgeLimitRecursively]_block_invoke
+__56-[PINMemoryCache didReceiveEnterBackgroundNotification:]_block_invoke
+__54-[PINMemoryCache didReceiveMemoryWarningNotification:]_block_invoke
+__29+[PINMemoryCache sharedCache]_block_invoke
+-[PINDiskCache init]
+-[PINDiskCache initWithName:]
+-[PINDiskCache initWithName:fileExtension:]
+-[PINDiskCache initWithName:rootPath:fileExtension:]
+-[PINDiskCache initWithName:rootPath:serializer:deserializer:fileExtension:]
+-[PINDiskCache initWithName:rootPath:serializer:deserializer:fileExtension:operationQueue:]
+___91-[PINDiskCache initWithName:rootPath:serializer:deserializer:fileExtension:operationQueue:]_block_invoke
+-[PINDiskCache description]
++[PINDiskCache sharedCache]
+___27+[PINDiskCache sharedCache]_block_invoke
+___copy_helper_block_.62
+___destroy_helper_block_.63
+-[PINDiskCache encodedFileURLForKey:]
+-[PINDiskCache keyForEncodedFileURL:]
+-[PINDiskCache encodedString:]
+-[PINDiskCache decodedString:]
+-[PINDiskCache defaultSerializer]
+___33-[PINDiskCache defaultSerializer]_block_invoke
+-[PINDiskCache defaultDeserializer]
+___35-[PINDiskCache defaultDeserializer]_block_invoke
++[PINDiskCache sharedTrashQueue]
+___32+[PINDiskCache sharedTrashQueue]_block_invoke
++[PINDiskCache sharedTrashURL]
+___30+[PINDiskCache sharedTrashURL]_block_invoke
++[PINDiskCache moveItemAtURLToTrash:]
++[PINDiskCache emptyTrash]
+___26+[PINDiskCache emptyTrash]_block_invoke
+___copy_helper_block_.149
+___destroy_helper_block_.150
+-[PINDiskCache _locked_createCacheDirectory]
+-[PINDiskCache _locked_initializeDiskProperties]
+-[PINDiskCache asynchronouslySetFileModificationDate:forURL:]
+___61-[PINDiskCache asynchronouslySetFileModificationDate:forURL:]_block_invoke
+___copy_helper_block_.173
+___destroy_helper_block_.174
+-[PINDiskCache _locked_setFileModificationDate:forURL:]
+-[PINDiskCache removeFileAndExecuteBlocksForKey:]
+-[PINDiskCache trimDiskToSize:]
+-[PINDiskCache trimDiskToSizeByDate:]
+-[PINDiskCache trimDiskToDate:]
+-[PINDiskCache trimToAgeLimitRecursively]
+___41-[PINDiskCache trimToAgeLimitRecursively]_block_invoke
+___41-[PINDiskCache trimToAgeLimitRecursively]_block_invoke_2
+___copy_helper_block_.206
+___destroy_helper_block_.207
+___copy_helper_block_.209
+___destroy_helper_block_.210
+-[PINDiskCache lockFileAccessWhileExecutingBlock:]
+___50-[PINDiskCache lockFileAccessWhileExecutingBlock:]_block_invoke
+___copy_helper_block_.212
+___destroy_helper_block_.213
+-[PINDiskCache containsObjectForKey:block:]
+___43-[PINDiskCache containsObjectForKey:block:]_block_invoke
+___copy_helper_block_.217
+___destroy_helper_block_.218
+-[PINDiskCache objectForKey:block:]
+___35-[PINDiskCache objectForKey:block:]_block_invoke
+___copy_helper_block_.222
+___destroy_helper_block_.223
+-[PINDiskCache fileURLForKey:block:]
+___36-[PINDiskCache fileURLForKey:block:]_block_invoke
+___copy_helper_block_.227
+___destroy_helper_block_.228
+-[PINDiskCache setObject:forKey:block:]
+___39-[PINDiskCache setObject:forKey:block:]_block_invoke
+___copy_helper_block_.232
+___destroy_helper_block_.233
+-[PINDiskCache removeObjectForKey:block:]
+___41-[PINDiskCache removeObjectForKey:block:]_block_invoke
+___copy_helper_block_.237
+___destroy_helper_block_.238
+-[PINDiskCache trimToSize:block:]
+___33-[PINDiskCache trimToSize:block:]_block_invoke
+___copy_helper_block_.242
+___destroy_helper_block_.243
+-[PINDiskCache trimToDate:block:]
+___33-[PINDiskCache trimToDate:block:]_block_invoke
+___copy_helper_block_.247
+___destroy_helper_block_.248
+-[PINDiskCache trimToSizeByDate:block:]
+___39-[PINDiskCache trimToSizeByDate:block:]_block_invoke
+___copy_helper_block_.252
+___destroy_helper_block_.253
+-[PINDiskCache removeAllObjects:]
+___33-[PINDiskCache removeAllObjects:]_block_invoke
+___copy_helper_block_.257
+___destroy_helper_block_.258
+-[PINDiskCache enumerateObjectsWithBlock:completionBlock:]
+___58-[PINDiskCache enumerateObjectsWithBlock:completionBlock:]_block_invoke
+___copy_helper_block_.262
+___destroy_helper_block_.263
+-[PINDiskCache synchronouslyLockFileAccessWhileExecutingBlock:]
+-[PINDiskCache containsObjectForKey:]
+-[PINDiskCache objectForKey:]
+-[PINDiskCache objectForKeyedSubscript:]
+-[PINDiskCache objectForKey:fileURL:]
+-[PINDiskCache fileURLForKey:]
+-[PINDiskCache fileURLForKey:updateFileModificationDate:]
+-[PINDiskCache setObject:forKey:]
+-[PINDiskCache setObject:forKeyedSubscript:]
+-[PINDiskCache setObject:forKey:fileURL:]
+-[PINDiskCache removeObjectForKey:]
+-[PINDiskCache removeObjectForKey:fileURL:]
+-[PINDiskCache trimToSize:]
+-[PINDiskCache trimToDate:]
+-[PINDiskCache trimToSizeByDate:]
+-[PINDiskCache removeAllObjects]
+-[PINDiskCache enumerateObjectsWithBlock:]
+-[PINDiskCache willAddObjectBlock]
+-[PINDiskCache setWillAddObjectBlock:]
+___38-[PINDiskCache setWillAddObjectBlock:]_block_invoke
+___copy_helper_block_.292
+___destroy_helper_block_.293
+-[PINDiskCache willRemoveObjectBlock]
+-[PINDiskCache setWillRemoveObjectBlock:]
+___41-[PINDiskCache setWillRemoveObjectBlock:]_block_invoke
+___copy_helper_block_.295
+___destroy_helper_block_.296
+-[PINDiskCache willRemoveAllObjectsBlock]
+-[PINDiskCache setWillRemoveAllObjectsBlock:]
+___45-[PINDiskCache setWillRemoveAllObjectsBlock:]_block_invoke
+___copy_helper_block_.298
+___destroy_helper_block_.299
+-[PINDiskCache didAddObjectBlock]
+-[PINDiskCache setDidAddObjectBlock:]
+___37-[PINDiskCache setDidAddObjectBlock:]_block_invoke
+___copy_helper_block_.301
+___destroy_helper_block_.302
+-[PINDiskCache didRemoveObjectBlock]
+-[PINDiskCache setDidRemoveObjectBlock:]
+___40-[PINDiskCache setDidRemoveObjectBlock:]_block_invoke
+___copy_helper_block_.304
+___destroy_helper_block_.305
+-[PINDiskCache didRemoveAllObjectsBlock]
+-[PINDiskCache setDidRemoveAllObjectsBlock:]
+___44-[PINDiskCache setDidRemoveAllObjectsBlock:]_block_invoke
+___copy_helper_block_.307
+___destroy_helper_block_.308
+-[PINDiskCache byteLimit]
+-[PINDiskCache setByteLimit:]
+___29-[PINDiskCache setByteLimit:]_block_invoke
+___copy_helper_block_.310
+___destroy_helper_block_.311
+-[PINDiskCache ageLimit]
+-[PINDiskCache setAgeLimit:]
+___28-[PINDiskCache setAgeLimit:]_block_invoke
+___copy_helper_block_.313
+___destroy_helper_block_.314
+-[PINDiskCache isTTLCache]
+-[PINDiskCache setTtlCache:]
+___28-[PINDiskCache setTtlCache:]_block_invoke
+___copy_helper_block_.316
+___destroy_helper_block_.317
+-[PINDiskCache writingProtectionOption]
+-[PINDiskCache setWritingProtectionOption:]
+___43-[PINDiskCache setWritingProtectionOption:]_block_invoke
+___copy_helper_block_.319
+___destroy_helper_block_.320
+-[PINDiskCache lock]
+-[PINDiskCache unlock]
+-[PINDiskCache name]
+-[PINDiskCache cacheURL]
+-[PINDiskCache setCacheURL:]
+-[PINDiskCache byteCount]
+-[PINDiskCache setByteCount:]
+-[PINDiskCache fileExtension]
+-[PINDiskCache operationQueue]
+-[PINDiskCache setOperationQueue:]
+-[PINDiskCache dates]
+-[PINDiskCache setDates:]
+-[PINDiskCache sizes]
+-[PINDiskCache setSizes:]
+-[PINDiskCache .cxx_destruct]
+_OBJC_IVAR_$_PINDiskCache._name
+_OBJC_IVAR_$_PINDiskCache._fileExtension
+_OBJC_IVAR_$_PINDiskCache._operationQueue
+_OBJC_IVAR_$_PINDiskCache._instanceLock
+_OBJC_IVAR_$_PINDiskCache._willAddObjectBlock
+_OBJC_IVAR_$_PINDiskCache._willRemoveObjectBlock
+_OBJC_IVAR_$_PINDiskCache._willRemoveAllObjectsBlock
+_OBJC_IVAR_$_PINDiskCache._didAddObjectBlock
+_OBJC_IVAR_$_PINDiskCache._didRemoveObjectBlock
+_OBJC_IVAR_$_PINDiskCache._didRemoveAllObjectsBlock
+_OBJC_IVAR_$_PINDiskCache._byteCount
+_OBJC_IVAR_$_PINDiskCache._byteLimit
+_OBJC_IVAR_$_PINDiskCache._ageLimit
+_OBJC_IVAR_$_PINDiskCache._writingProtectionOption
+_OBJC_IVAR_$_PINDiskCache._dates
+_OBJC_IVAR_$_PINDiskCache._sizes
+_OBJC_IVAR_$_PINDiskCache._cacheURL
+_OBJC_IVAR_$_PINDiskCache._serializer
+_OBJC_IVAR_$_PINDiskCache._deserializer
+___block_descriptor_tmp.64
+___block_descriptor_tmp.98
+___block_literal_global
+___block_descriptor_tmp.103
+___block_literal_global.104
+_sharedTrashQueue.trashQueue
+_sharedTrashQueue.predicate
+___block_literal_global.110
+_sharedTrashURL.sharedTrashURL
+_sharedTrashURL.predicate
+___block_descriptor_tmp.129
+___block_literal_global.130
+___block_descriptor_tmp.152
+___block_descriptor_tmp.175
+___block_descriptor_tmp.208
+___block_descriptor_tmp.211
+___block_descriptor_tmp.214
+___block_descriptor_tmp.219
+___block_descriptor_tmp.224
+___block_descriptor_tmp.229
+___block_descriptor_tmp.234
+___block_descriptor_tmp.239
+___block_descriptor_tmp.244
+___block_descriptor_tmp.249
+___block_descriptor_tmp.254
+___block_descriptor_tmp.259
+___block_descriptor_tmp.264
+_OBJC_IVAR_$_PINDiskCache._ttlCache
+___block_descriptor_tmp.294
+___block_descriptor_tmp.297
+___block_descriptor_tmp.300
+___block_descriptor_tmp.303
+___block_descriptor_tmp.306
+___block_descriptor_tmp.309
+___block_descriptor_tmp.312
+___block_descriptor_tmp.315
+___block_descriptor_tmp.318
+___block_descriptor_tmp.321
+/Users/garrett/code/PINCache/PINCache/PINDiskCache.m
+/Users/garrett/code/PINCache/PINCache/PINDiskCache.h
+__43-[PINDiskCache setWritingProtectionOption:]_block_invoke
+__28-[PINDiskCache setTtlCache:]_block_invoke
+__28-[PINDiskCache setAgeLimit:]_block_invoke
+__29-[PINDiskCache setByteLimit:]_block_invoke
+__44-[PINDiskCache setDidRemoveAllObjectsBlock:]_block_invoke
+__40-[PINDiskCache setDidRemoveObjectBlock:]_block_invoke
+__37-[PINDiskCache setDidAddObjectBlock:]_block_invoke
+__45-[PINDiskCache setWillRemoveAllObjectsBlock:]_block_invoke
+__41-[PINDiskCache setWillRemoveObjectBlock:]_block_invoke
+__38-[PINDiskCache setWillAddObjectBlock:]_block_invoke
+__58-[PINDiskCache enumerateObjectsWithBlock:completionBlock:]_block_invoke
+__33-[PINDiskCache removeAllObjects:]_block_invoke
+__39-[PINDiskCache trimToSizeByDate:block:]_block_invoke
+__33-[PINDiskCache trimToDate:block:]_block_invoke
+__33-[PINDiskCache trimToSize:block:]_block_invoke
+__41-[PINDiskCache removeObjectForKey:block:]_block_invoke
+__39-[PINDiskCache setObject:forKey:block:]_block_invoke
+__36-[PINDiskCache fileURLForKey:block:]_block_invoke
+__35-[PINDiskCache objectForKey:block:]_block_invoke
+__43-[PINDiskCache containsObjectForKey:block:]_block_invoke
+__50-[PINDiskCache lockFileAccessWhileExecutingBlock:]_block_invoke
+__41-[PINDiskCache trimToAgeLimitRecursively]_block_invoke_2
+__41-[PINDiskCache trimToAgeLimitRecursively]_block_invoke
+__61-[PINDiskCache asynchronouslySetFileModificationDate:forURL:]_block_invoke
+__26+[PINDiskCache emptyTrash]_block_invoke
+__30+[PINDiskCache sharedTrashURL]_block_invoke
+__32+[PINDiskCache sharedTrashQueue]_block_invoke
+__35-[PINDiskCache defaultDeserializer]_block_invoke
+__33-[PINDiskCache defaultSerializer]_block_invoke
+__27+[PINDiskCache sharedCache]_block_invoke
+__91-[PINDiskCache initWithName:rootPath:serializer:deserializer:fileExtension:operationQueue:]_block_invoke
+-[PINOperationGroup initWithOperationQueue:]
+-[PINOperationGroup dealloc]
++[PINOperationGroup asyncOperationGroupWithQueue:]
+-[PINOperationGroup locked_nextOperationReference]
+-[PINOperationGroup start]
+___26-[PINOperationGroup start]_block_invoke
+___26-[PINOperationGroup start]_block_invoke.25
+___copy_helper_block_.28
+___destroy_helper_block_.29
+-[PINOperationGroup cancel]
+-[PINOperationGroup addOperation:]
+-[PINOperationGroup addOperation:withPriority:]
+-[PINOperationGroup setCompletion:]
+-[PINOperationGroup waitUntilComplete]
+-[PINOperationGroup lock]
+-[PINOperationGroup unlock]
+-[PINOperationGroup .cxx_destruct]
+_OBJC_IVAR_$_PINOperationGroup._lock
+_OBJC_IVAR_$_PINOperationGroup._operationQueue
+_OBJC_IVAR_$_PINOperationGroup._operations
+_OBJC_IVAR_$_PINOperationGroup._operationReferences
+_OBJC_IVAR_$_PINOperationGroup._operationPriorities
+_OBJC_IVAR_$_PINOperationGroup._groupToOperationReferences
+_OBJC_IVAR_$_PINOperationGroup._group
+_OBJC_IVAR_$_PINOperationGroup._operationReferenceCount
+_OBJC_IVAR_$_PINOperationGroup._started
+_OBJC_IVAR_$_PINOperationGroup._canceled
+_OBJC_IVAR_$_PINOperationGroup._completion
+_OBJC_IVAR_$_PINOperationGroup._completionQueue
+___block_descriptor_tmp.30
+/Users/garrett/code/PINCache/PINCache/PINOperationGroup.m
+__26-[PINOperationGroup start]_block_invoke.25
+__26-[PINOperationGroup start]_block_invoke
++[PINOperation operationWithBlock:reference:priority:]
+-[PINOperation block]
+-[PINOperation setBlock:]
+-[PINOperation reference]
+-[PINOperation setReference:]
+-[PINOperation priority]
+-[PINOperation setPriority:]
+-[PINOperation .cxx_destruct]
+-[PINOperationQueue initWithMaxConcurrentOperations:]
+-[PINOperationQueue initWithMaxConcurrentOperations:concurrentQueue:]
+-[PINOperationQueue dealloc]
++[PINOperationQueue sharedOperationQueue]
+___41+[PINOperationQueue sharedOperationQueue]_block_invoke
+-[PINOperationQueue nextOperationReference]
+-[PINOperationQueue addOperation:]
+-[PINOperationQueue addOperation:withPriority:]
+-[PINOperationQueue cancelAllOperations]
+-[PINOperationQueue cancelOperation:]
+-[PINOperationQueue locked_cancelOperation:]
+-[PINOperationQueue setOperationPriority:withReference:]
+-[PINOperationQueue scheduleNextOperations:]
+___44-[PINOperationQueue scheduleNextOperations:]_block_invoke
+___44-[PINOperationQueue scheduleNextOperations:]_block_invoke.92
+___44-[PINOperationQueue scheduleNextOperations:]_block_invoke_2
+-[PINOperationQueue operationQueueWithPriority:]
+-[PINOperationQueue locked_nextOperationByPriority]
+-[PINOperationQueue locked_nextOperationByQueue]
+-[PINOperationQueue waitUntilAllOperationsAreFinished]
+-[PINOperationQueue locked_removeOperation:]
+-[PINOperationQueue lock]
+-[PINOperationQueue unlock]
+-[PINOperationQueue .cxx_destruct]
+_OBJC_IVAR_$_PINOperation._block
+_OBJC_IVAR_$_PINOperation._reference
+_OBJC_IVAR_$_PINOperation._priority
+_OBJC_IVAR_$_PINOperationQueue._operationReferenceCount
+_OBJC_IVAR_$_PINOperationQueue._lock
+_OBJC_IVAR_$_PINOperationQueue._group
+_OBJC_IVAR_$_PINOperationQueue._serialQueue
+_OBJC_IVAR_$_PINOperationQueue._concurrentQueue
+_OBJC_IVAR_$_PINOperationQueue._concurrentSemaphore
+_OBJC_IVAR_$_PINOperationQueue._semaphoreQueue
+_OBJC_IVAR_$_PINOperationQueue._queuedOperations
+_OBJC_IVAR_$_PINOperationQueue._lowPriorityOperations
+_OBJC_IVAR_$_PINOperationQueue._defaultPriorityOperations
+_OBJC_IVAR_$_PINOperationQueue._highPriorityOperations
+_OBJC_IVAR_$_PINOperationQueue._referenceToOperations
+_sharedOperationQueue.sharedOperationQueue
+_sharedOperationQueue.onceToken
+_OBJC_IVAR_$_PINOperationQueue._serialQueueBusy
+___block_descriptor_tmp.91
+/Users/garrett/code/PINCache/PINCache/PINOperationQueue.m
+__44-[PINOperationQueue scheduleNextOperations:]_block_invoke_2
+__44-[PINOperationQueue scheduleNextOperations:]_block_invoke.92
+__44-[PINOperationQueue scheduleNextOperations:]_block_invoke
+__41+[PINOperationQueue sharedOperationQueue]_block_invoke
+/Users/garrett/Library/Developer/Xcode/DerivedData/PINCache-bdvuplmldlcckffmsgeedivcmatf/Build/Intermediates/PINCache.build/Release-appletvos/tvOS.build/DerivedSources/PINCache_vers.c
