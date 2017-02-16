@@ -21,3 +21,5 @@ xcuserdata
 /buck-out
 /.buckconfig.local
 /.buckd
+
+Carthage/Build
