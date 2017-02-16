@@ -22,6 +22,7 @@ test:
 	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	carthage update
+	carthage update --no-use-binaries --no-build
+	carthage build --no-skip-current
 
 all: carthage lint test analyze
