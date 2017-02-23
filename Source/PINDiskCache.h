@@ -485,11 +485,6 @@ PIN_SUBCLASSING_RESTRICTED
  */
 typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 
-/**
- A callback block which provides the cache, key and object as arguments
- */
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding> _Nullable object);
-
 @interface PINDiskCache (Deprecated)
 - (void)lockFileAccessWhileExecutingBlock:(nullable PINCacheBlock)block __attribute__((deprecated));
 - (void)containsObjectForKey:(NSString *)key block:(PINDiskCacheContainsBlock)block __attribute__((deprecated));
