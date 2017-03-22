@@ -18,7 +18,7 @@ UIImage *img = [[UIImage alloc] initWithData:data scale:[[UIScreen mainScreen] s
 **Swift**
 ```swift
 let img = UIImage(data: data, scale:UIScreen.main.scale)
-PINCache.shared.setObject(img, forKey: "img")
+PINCache.shared().setObject(img, forKey: "img")
 ```
 
 Get them back out like this:
@@ -32,7 +32,7 @@ Get them back out like this:
 ```
 **Swift**
 ```swift
-PINCache.shared.object(forKeyAsync: "image") { (cache, key, object) in
+PINCache.shared().object(forKey: "image") { (cache, key, object) in
     if let image = object as? UIImage {
         print("image scale: %f", image.scale)
     }
