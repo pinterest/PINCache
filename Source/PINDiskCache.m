@@ -231,7 +231,7 @@ static NSURL *_sharedTrashURL;
     }
     
     if ([string respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
-        NSString *encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@":/%"] invertedSet]];
+        NSString *encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
         if (self.fileExtension.length > 0) {
             return [encodedString stringByAppendingPathExtension:self.fileExtension];
         }
@@ -240,7 +240,7 @@ static NSURL *_sharedTrashURL;
         }
     }
     else {
-        CFStringRef static const charsToEscape = CFSTR(":/%");
+        CFStringRef static const charsToEscape = CFSTR(".:/%");
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         CFStringRef escapedString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
