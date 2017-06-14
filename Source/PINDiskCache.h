@@ -50,6 +50,24 @@ typedef NSData* _Nonnull(^PINDiskCacheSerializerBlock)(id<NSCoding> object, NSSt
  */
 typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSString *key);
 
+/**
+ *  A block used to encode keys
+ *
+ *  @param original/decoded key
+ *
+ *  @return encoded key
+ */
+typedef NSString *_Nonnull(^PINDiskCacheKeyEncoderBlock)(NSString *decodedKey);
+
+/**
+ *  A block used to decode keys
+ *
+ *  @param encoded key
+ *
+ *  @return decoded key
+ */
+typedef NSString *_Nonnull(^PINDiskCacheKeyDecoderBlock)(NSString *encodedKey);
+
 
 /**
  `PINDiskCache` is a thread safe key/value store backed by the file system. It accepts any object conforming
@@ -284,11 +302,21 @@ PIN_SUBCLASSING_RESTRICTED
  @param rootPath The path of the cache.
  @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
  @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
+ @param keyEncoder A block used to encode key(filename). If nil provided, default url encoder will be used
+ @param keyDecoder A block used to decode key(filename). If nil provided, default url decoder will be used
  @param fileExtension The file extension for files on disk.
  @param operationQueue A PINOperationQueue to run asynchronous operations
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(nonnull NSString *)name prefix:(nonnull NSString *)prefix rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(nonnull NSString *)name
+                      prefix:(nonnull NSString *)prefix
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyEncoder
+               fileExtension:(nullable NSString *)fileExtension
+              operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Asynchronous Methods
 /// @name Asynchronous Methods

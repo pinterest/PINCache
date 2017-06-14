@@ -39,7 +39,17 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil fileExtension:fileExtension];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension {
+    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:NULL keyDecoder:NULL fileExtension:fileExtension];
+}
+
+- (instancetype)initWithName:(NSString *)name
+                    rootPath:(NSString *)rootPath
+                  serializer:(PINDiskCacheSerializerBlock)serializer
+                deserializer:(PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
+               fileExtension:(NSString *)fileExtension
 {
     if (!name)
         return nil;
@@ -49,7 +59,15 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
       
         //10 may actually be a bit high, but currently much of our threads are blocked on empyting the trash. Until we can resolve that, lets bump this up.
         _operationQueue = [[PINOperationQueue alloc] initWithMaxConcurrentOperations:10];
-        _diskCache = [[PINDiskCache alloc] initWithName:_name prefix:PINDiskCachePrefix rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:_operationQueue];
+        _diskCache = [[PINDiskCache alloc] initWithName:_name
+                                                 prefix:PINDiskCachePrefix
+                                               rootPath:rootPath
+                                             serializer:serializer
+                                           deserializer:deserializer
+                                             keyEncoder:NULL
+                                             keyDecoder:NULL
+                                          fileExtension:fileExtension
+                                         operationQueue:_operationQueue];
         _memoryCache = [[PINMemoryCache alloc] initWithOperationQueue:_operationQueue];
     }
     return self;

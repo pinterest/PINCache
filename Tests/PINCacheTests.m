@@ -4,6 +4,8 @@
 
 #import "PINCacheTests.h"
 #import <PINCache/PINCache.h>
+#import <PINOperation/PINOperation.h>
+
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
   typedef UIImage PINImage;
@@ -977,6 +979,33 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     
     NSUInteger success = dispatch_group_wait(group, [self timeout]);
     XCTAssert(success == 0, @"Timed out");
+}
+
+- (void)testCustomEncoderDecoder {
+    NSString *rootPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
+    PINDiskCacheKeyEncoderBlock encoder = ^NSString *(NSString *decodedKey) {
+        return decodedKey;
+    };
+    PINDiskCacheKeyDecoderBlock decoder = ^NSString *(NSString *encodedKey) {
+        return encodedKey;
+    };
+    PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:@"testCustomEncoder"
+                                                          prefix:PINDiskCachePrefix
+                                                        rootPath:rootPath
+                                                      serializer:NULL
+                                                    deserializer:NULL
+                                                      keyEncoder:encoder
+                                                      keyDecoder:decoder
+                                                   fileExtension:NULL
+                                                  operationQueue:[PINOperationQueue sharedOperationQueue]];
+    
+    [testCache setObject:@(1) forKey:@"test_key"];
+    
+    XCTAssertNotNil([testCache objectForKey:@"test_key"], @"Object should not be nil");
+    
+    NSString *encodedKey = [[testCache fileURLForKey:@"test_key"] lastPathComponent];
+    XCTAssertEqualObjects(@"test_key", encodedKey, @"Encoded key should be equal to decoded one");
+
 }
 
 @end
