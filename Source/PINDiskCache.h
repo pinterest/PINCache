@@ -53,7 +53,7 @@ typedef id<NSCoding> _Nonnull(^PINDiskCacheDeserializerBlock)(NSData* data, NSSt
 /**
  *  A block used to encode keys
  *
- *  @param original/decoded key
+ *  @param decodedKey Original/decoded key
  *
  *  @return encoded key
  */
@@ -62,7 +62,7 @@ typedef NSString *_Nonnull(^PINDiskCacheKeyEncoderBlock)(NSString *decodedKey);
 /**
  *  A block used to decode keys
  *
- *  @param encoded key
+ *  @param encodedKey An encoded key
  *
  *  @return decoded key
  */
@@ -314,7 +314,7 @@ PIN_SUBCLASSING_RESTRICTED
                   serializer:(nullable PINDiskCacheSerializerBlock)serializer
                 deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
                   keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
-                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
                fileExtension:(nullable NSString *)fileExtension
               operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
 
