@@ -84,24 +84,19 @@ static NSURL *_sharedTrashURL;
 
 - (instancetype)initWithName:(NSString *)name
 {
-    return [self initWithName:name fileExtension:nil];
+    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0]];
 }
 
-- (instancetype)initWithName:(NSString *)name fileExtension:(NSString *)fileExtension
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
 {
-    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] fileExtension:fileExtension];
+    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath fileExtension:(NSString *)fileExtension
-{
-    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil fileExtension:fileExtension];
-}
-
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer
 {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer fileExtension:fileExtension operationQueue:[PINOperationQueue sharedOperationQueue]];
+    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer operationQueue:[PINOperationQueue sharedOperationQueue]];
 #pragma clang diagnostic pop
 }
 
@@ -109,7 +104,6 @@ static NSURL *_sharedTrashURL;
                     rootPath:(NSString *)rootPath
                   serializer:(PINDiskCacheSerializerBlock)serializer
                 deserializer:(PINDiskCacheDeserializerBlock)deserializer
-               fileExtension:(NSString *)fileExtension
               operationQueue:(PINOperationQueue *)operationQueue
 {
   return [self initWithName:name
@@ -119,7 +113,6 @@ static NSURL *_sharedTrashURL;
                deserializer:deserializer
                  keyEncoder:nil
                  keyDecoder:nil
-              fileExtension:fileExtension
              operationQueue:operationQueue];
 }
 
@@ -130,7 +123,6 @@ static NSURL *_sharedTrashURL;
                 deserializer:(PINDiskCacheDeserializerBlock)deserializer
                   keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
-               fileExtension:(NSString *)fileExtension
               operationQueue:(PINOperationQueue *)operationQueue
 {
     if (!name)
@@ -146,7 +138,6 @@ static NSURL *_sharedTrashURL;
     if (self = [super init]) {
         _name = [name copy];
         _prefix = [prefix copy];
-        _fileExtension = [fileExtension copy];
         _operationQueue = operationQueue;
         _instanceLock = [[NSConditionLock alloc] initWithCondition:PINDiskCacheConditionNotReady];
         _willAddObjectBlock = nil;
@@ -284,12 +275,7 @@ static NSURL *_sharedTrashURL;
         
         if ([decodedKey respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
             NSString *encodedString = [decodedKey stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
-            if (self.fileExtension.length > 0) {
-                return [encodedString stringByAppendingPathExtension:self.fileExtension];
-            }
-            else {
-                return encodedString;
-            }
+            return encodedString;
         }
         else {
             CFStringRef static const charsToEscape = CFSTR(".:/%");
@@ -302,12 +288,7 @@ static NSURL *_sharedTrashURL;
                                                                                 kCFStringEncodingUTF8);
 #pragma clang diagnostic pop
             
-            if (self.fileExtension.length > 0) {
-                return [(__bridge_transfer NSString *)escapedString stringByAppendingPathExtension:self.fileExtension];
-            }
-            else {
-                return (__bridge_transfer NSString *)escapedString;
-            }
+            return (__bridge_transfer NSString *)escapedString;
         }
     };
 }

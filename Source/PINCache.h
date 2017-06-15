@@ -76,26 +76,14 @@ PIN_SUBCLASSING_RESTRICTED
 
 /**
  Multiple instances with the same name are *not* allowed and can *not* safely
- access the same data on disk.. Also used to create the <diskCache>.
- 
- @see name
- @param name The name of the cache.
- @param fileExtension The file extension for files on disk.
- @result A new cache with the specified name.
- */
-- (instancetype)initWithName:(nonnull NSString *)name fileExtension:(nullable NSString *)fileExtension;
-
-/**
- Multiple instances with the same name are *not* allowed and can *not* safely
  access the same data on disk. Also used to create the <diskCache>.
  
  @see name
  @param name The name of the cache.
  @param rootPath The path of the cache on disk.
- @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath fileExtension:(nullable NSString *)fileExtension;
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath;
 
 /**
  Multiple instances with the same name are *not* allowed and can *not* safely
@@ -108,14 +96,12 @@ PIN_SUBCLASSING_RESTRICTED
  @param rootPath The path of the cache on disk.
  @param serializer   A block used to serialize object before writing to disk. If nil provided, default NSKeyedArchiver serialized will be used.
  @param deserializer A block used to deserialize object read from disk. If nil provided, default NSKeyedUnarchiver serialized will be used.
- @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
 - (instancetype)initWithName:(NSString *)name
                     rootPath:(NSString *)rootPath
                   serializer:(nullable PINDiskCacheSerializerBlock)serializer
-                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
-               fileExtension:(nullable NSString *)fileExtension;
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer;
 
 
 /**
@@ -131,7 +117,6 @@ PIN_SUBCLASSING_RESTRICTED
  @param deserializer A block used to deserialize object read from disk. If nil provided, default NSKeyedUnarchiver serialized will be used.
  @param keyEncoder A block used to encode key(filename). If nil provided, default url encoder will be used
  @param keyDecoder A block used to decode key(filename). If nil provided, default url decoder will be used
- @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
 - (instancetype)initWithName:(nonnull NSString *)name
@@ -139,8 +124,7 @@ PIN_SUBCLASSING_RESTRICTED
                   serializer:(nullable PINDiskCacheSerializerBlock)serializer
                 deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
                   keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
-                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
-               fileExtension:(nullable NSString *)fileExtension NS_DESIGNATED_INITIALIZER;
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder NS_DESIGNATED_INITIALIZER;
 
 @end
 

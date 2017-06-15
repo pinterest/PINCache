@@ -155,11 +155,6 @@ PIN_SUBCLASSING_RESTRICTED
 @property (assign) NSTimeInterval ageLimit;
 
 /**
- Extension for all cache files on disk. Defaults to no extension. 
- */
-@property (nullable, readonly) NSString * fileExtension;
-
-/**
  The writing protection option used when writing a file on disk. This value is used every time an object is set.
  NSDataWritingAtomic and NSDataWritingWithoutOverwriting are ignored if set
  Defaults to NSDataWritingFileProtectionNone.
@@ -251,22 +246,10 @@ PIN_SUBCLASSING_RESTRICTED
  
  @see name
  @param name The name of the cache.
- @param fileExtension The file extension for files on disk.
- @result A new cache with the specified name.
- */
-- (instancetype)initWithName:(nonnull NSString *)name fileExtension:(nullable NSString *)fileExtension;
-
-/**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality.
- 
- @see name
- @param name The name of the cache.
  @param rootPath The path of the cache.
- @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath fileExtension:(nullable NSString *)fileExtension;
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath;
 
 /**
  @see name
@@ -274,10 +257,9 @@ PIN_SUBCLASSING_RESTRICTED
  @param rootPath The path of the cache.
  @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
  @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
- @param fileExtension The file extension for files on disk.
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension;
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer;
 
 /**
  The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
@@ -287,11 +269,10 @@ PIN_SUBCLASSING_RESTRICTED
  @param rootPath The path of the cache.
  @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
  @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
- @param fileExtension The file extension for files on disk.
  @param operationQueue A PINOperationQueue to run asynchronous operations
  @result A new cache with the specified name.
  */
-- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer fileExtension:(nullable NSString *)fileExtension operationQueue:(nonnull PINOperationQueue *)operationQueue __attribute__((deprecated));
+- (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer operationQueue:(nonnull PINOperationQueue *)operationQueue __attribute__((deprecated));
 
 /**
  The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
@@ -304,7 +285,6 @@ PIN_SUBCLASSING_RESTRICTED
  @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
  @param keyEncoder A block used to encode key(filename). If nil provided, default url encoder will be used
  @param keyDecoder A block used to decode key(filename). If nil provided, default url decoder will be used
- @param fileExtension The file extension for files on disk.
  @param operationQueue A PINOperationQueue to run asynchronous operations
  @result A new cache with the specified name.
  */
@@ -315,7 +295,6 @@ PIN_SUBCLASSING_RESTRICTED
                 deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
                   keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
-               fileExtension:(nullable NSString *)fileExtension
               operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Asynchronous Methods

@@ -26,21 +26,16 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 
 - (instancetype)initWithName:(NSString *)name
 {
-    return [self initWithName:name fileExtension:nil];
+    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject]];
 }
 
-- (instancetype)initWithName:(NSString *)name fileExtension:(NSString *)fileExtension
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath
 {
-    return [self initWithName:name rootPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] fileExtension:fileExtension];
+    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil];
 }
 
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath fileExtension:(NSString *)fileExtension
-{
-    return [self initWithName:name rootPath:rootPath serializer:nil deserializer:nil fileExtension:fileExtension];
-}
-
-- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer fileExtension:(NSString *)fileExtension {
-    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:nil keyDecoder:nil fileExtension:fileExtension];
+- (instancetype)initWithName:(NSString *)name rootPath:(NSString *)rootPath serializer:(PINDiskCacheSerializerBlock)serializer deserializer:(PINDiskCacheDeserializerBlock)deserializer {
+    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:nil keyDecoder:nil];
 }
 
 - (instancetype)initWithName:(NSString *)name
@@ -49,7 +44,6 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                 deserializer:(PINDiskCacheDeserializerBlock)deserializer
                   keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
-               fileExtension:(NSString *)fileExtension
 {
     if (!name)
         return nil;
@@ -66,7 +60,6 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                            deserializer:deserializer
                                              keyEncoder:nil
                                              keyDecoder:nil
-                                          fileExtension:fileExtension
                                          operationQueue:_operationQueue];
         _memoryCache = [[PINMemoryCache alloc] initWithOperationQueue:_operationQueue];
     }
