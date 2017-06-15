@@ -115,7 +115,7 @@ PIN_SUBCLASSING_RESTRICTED
                     rootPath:(NSString *)rootPath
                   serializer:(nullable PINDiskCacheSerializerBlock)serializer
                 deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
-               fileExtension:(NSString *)fileExtension;
+               fileExtension:(nullable NSString *)fileExtension;
 
 
 /**
