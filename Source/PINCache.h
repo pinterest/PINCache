@@ -65,8 +65,8 @@ PIN_SUBCLASSING_RESTRICTED
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ Multiple instances with the same name are *not* allowed and can *not* safely
+ access the same data on disk. Also used to create the <diskCache>.
  
  @see name
  @param name The name of the cache.
@@ -75,8 +75,8 @@ PIN_SUBCLASSING_RESTRICTED
 - (instancetype)initWithName:(nonnull NSString *)name;
 
 /**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ Multiple instances with the same name are *not* allowed and can *not* safely
+ access the same data on disk.. Also used to create the <diskCache>.
  
  @see name
  @param name The name of the cache.
@@ -86,8 +86,8 @@ PIN_SUBCLASSING_RESTRICTED
 - (instancetype)initWithName:(nonnull NSString *)name fileExtension:(nullable NSString *)fileExtension;
 
 /**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ Multiple instances with the same name are *not* allowed and can *not* safely
+ access the same data on disk. Also used to create the <diskCache>.
  
  @see name
  @param name The name of the cache.
@@ -98,8 +98,8 @@ PIN_SUBCLASSING_RESTRICTED
 - (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath fileExtension:(nullable NSString *)fileExtension;
 
 /**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ Multiple instances with the same name are *not* allowed and can *not* safely
+ access the same data on disk.. Also used to create the <diskCache>.
  Initializer allows you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization for <diskCache>.
  You must provide both serializer and deserializer, or opt-out to default implementation providing nil values.
  
@@ -119,8 +119,8 @@ PIN_SUBCLASSING_RESTRICTED
 
 
 /**
- Multiple instances with the same name are allowed and can safely access
- the same data on disk thanks to the magic of seriality. Also used to create the <diskCache>.
+ Multiple instances with the same name are *not* allowed and can *not* safely
+ access the same data on disk. Also used to create the <diskCache>.
  Initializer allows you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization for <diskCache>.
  You must provide both serializer and deserializer, or opt-out to default implementation providing nil values.
  

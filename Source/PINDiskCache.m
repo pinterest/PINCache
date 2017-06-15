@@ -117,8 +117,8 @@ static NSURL *_sharedTrashURL;
                    rootPath:rootPath
                  serializer:serializer
                deserializer:deserializer
-               keyEncoder:NULL
-               keyDecoder:NULL
+                 keyEncoder:nil
+                 keyDecoder:nil
               fileExtension:fileExtension
              operationQueue:operationQueue];
 }
@@ -128,25 +128,20 @@ static NSURL *_sharedTrashURL;
                     rootPath:(NSString *)rootPath
                   serializer:(PINDiskCacheSerializerBlock)serializer
                 deserializer:(PINDiskCacheDeserializerBlock)deserializer
-                keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
-                keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
+                  keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
                fileExtension:(NSString *)fileExtension
               operationQueue:(PINOperationQueue *)operationQueue
 {
     if (!name)
         return nil;
     
-    if ((serializer && !deserializer) ||
-        (!serializer && deserializer)){
-        @throw [NSException exceptionWithName:@"Must initialize with a both serializer and deserializer" reason:@"PINDiskCache must be initialized with a serializer and deserializer." userInfo:nil];
-        return nil;
-    }
+
+    NSAssert(((!serializer && !deserializer) || (serializer && deserializer)),
+             @"PINDiskCache must be initialized with a serializer AND deserializer.");
     
-    if ((keyEncoder && !keyDecoder) ||
-        (!keyEncoder && keyDecoder)){
-        @throw [NSException exceptionWithName:@"Must initialize with a both encoder and decoder" reason:@"PINDiskCache must be initialized with a encoder and decoder." userInfo:nil];
-        return nil;
-    }
+    NSAssert(((!keyEncoder && !keyDecoder) || (keyEncoder && keyDecoder)),
+              @"PINDiskCache must be initialized with a encoder AND decoder.");
     
     if (self = [super init]) {
         _name = [name copy];
