@@ -16,6 +16,8 @@
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], \
 __LINE__, [error localizedDescription]); }
 
+#define PINDiskCacheException(exception) if (exception) { NSAssert(NO, [exception reason]); }
+
 NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
@@ -858,7 +860,8 @@ static NSURL *_sharedTrashURL;
                   [self lock];
                       [[NSFileManager defaultManager] removeItemAtPath:[fileURL path] error:&error];
                   [self unlock];
-                  PINDiskCacheError(error);
+                  PINDiskCacheError(error)
+                  PINDiskCacheException(exception);
               }
               [self lock];
             }
