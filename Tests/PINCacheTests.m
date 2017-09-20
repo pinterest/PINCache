@@ -877,7 +877,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
     //This should not return until *after* disk cache directory has been created
-    [testCache objectForKey:@"some bogus key"];
+    [testCache setObject:[NSNumber numberWithInt:1] forKey:@"some bogus key"];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[testCacheURL path]]);
 }
 

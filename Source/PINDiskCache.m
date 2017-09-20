@@ -838,7 +838,7 @@ static NSURL *_sharedTrashURL;
 {
     NSDate *now = [[NSDate alloc] init];
     
-    if (!key)
+    if (!key || (_dates.count == 0 && _sizes.count == 0))
         return nil;
     
     id <NSCoding> object = nil;
