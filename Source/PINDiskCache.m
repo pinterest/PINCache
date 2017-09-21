@@ -838,7 +838,11 @@ static NSURL *_sharedTrashURL;
 {
     NSDate *now = [[NSDate alloc] init];
     
-    if (!key)
+    [self lock];
+        BOOL isEmpty = (_dates.count == 0 && _sizes.count == 0);
+    [self unlock];
+
+    if (!key || isEmpty)
         return nil;
     
     id <NSCoding> object = nil;
@@ -936,8 +940,23 @@ static NSURL *_sharedTrashURL;
       NSDataWritingOptions writeOptions = NSDataWritingAtomic;
     #endif
   
-    NSURL *fileURL = [self encodedFileURLForKey:key];
-    
+    // Remain unlocked here so that we're not locked while serializing.
+    NSData *data = _serializer(object, key);
+    NSURL *fileURL = nil;
+
+    NSUInteger byteLimit = self.byteLimit;
+    if (data.length <= byteLimit || byteLimit == 0) {
+        // The cache is large enough to fit this object (although we may need to evict others).
+        fileURL = [self encodedFileURLForKey:key];
+    } else {
+        // The cache isn't large enough to fit this object (even if all others were evicted).
+        // We should not write it to disk because it will be deleted immediately after.
+        if (outFileURL) {
+            *outFileURL = nil;
+        }
+        return;
+    }
+
     [self lock];
         PINCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
         if (willAddObjectBlock) {
@@ -946,13 +965,7 @@ static NSURL *_sharedTrashURL;
             [self lock];
         }
     
-        //We unlock here so that we're not locked while serializing.
-        [self unlock];
-            NSData *data = _serializer(object, key);
-        [self lock];
-    
         NSError *writeError = nil;
-  
         BOOL written = [data writeToURL:fileURL options:writeOptions error:&writeError];
         PINDiskCacheError(writeError);
         

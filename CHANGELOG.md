@@ -3,6 +3,7 @@
 * Add your own contributions to the next release on the line below this with your name.
 
 ## 3.0.1 -- Beta 5
+- [fix] Respect small byteLimit settings by checking object size in setObject: [#198](https://github.com/pinterest/PINCache/pull/198)
 - [new] Added an ability to set custom encoder/decoder for file names: [#192](https://github.com/pinterest/PINCache/pull/192)
 
 ## 2.2.1 -- 2016 Mar 5
