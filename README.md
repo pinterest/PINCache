@@ -51,7 +51,8 @@ NSLog(@"3 for the price of 1: %d", [[[PINCache sharedCache] diskCache] byteCount
 ```
 **Swift**
 ```swift
-let images = [image, image, image]
+// In Swift, Array, String, and Dictionary are all value types.
+let images = [image, image, image] as NSArray // Cast to NSArray
 PINCache.shared.setObject(images, forKey: "images")
 print("3 for the prices of 1: %d", PINCache.shared.diskCache.byteCount)
 ```
