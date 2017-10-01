@@ -150,8 +150,11 @@ static NSURL *_sharedTrashURL;
         _didRemoveAllObjectsBlock = nil;
         
         _byteCount = 0;
-        _byteLimit = 0;
-        _ageLimit = 0.0;
+        
+        // 50 MB by default
+        _byteLimit = 50 * 1024 * 1024;
+        // 30 days by default
+        _ageLimit = 60 * 60 * 24 * 30;
         
 #if TARGET_OS_IPHONE
         _writingProtectionOption = NSDataWritingFileProtectionNone;
