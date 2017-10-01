@@ -56,6 +56,8 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
 @property (strong, nonatomic) NSMutableDictionary *dates;
 @property (strong, nonatomic) NSMutableDictionary *sizes;
+@property (strong, nonatomic) NSMutableSet *knownKeys;
+@property (assign, nonatomic) BOOL diskStateKnown;
 @end
 
 @implementation PINDiskCache
@@ -162,6 +164,8 @@ static NSURL *_sharedTrashURL;
         
         _dates = [[NSMutableDictionary alloc] init];
         _sizes = [[NSMutableDictionary alloc] init];
+        _knownKeys = [[NSMutableSet alloc] init];
+        _diskStateKnown = NO;
       
         _cacheURL = [[self class] cacheURLWithRootPath:rootPath prefix:_prefix name:_name];
         
@@ -451,10 +455,14 @@ static NSURL *_sharedTrashURL;
             [_sizes setObject:fileSize forKey:key];
             byteCount += [fileSize unsignedIntegerValue];
         }
+        
+        [_knownKeys addObject:key];
     }
     
     if (byteCount > 0)
-        self.byteCount = byteCount; // atomic
+        _byteCount = byteCount;
+    
+    _diskStateKnown = YES;
 }
 
 - (void)asynchronouslySetFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
@@ -523,6 +531,7 @@ static NSURL *_sharedTrashURL;
         
         [_sizes removeObjectForKey:key];
         [_dates removeObjectForKey:key];
+        [_knownKeys removeObject:key];
     
         PINCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
         if (didRemoveObjectBlock) {
@@ -824,7 +833,10 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)containsObjectForKey:(NSString *)key
 {
-    return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
+    if ([_knownKeys containsObject:key]) {
+        return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
+    }
+    return NO;
 }
 
 - (nullable id<NSCoding>)objectForKey:(NSString *)key
@@ -843,9 +855,10 @@ static NSURL *_sharedTrashURL;
     
     [self lock];
         BOOL isEmpty = (_dates.count == 0 && _sizes.count == 0);
+        BOOL containsKey = [_knownKeys containsObject:key];
     [self unlock];
 
-    if (!key || isEmpty)
+    if (!key || isEmpty || !containsKey)
         return nil;
     
     id <NSCoding> object = nil;
@@ -854,6 +867,7 @@ static NSURL *_sharedTrashURL;
     [self lock];
         if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
+            
             NSData *objectData = [[NSData alloc] initWithContentsOfFile:[fileURL path]];
           
             if (objectData) {
@@ -991,6 +1005,8 @@ static NSURL *_sharedTrashURL;
                 [self->_dates setObject:date forKey:key];
             }
             
+            [_knownKeys addObject:key];
+            
             if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
                 [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
         } else {
@@ -1081,12 +1097,13 @@ static NSURL *_sharedTrashURL;
         
         [self->_dates removeAllObjects];
         [self->_sizes removeAllObjects];
+        [self->_knownKeys removeAllObjects];
         self.byteCount = 0; // atomic
     
         PINCacheBlock didRemoveAllObjectsBlock = self->_didRemoveAllObjectsBlock;
         if (didRemoveAllObjectsBlock) {
             [self unlock];
-            didRemoveAllObjectsBlock(self);
+                didRemoveAllObjectsBlock(self);
             [self lock];
         }
     
@@ -1100,12 +1117,12 @@ static NSURL *_sharedTrashURL;
     
     [self lock];
         NSDate *now = [NSDate date];
-        NSArray *keysSortedByDate = [self->_dates keysSortedByValueUsingSelector:@selector(compare:)];
-        
-        for (NSString *key in keysSortedByDate) {
+    
+        for (NSString *key in _knownKeys) {
             NSURL *fileURL = [self encodedFileURLForKey:key];
-            // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
-            if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
+            // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and the object is still alive
+            NSDate *date = [_dates objectForKey:key];
+            if (!self->_ttlCache || self->_ageLimit <= 0 || (date && fabs([date timeIntervalSinceDate:now]) < self->_ageLimit)) {
                 block(key, fileURL);
             }
         }
