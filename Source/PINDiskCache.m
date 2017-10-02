@@ -46,8 +46,6 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @end
 
 @interface PINDiskCache () {
-    NSConditionLock *_instanceLock;
-    
     PINDiskCacheSerializerBlock _serializer;
     PINDiskCacheDeserializerBlock _deserializer;
     
@@ -55,11 +53,13 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
     PINDiskCacheKeyDecoderBlock _keyDecoder;
 }
 
+@property (assign, nonatomic) pthread_mutex_t mutex;
 @property (copy, nonatomic) NSString *name;
 @property (assign) NSUInteger byteCount;
 @property (strong, nonatomic) NSURL *cacheURL;
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
 @property (strong, nonatomic) NSMutableDictionary <NSString *, PINDiskCacheMetadata *> *metadata;
+@property (assign, nonatomic) BOOL diskWritable;
 @property (assign, nonatomic) BOOL diskStateKnown;
 @end
 
@@ -82,6 +82,12 @@ static NSURL *_sharedTrashURL;
 #endif
 
 #pragma mark - Initialization -
+
+- (void)dealloc
+{
+    __unused int result = pthread_mutex_destroy(&_mutex);
+    NSCAssert(result == 0, @"Failed to destroy lock in PINMemoryCache %p. Code: %d", (void *)self, result);
+}
 
 - (instancetype)init
 {
@@ -143,10 +149,12 @@ static NSURL *_sharedTrashURL;
               @"PINDiskCache must be initialized with a encoder AND decoder.");
     
     if (self = [super init]) {
+        __unused int result = pthread_mutex_init(&_mutex, NULL);
+        NSAssert(result == 0, @"Failed to init lock in PINMemoryCache %@. Code: %d", self, result);
+        
         _name = [name copy];
         _prefix = [prefix copy];
         _operationQueue = operationQueue;
-        _instanceLock = [[NSConditionLock alloc] initWithCondition:PINDiskCacheConditionNotReady];
         _willAddObjectBlock = nil;
         _willRemoveObjectBlock = nil;
         _willRemoveAllObjectsBlock = nil;
@@ -198,11 +206,10 @@ static NSURL *_sharedTrashURL;
 
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize. This must *not* be done on _operationQueue because other operations added may hold the lock and fill up the queue.
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            //should always be able to aquire the lock unless the below code is running.
-            [_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
+            [self lock];
                 [self _locked_createCacheDirectory];
-                [self _locked_initializeDiskProperties];
-            [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
+            [self unlock];
+            [self initializeDiskProperties];
         });
     }
     return self;
@@ -415,8 +422,10 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)_locked_createCacheDirectory
 {
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[_cacheURL path]])
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[_cacheURL path]]) {
+        _diskWritable = YES;
         return NO;
+    }
     
     NSError *error = nil;
     BOOL success = [[NSFileManager defaultManager] createDirectoryAtURL:_cacheURL
@@ -425,45 +434,63 @@ static NSURL *_sharedTrashURL;
                                                                   error:&error];
     PINDiskCacheError(error);
     
+    // while this may not be true if success is false, it's better than deadlocking later.
+    _diskWritable = YES;
+    
     return success;
 }
 
-- (void)_locked_initializeDiskProperties
+- (void)initializeDiskProperties
 {
     NSUInteger byteCount = 0;
     NSArray *keys = @[ NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey ];
     
     NSError *error = nil;
-    NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:_cacheURL
-                                                   includingPropertiesForKeys:keys
-                                                                      options:NSDirectoryEnumerationSkipsHiddenFiles
-                                                                        error:&error];
+    
+    [self lock];
+        NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:_cacheURL
+                                                       includingPropertiesForKeys:keys
+                                                                          options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                                            error:&error];
+    [self unlock];
+    
     PINDiskCacheError(error);
     
     for (NSURL *fileURL in files) {
         NSString *key = [self keyForEncodedFileURL:fileURL];
         
         error = nil;
-        NSDictionary *dictionary = [fileURL resourceValuesForKeys:keys error:&error];
-        PINDiskCacheError(error);
         
-        _metadata[key] = [[PINDiskCacheMetadata alloc] init];
+        // Continually grab and release lock while processing files to avoid contention
+        [self lock];
+            NSDictionary *dictionary = [fileURL resourceValuesForKeys:keys error:&error];
+            PINDiskCacheError(error);
+            
+            if (_metadata[key] == nil) {
+                _metadata[key] = [[PINDiskCacheMetadata alloc] init];
+            }
         
-        NSDate *date = [dictionary objectForKey:NSURLContentModificationDateKey];
-        if (date && key)
-            _metadata[key].date = date;
+            NSDate *date = [dictionary objectForKey:NSURLContentModificationDateKey];
+            if (date && key)
+                _metadata[key].date = date;
         
-        NSNumber *fileSize = [dictionary objectForKey:NSURLTotalFileAllocatedSizeKey];
-        if (fileSize) {
-            _metadata[key].size = fileSize;
-            byteCount += [fileSize unsignedIntegerValue];
-        }
+            NSNumber *fileSize = [dictionary objectForKey:NSURLTotalFileAllocatedSizeKey];
+            if (fileSize) {
+                _metadata[key].size = fileSize;
+                byteCount += [fileSize unsignedIntegerValue];
+            }
+        [self unlock];
     }
     
-    if (byteCount > 0)
-        _byteCount = byteCount;
+    [self lock];
+        if (byteCount > 0)
+            _byteCount = byteCount;
     
-    _diskStateKnown = YES;
+        if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
+            [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
+    
+        _diskStateKnown = YES;
+    [self unlock];
 }
 
 - (void)asynchronouslySetFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
@@ -472,7 +499,7 @@ static NSURL *_sharedTrashURL;
     [self.operationQueue addOperation:^{
         PINDiskCache *strongSelf = weakSelf;
         if (strongSelf) {
-            [strongSelf lock];
+            [strongSelf lockUntilWritable];
                 [strongSelf _locked_setFileModificationDate:date forURL:fileURL];
             [strongSelf unlock];
         }
@@ -505,7 +532,8 @@ static NSURL *_sharedTrashURL;
 {
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
-    [self lock];
+    // We only need to lock until writable at the top because once writable, always writable
+    [self lockUntilWritable];
         if (!fileURL || ![[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             [self unlock];
             return NO;
@@ -546,7 +574,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToSize:(NSUInteger)trimByteCount
 {
-    [self lock];
+    [self lockUntilWritable];
         if (_byteCount > trimByteCount) {
             NSArray *keysSortedBySize = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.size compare:obj2.size];
@@ -569,7 +597,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToSizeByDate:(NSUInteger)trimByteCount
 {
-    [self lock];
+    [self lockUntilWritable];
         if (_byteCount > trimByteCount) {
             NSArray *keysSortedByDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.date compare:obj2.date];
@@ -592,7 +620,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToDate:(NSDate *)trimDate
 {
-    [self lock];
+    [self lockUntilWritable];
         NSArray *keysSortedByDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
             return [obj1.date compare:obj2.date];
         }];
@@ -650,7 +678,7 @@ static NSURL *_sharedTrashURL;
     
     [self.operationQueue addOperation:^{
         PINDiskCache *strongSelf = weakSelf;
-        [strongSelf lock];
+        [strongSelf lockUntilWritable];
             block(strongSelf);
         [strongSelf unlock];
     } withPriority:PINOperationQueuePriorityLow];
@@ -693,7 +721,7 @@ static NSURL *_sharedTrashURL;
         PINDiskCache *strongSelf = weakSelf;
         NSURL *fileURL = [strongSelf fileURLForKey:key];
       
-        [strongSelf lock];
+        [strongSelf lockUntilWritable];
             block(key, fileURL);
         [strongSelf unlock];
     } withPriority:PINOperationQueuePriorityLow];
@@ -830,7 +858,7 @@ static NSURL *_sharedTrashURL;
 - (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINCacheBlock)block
 {
     if (block) {
-        [self lock];
+        [self lockUntilWritable];
             block(self);
         [self unlock];
     }
@@ -859,17 +887,22 @@ static NSURL *_sharedTrashURL;
     NSDate *now = [[NSDate alloc] init];
     
     [self lock];
-        BOOL isEmpty = _metadata.count == 0;
-        BOOL containsKey = _metadata[key] != nil;
+        BOOL containsKey = _metadata[key] != nil && _diskStateKnown;
     [self unlock];
 
-    if (!key || isEmpty || !containsKey)
+    if (!key || !containsKey)
         return nil;
     
     id <NSCoding> object = nil;
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
     [self lock];
+        if (self->_ttlCache) {
+            // We actually need to know the entire disk state if we're a TTL cache.
+            [self unlock];
+            [self lockUntilDiskStateKnown];
+        }
+    
         if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([_metadata[key].date timeIntervalSinceDate:now]) < self->_ageLimit) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             
@@ -920,7 +953,7 @@ static NSURL *_sharedTrashURL;
     NSDate *now = [[NSDate alloc] init];
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
-    [self lock];
+    [self lockUntilWritable];
         if (fileURL.path && [[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
             if (updateFileModificationDate) {
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
@@ -979,7 +1012,7 @@ static NSURL *_sharedTrashURL;
         return;
     }
 
-    [self lock];
+    [self lockUntilWritable];
         PINCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
         if (willAddObjectBlock) {
             [self unlock];
@@ -1089,11 +1122,12 @@ static NSURL *_sharedTrashURL;
 
 - (void)removeAllObjects
 {
-    [self lock];
+    // We don't need to know the disk state since we're just going to remove everything.
+    [self lockUntilWritable];
         PINCacheBlock willRemoveAllObjectsBlock = self->_willRemoveAllObjectsBlock;
         if (willRemoveAllObjectsBlock) {
             [self unlock];
-            willRemoveAllObjectsBlock(self);
+                willRemoveAllObjectsBlock(self);
             [self lock];
         }
     
@@ -1120,7 +1154,7 @@ static NSURL *_sharedTrashURL;
     if (!block)
         return;
     
-    [self lock];
+    [self lockUntilDiskStateKnown];
         NSDate *now = [NSDate date];
     
         for (NSString *key in _metadata) {
@@ -1397,20 +1431,52 @@ static NSURL *_sharedTrashURL;
     NSDataWritingOptions option = NSDataWritingFileProtectionMask & writingProtectionOption;
     
     [strongSelf lock];
-    strongSelf->_writingProtectionOption = option;
+        strongSelf->_writingProtectionOption = option;
     [strongSelf unlock];
   } withPriority:PINOperationQueuePriorityHigh];
 }
 #endif
 
+- (void)lockUntilWritable
+{
+    __unused int result = pthread_mutex_lock(&_mutex);
+    NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    
+    // spinlock if the disk isn't writable
+    while (_diskWritable == NO) {
+        [self unlock];
+        usleep(100);
+        
+        __unused int result = pthread_mutex_lock(&_mutex);
+        NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    }
+}
+
+- (void)lockUntilDiskStateKnown
+{
+    __unused int result = pthread_mutex_lock(&_mutex);
+    NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    
+    // spinlock if the disk state isn't known
+    while (_diskStateKnown == NO) {
+        [self unlock];
+        usleep(100);
+        
+        __unused int result = pthread_mutex_lock(&_mutex);
+        NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    }
+}
+
 - (void)lock
 {
-    [_instanceLock lockWhenCondition:PINDiskCacheConditionReady];
+    __unused int result = pthread_mutex_lock(&_mutex);
+    NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
 }
 
 - (void)unlock
 {
-    [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
+    __unused int result = pthread_mutex_unlock(&_mutex);
+    NSAssert(result == 0, @"Failed to unlock PINDiskCache %@. Code: %d", self, result);
 }
 
 @end
