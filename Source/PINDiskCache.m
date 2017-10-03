@@ -887,7 +887,7 @@ static NSURL *_sharedTrashURL;
     NSDate *now = [[NSDate alloc] init];
     
     [self lock];
-        BOOL containsKey = _metadata[key] != nil && _diskStateKnown;
+        BOOL containsKey = _metadata[key] != nil || _diskStateKnown == NO;
     [self unlock];
 
     if (!key || !containsKey)

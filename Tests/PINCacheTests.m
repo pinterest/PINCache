@@ -18,6 +18,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 @interface PINDiskCache()
 
+@property (assign, nonatomic) BOOL diskStateKnown;
+
 + (dispatch_queue_t)sharedTrashQueue;
 - (NSString *)encodedString:(NSString *)string;
 
@@ -676,6 +678,62 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssert(diskObj1 == nil, @"should not be in disk cache");
     XCTAssert(memObj2 != nil, @"should be in memory cache");
     XCTAssert(diskObj2 != nil, @"should be in disk cache");
+}
+
+- (void)testByteLimit
+{
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    self.cache[key] = [self image];
+    
+    // Below is the size it's actually on disk.
+    [self.cache.diskCache setByteLimit:983040];
+    
+    // ensure the object is returned
+    XCTAssert([self.cache.diskCache objectForKey:key] != nil, @"object should be stored");
+    
+    [self.cache.diskCache setByteLimit:1];
+    
+    // wait for disk cache to be trimmed
+    sleep(2);
+    
+    XCTAssert([self.cache.diskCache objectForKey:key] == nil, @"object should be cleared");
+    
+    // check to see if it's actually deleted
+    [self.cache.diskCache synchronouslyLockFileAccessWhileExecutingBlock:^(id<PINCaching>  _Nonnull cache) {
+        NSError *error = nil;
+        NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:self.cache.diskCache.cacheURL
+                                                          includingPropertiesForKeys:@[]
+                                                                             options:0
+                                                                               error:&error];
+        XCTAssertNil(error);
+        XCTAssert(contents.count == 0);
+    }];
+}
+
+- (void)testDiskReadingAfterCacheInit
+{
+    NSString *cacheName = @"testDiskReadingAfterCacheInit";
+    PINDiskCache *diskCache = [[PINDiskCache alloc] initWithName:cacheName];
+    [diskCache removeAllObjects];
+    
+    // store a bunch of objects
+    for (NSUInteger idx = 0; idx < 1000; idx++) {
+        NSData *tmpData = [[@(idx) stringValue] dataUsingEncoding:NSUTF8StringEncoding];
+        [diskCache setObject:tmpData forKey:[@(idx) stringValue]];
+    }
+    
+    // Create a new instance, it'll have to look on disk to startup.
+    diskCache = nil;
+    diskCache = [[PINDiskCache alloc] initWithName:cacheName];
+    
+    // Check to see if we can get an object before the disk state is known.
+    XCTAssertNotNil([diskCache objectForKey:[@(999) stringValue]]);
+    XCTAssertFalse(diskCache.diskStateKnown);
+    
+    sleep(5);
+    
+    XCTAssertTrue(diskCache.diskStateKnown);
 }
 
 #if TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
