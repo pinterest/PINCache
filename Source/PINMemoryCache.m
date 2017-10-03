@@ -831,7 +831,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 - (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock
 {
     [self enumerateObjectsWithBlockAsync:^(id<PINCaching> _Nonnull cache, NSString * _Nonnull key, id _Nullable object, BOOL * _Nonnull stop) {
-      block(cache, key, object);
+      if ([cache isKindOfClass:[PINMemoryCache class]]) {
+        PINMemoryCache *memoryCache = (PINMemoryCache *)cache;
+        block(memoryCache, key, object);
+      }
     } completionBlock:completionBlock];
 }
 
