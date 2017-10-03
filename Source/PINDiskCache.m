@@ -797,7 +797,7 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityLow];
 }
 
-- (void)enumerateObjectsWithBlockAsync:(PINDiskCacheFileURLBlock)block completionBlock:(PINCacheBlock)completionBlock
+- (void)enumerateObjectsWithBlockAsync:(PINDiskCacheFileURLEnumerationBlock)block completionBlock:(PINCacheBlock)completionBlock
 {
     __weak PINDiskCache *weakSelf = self;
     
@@ -1093,7 +1093,7 @@ static NSURL *_sharedTrashURL;
     [self unlock];
 }
 
-- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block
+- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLEnumerationBlock)block
 {
     if (!block)
         return;
@@ -1106,7 +1106,10 @@ static NSURL *_sharedTrashURL;
             NSURL *fileURL = [self encodedFileURLForKey:key];
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
-                block(key, fileURL);
+                BOOL stop;
+                block(key, fileURL, &stop);
+                if (stop)
+                  break;
             }
         }
     [self unlock];
@@ -1444,7 +1447,9 @@ static NSURL *_sharedTrashURL;
 
 - (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock
 {
-    [self enumerateObjectsWithBlockAsync:block completionBlock:completionBlock];
+    [self enumerateObjectsWithBlockAsync:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL * _Nonnull stop) {
+      block(key, fileURL);
+    } completionBlock:completionBlock];
 }
 
 @end

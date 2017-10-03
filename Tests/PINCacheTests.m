@@ -503,7 +503,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     __block NSUInteger enumCount = 0;
 
     self.cache.memoryCache.didReceiveMemoryWarningBlock = ^(PINMemoryCache *cache) {
-        [cache enumerateObjectsWithBlockAsync:^(PINMemoryCache *cache, NSString *key, id object) {
+        [cache enumerateObjectsWithBlockAsync:^(PINMemoryCache *cache, NSString *key, id object, BOOL *stop) {
             @synchronized (self) {
                 enumCount++;
             }
@@ -543,7 +543,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     __block NSUInteger enumCount = 0;
 
-    [self.cache.diskCache enumerateObjectsWithBlockAsync:^(NSString *key, NSURL *fileURL) {
+    [self.cache.diskCache enumerateObjectsWithBlockAsync:^(NSString *key, NSURL *fileURL, BOOL *stop) {
         @synchronized (self) {
             enumCount++;
         }
@@ -759,14 +759,14 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // With the TTL cache enabled, we expect enumerating over the caches to yield 0 objects
     NSUInteger expectedObjCount = 0;
     __block NSUInteger objCount = 0;
-    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
+    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL *stop) {
       objCount++;
     }];
 
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
     objCount = 0;
-    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache *cache, NSString *key, id _Nullable object) {
+    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache *cache, NSString *key, id _Nullable object, BOOL *stop) {
       objCount++;
     }];
 
@@ -785,14 +785,14 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // With the TTL cache disabled, we expect enumerating over the caches to yield 1 object each, since the 2nd cache clearing hasn't happened yet
     expectedObjCount = 1;
     objCount = 0;
-    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL) {
+    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL *stop) {
       objCount++;
     }];
 
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
     objCount = 0;
-    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
+    [self.cache.memoryCache enumerateObjectsWithBlock:^(PINMemoryCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object, BOOL *stop) {
       objCount++;
     }];
 
