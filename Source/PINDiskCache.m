@@ -59,7 +59,9 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @property (strong, nonatomic) NSURL *cacheURL;
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
 @property (strong, nonatomic) NSMutableDictionary <NSString *, PINDiskCacheMetadata *> *metadata;
+@property (assign, nonatomic) pthread_cond_t diskWritableCondition;
 @property (assign, nonatomic) BOOL diskWritable;
+@property (assign, nonatomic) pthread_cond_t diskStateKnownCondition;
 @property (assign, nonatomic) BOOL diskStateKnown;
 @end
 
@@ -203,6 +205,9 @@ static NSURL *_sharedTrashURL;
         } else {
             _keyDecoder = self.defaultKeyDecoder;
         }
+        
+        pthread_cond_init(&_diskWritableCondition, NULL);
+        pthread_cond_init(&_diskStateKnownCondition, NULL);
 
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize. This must *not* be done on _operationQueue because other operations added may hold the lock and fill up the queue.
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -422,22 +427,24 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)_locked_createCacheDirectory
 {
-    if ([[NSFileManager defaultManager] fileExistsAtPath:[_cacheURL path]]) {
-        _diskWritable = YES;
-        return NO;
+    BOOL created = NO;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[_cacheURL path]] == NO) {
+        NSError *error = nil;
+        BOOL success = [[NSFileManager defaultManager] createDirectoryAtURL:_cacheURL
+                                                withIntermediateDirectories:YES
+                                                                 attributes:nil
+                                                                      error:&error];
+        PINDiskCacheError(error);
+        created = success;
     }
     
-    NSError *error = nil;
-    BOOL success = [[NSFileManager defaultManager] createDirectoryAtURL:_cacheURL
-                                            withIntermediateDirectories:YES
-                                                             attributes:nil
-                                                                  error:&error];
-    PINDiskCacheError(error);
+
     
     // while this may not be true if success is false, it's better than deadlocking later.
     _diskWritable = YES;
+    pthread_cond_broadcast(&_diskWritableCondition);
     
-    return success;
+    return created;
 }
 
 - (void)initializeDiskProperties
@@ -490,6 +497,7 @@ static NSURL *_sharedTrashURL;
             [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
     
         _diskStateKnown = YES;
+        pthread_cond_broadcast(&_diskStateKnownCondition);
     [self unlock];
 }
 
@@ -1439,31 +1447,21 @@ static NSURL *_sharedTrashURL;
 
 - (void)lockUntilWritable
 {
-    __unused int result = pthread_mutex_lock(&_mutex);
-    NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    [self lock];
     
     // spinlock if the disk isn't writable
-    while (_diskWritable == NO) {
-        [self unlock];
-        usleep(100);
-        
-        __unused int result = pthread_mutex_lock(&_mutex);
-        NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    if (_diskWritable == NO) {
+        pthread_cond_wait(&_diskWritableCondition, &_mutex);
     }
 }
 
 - (void)lockUntilDiskStateKnown
 {
-    __unused int result = pthread_mutex_lock(&_mutex);
-    NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    [self lock];
     
     // spinlock if the disk state isn't known
-    while (_diskStateKnown == NO) {
-        [self unlock];
-        usleep(100);
-        
-        __unused int result = pthread_mutex_lock(&_mutex);
-        NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    if (_diskStateKnown == NO) {
+        pthread_cond_wait(&_diskStateKnownCondition, &_mutex);
     }
 }
 
