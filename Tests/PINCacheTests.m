@@ -589,54 +589,93 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 - (void)testAgeLimit
 {
     [self.cache removeAllObjects];
-    NSString *key = @"key";
-    self.cache[key] = [self image];
+    NSString *key1 = @"key1";
+    NSString *key2 = @"key2";
+    self.cache[key1] = [self image];
+    self.cache[key2] = [self image];
     [self.cache.memoryCache setAgeLimit:60];
     [self.cache.diskCache setAgeLimit:60];
     
     dispatch_group_t group = dispatch_group_create();
     
-    __block id memObj = nil;
-    __block id diskObj = nil;
+    __block id memObj1 = nil;
+    __block id diskObj1 = nil;
+    __block id memObj2 = nil;
+    __block id diskObj2 = nil;
     
     dispatch_group_enter(group);
-    [self.cache.memoryCache objectForKeyAsync:key completion:^(PINMemoryCache *cache, NSString *key, id object) {
-        memObj = object;
+    [self.cache.memoryCache objectForKeyAsync:key1 completion:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj1 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
-        diskObj = object;
+    [self.cache.memoryCache objectForKeyAsync:key2 completion:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj2 = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+        diskObj1 = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+        diskObj2 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     
-    XCTAssert(memObj != nil, @"should still be in memory cache");
-    XCTAssert(diskObj != nil, @"should still be in disk cache");
-  
-    [self.cache.memoryCache setAgeLimit:1];
-    [self.cache.diskCache setAgeLimit:1];
+    XCTAssert(memObj1 != nil, @"should still be in memory cache");
+    XCTAssert(diskObj1 != nil, @"should still be in disk cache");
+    XCTAssert(memObj2 != nil, @"should still be in memory cache");
+    XCTAssert(diskObj2 != nil, @"should still be in disk cache");
+    
+    //Set them again, but separate it out.
+    self.cache[key1] = [self image];
+    sleep(2);
+    self.cache[key2] = [self image];
   
     sleep(2);
     
+    [self.cache.memoryCache setAgeLimit:3.5];
+    [self.cache.diskCache setAgeLimit:3.5];
+    
+    sleep(1);
+    
     dispatch_group_enter(group);
-    [self.cache.memoryCache objectForKeyAsync:key completion:^(PINMemoryCache *cache, NSString *key, id object) {
-        memObj = object;
+    [self.cache.memoryCache objectForKeyAsync:key1 completion:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj1 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
-        diskObj = object;
+    [self.cache.memoryCache objectForKeyAsync:key2 completion:^(PINMemoryCache *cache, NSString *key, id object) {
+        memObj2 = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+        diskObj1 = object;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_enter(group);
+    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+        diskObj2 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     
-    XCTAssert(memObj == nil, @"should not be in memory cache");
-    XCTAssert(diskObj == nil, @"should not be in disk cache");
+    XCTAssert(memObj1 == nil, @"should not be in memory cache");
+    XCTAssert(diskObj1 == nil, @"should not be in disk cache");
+    XCTAssert(memObj2 != nil, @"should be in memory cache");
+    XCTAssert(diskObj2 != nil, @"should be in disk cache");
 }
 
 #if TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
