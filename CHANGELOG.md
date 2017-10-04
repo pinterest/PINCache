@@ -3,6 +3,7 @@
 * Add your own contributions to the next release on the line below this with your name.
 - [fix] Add some sane limits to the disk cache: [#201]https://github.com/pinterest/PINCache/pull/201
 - [new] Update enumeration methods to allow a stop flag to be flipped by caller: [#204](https://github.com/pinterest/PINCache/pull/204)
+- [performance] Improves cache miss performance by ~2 orders of magnitude on device: [#202](https://github.com/pinterest/PINCache/pull/202)
 
 ## 3.0.1 -- Beta 5
 - [fix] Respect small byteLimit settings by checking object size in setObject: [#198](https://github.com/pinterest/PINCache/pull/198)
