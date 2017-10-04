@@ -89,6 +89,8 @@ static NSURL *_sharedTrashURL;
 {
     __unused int result = pthread_mutex_destroy(&_mutex);
     NSCAssert(result == 0, @"Failed to destroy lock in PINMemoryCache %p. Code: %d", (void *)self, result);
+    pthread_cond_destroy(&_diskWritableCondition);
+    pthread_cond_destroy(&_diskStateKnownCondition);
 }
 
 - (instancetype)init
@@ -430,12 +432,11 @@ static NSURL *_sharedTrashURL;
     BOOL created = NO;
     if ([[NSFileManager defaultManager] fileExistsAtPath:[_cacheURL path]] == NO) {
         NSError *error = nil;
-        BOOL success = [[NSFileManager defaultManager] createDirectoryAtURL:_cacheURL
+        created = [[NSFileManager defaultManager] createDirectoryAtURL:_cacheURL
                                                 withIntermediateDirectories:YES
                                                                  attributes:nil
                                                                       error:&error];
         PINDiskCacheError(error);
-        created = success;
     }
     
 
@@ -507,7 +508,7 @@ static NSURL *_sharedTrashURL;
     [self.operationQueue addOperation:^{
         PINDiskCache *strongSelf = weakSelf;
         if (strongSelf) {
-            [strongSelf lockUntilWritable];
+            [strongSelf lockForWriting];
                 [strongSelf _locked_setFileModificationDate:date forURL:fileURL];
             [strongSelf unlock];
         }
@@ -541,7 +542,7 @@ static NSURL *_sharedTrashURL;
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
     // We only need to lock until writable at the top because once writable, always writable
-    [self lockUntilWritable];
+    [self lockForWriting];
         if (!fileURL || ![[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             [self unlock];
             return NO;
@@ -582,7 +583,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToSize:(NSUInteger)trimByteCount
 {
-    [self lockUntilWritable];
+    [self lockForWriting];
         if (_byteCount > trimByteCount) {
             NSArray *keysSortedBySize = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.size compare:obj2.size];
@@ -605,7 +606,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToSizeByDate:(NSUInteger)trimByteCount
 {
-    [self lockUntilWritable];
+    [self lockForWriting];
         if (_byteCount > trimByteCount) {
             NSArray *keysSortedByDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.date compare:obj2.date];
@@ -628,7 +629,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToDate:(NSDate *)trimDate
 {
-    [self lockUntilWritable];
+    [self lockForWriting];
         NSArray *keysSortedByDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
             return [obj1.date compare:obj2.date];
         }];
@@ -686,7 +687,7 @@ static NSURL *_sharedTrashURL;
     
     [self.operationQueue addOperation:^{
         PINDiskCache *strongSelf = weakSelf;
-        [strongSelf lockUntilWritable];
+        [strongSelf lockForWriting];
             block(strongSelf);
         [strongSelf unlock];
     } withPriority:PINOperationQueuePriorityLow];
@@ -729,7 +730,7 @@ static NSURL *_sharedTrashURL;
         PINDiskCache *strongSelf = weakSelf;
         NSURL *fileURL = [strongSelf fileURLForKey:key];
       
-        [strongSelf lockUntilWritable];
+        [strongSelf lockForWriting];
             block(key, fileURL);
         [strongSelf unlock];
     } withPriority:PINOperationQueuePriorityLow];
@@ -866,7 +867,7 @@ static NSURL *_sharedTrashURL;
 - (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINCacheBlock)block
 {
     if (block) {
-        [self lockUntilWritable];
+        [self lockForWriting];
             block(self);
         [self unlock];
     }
@@ -874,9 +875,12 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)containsObjectForKey:(NSString *)key
 {
-    if (_metadata[key] != nil) {
-        return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
-    }
+    [self lock];
+        if (_metadata[key] != nil || _diskStateKnown == NO) {
+            [self unlock];
+            return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
+        }
+    [self unlock];
     return NO;
 }
 
@@ -892,8 +896,6 @@ static NSURL *_sharedTrashURL;
 
 - (nullable id <NSCoding>)objectForKey:(NSString *)key fileURL:(NSURL **)outFileURL
 {
-    NSDate *now = [[NSDate alloc] init];
-    
     [self lock];
         BOOL containsKey = _metadata[key] != nil || _diskStateKnown == NO;
     [self unlock];
@@ -904,11 +906,12 @@ static NSURL *_sharedTrashURL;
     id <NSCoding> object = nil;
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
+    NSDate *now = [[NSDate alloc] init];
     [self lock];
         if (self->_ttlCache) {
             // We actually need to know the entire disk state if we're a TTL cache.
             [self unlock];
-            [self lockUntilDiskStateKnown];
+            [self lockAndWaitForKnownState];
         }
     
         if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([_metadata[key].date timeIntervalSinceDate:now]) < self->_ageLimit) {
@@ -961,7 +964,7 @@ static NSURL *_sharedTrashURL;
     NSDate *now = [[NSDate alloc] init];
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
-    [self lockUntilWritable];
+    [self lockForWriting];
         if (fileURL.path && [[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
             if (updateFileModificationDate) {
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
@@ -1020,7 +1023,7 @@ static NSURL *_sharedTrashURL;
         return;
     }
 
-    [self lockUntilWritable];
+    [self lockForWriting];
         PINCacheObjectBlock willAddObjectBlock = self->_willAddObjectBlock;
         if (willAddObjectBlock) {
             [self unlock];
@@ -1131,7 +1134,7 @@ static NSURL *_sharedTrashURL;
 - (void)removeAllObjects
 {
     // We don't need to know the disk state since we're just going to remove everything.
-    [self lockUntilWritable];
+    [self lockForWriting];
         PINCacheBlock willRemoveAllObjectsBlock = self->_willRemoveAllObjectsBlock;
         if (willRemoveAllObjectsBlock) {
             [self unlock];
@@ -1162,7 +1165,7 @@ static NSURL *_sharedTrashURL;
     if (!block)
         return;
     
-    [self lockUntilDiskStateKnown];
+    [self lockAndWaitForKnownState];
         NSDate *now = [NSDate date];
     
         for (NSString *key in _metadata) {
@@ -1445,7 +1448,7 @@ static NSURL *_sharedTrashURL;
 }
 #endif
 
-- (void)lockUntilWritable
+- (void)lockForWriting
 {
     [self lock];
     
@@ -1455,7 +1458,7 @@ static NSURL *_sharedTrashURL;
     }
 }
 
-- (void)lockUntilDiskStateKnown
+- (void)lockAndWaitForKnownState
 {
     [self lock];
     
