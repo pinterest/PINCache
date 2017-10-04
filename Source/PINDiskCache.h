@@ -104,6 +104,11 @@ PIN_SUBCLASSING_RESTRICTED
 #pragma mark - Class
 
 /**
+ This is temporary and should not be checked into the main branch
+ */
+@property (class, assign, nonatomic) BOOL disableAsynchronousStartup;
+
+/**
  @param rootPath The path for where the cache should be stored.
  @param prefix The prefix for the cache name.
  @param name The name of the cache.

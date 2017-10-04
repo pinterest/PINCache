@@ -25,6 +25,8 @@ static NSString * const PINDiskCacheOperationIdentifierTrimToDate = @"PINDiskCac
 static NSString * const PINDiskCacheOperationIdentifierTrimToSize = @"PINDiskCacheOperationIdentifierTrimToSize";
 static NSString * const PINDiskCacheOperationIdentifierTrimToSizeByDate = @"PINDiskCacheOperationIdentifierTrimToSizeByDate";
 
+static BOOL _disableAsyncronousStartup = NO;
+
 typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
     PINDiskCacheConditionNotReady = 0,
     PINDiskCacheConditionReady = 1,
@@ -1472,6 +1474,10 @@ static NSURL *_sharedTrashURL;
 {
     __unused int result = pthread_mutex_lock(&_mutex);
     NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
+    
+    if (_disableAsyncronousStartup && _diskStateKnown == NO) {
+        pthread_cond_wait(&_diskStateKnownCondition, &_mutex);
+    }
 }
 
 - (void)unlock
