@@ -458,8 +458,6 @@ static NSURL *_sharedTrashURL;
             _metadata[key].size = fileSize;
             byteCount += [fileSize unsignedIntegerValue];
         }
-        
-        [_knownKeys addObject:key];
     }
     
     if (byteCount > 0)
@@ -1015,8 +1013,6 @@ static NSURL *_sharedTrashURL;
             if (date) {
                 self->_metadata[key].date = date;
             }
-            
-            [_knownKeys addObject:key];
             
             if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
                 [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
