@@ -562,10 +562,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         for (NSString *key in keysSortedByDate) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
-                BOOL stop;
+                BOOL stop = NO;
                 block(self, key, _dictionary[key], &stop);
                 if (stop)
-                  break;
+                    break;
             }
         }
     [self unlock];
@@ -831,10 +831,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 - (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock
 {
     [self enumerateObjectsWithBlockAsync:^(id<PINCaching> _Nonnull cache, NSString * _Nonnull key, id _Nullable object, BOOL * _Nonnull stop) {
-      if ([cache isKindOfClass:[PINMemoryCache class]]) {
-        PINMemoryCache *memoryCache = (PINMemoryCache *)cache;
-        block(memoryCache, key, object);
-      }
+        if ([cache isKindOfClass:[PINMemoryCache class]]) {
+            PINMemoryCache *memoryCache = (PINMemoryCache *)cache;
+            block(memoryCache, key, object);
+        }
     } completionBlock:completionBlock];
 }
 

@@ -1106,10 +1106,10 @@ static NSURL *_sharedTrashURL;
             NSURL *fileURL = [self encodedFileURLForKey:key];
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
-                BOOL stop;
+                BOOL stop = NO;
                 block(key, fileURL, &stop);
                 if (stop)
-                  break;
+                    break;
             }
         }
     [self unlock];
