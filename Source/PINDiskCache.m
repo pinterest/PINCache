@@ -87,6 +87,16 @@ static NSURL *_sharedTrashURL;
 
 #pragma mark - Initialization -
 
++ (BOOL)disableAsynchronousStartup
+{
+    return _disableAsyncronousStartup;
+}
+
++ (void)setDisableAsynchronousStartup:(BOOL)disableAsynchronousStartup
+{
+    _disableAsyncronousStartup = disableAsynchronousStartup;
+}
+
 - (void)dealloc
 {
     __unused int result = pthread_mutex_destroy(&_mutex);
@@ -215,7 +225,7 @@ static NSURL *_sharedTrashURL;
 
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize. This must *not* be done on _operationQueue because other operations added may hold the lock and fill up the queue.
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self lock];
+            [self lockForStartup];
                 [self _locked_createCacheDirectory];
             [self unlock];
             [self initializeDiskProperties];
@@ -457,7 +467,7 @@ static NSURL *_sharedTrashURL;
     
     NSError *error = nil;
     
-    [self lock];
+    [self lockForStartup];
         NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:_cacheURL
                                                        includingPropertiesForKeys:keys
                                                                           options:NSDirectoryEnumerationSkipsHiddenFiles
@@ -472,7 +482,7 @@ static NSURL *_sharedTrashURL;
         error = nil;
         
         // Continually grab and release lock while processing files to avoid contention
-        [self lock];
+        [self lockForStartup];
             NSDictionary *dictionary = [fileURL resourceValuesForKeys:keys error:&error];
             PINDiskCacheError(error);
             
@@ -492,7 +502,7 @@ static NSURL *_sharedTrashURL;
         [self unlock];
     }
     
-    [self lock];
+    [self lockForStartup];
         if (byteCount > 0)
             _byteCount = byteCount;
     
@@ -1468,6 +1478,12 @@ static NSURL *_sharedTrashURL;
     if (_diskStateKnown == NO) {
         pthread_cond_wait(&_diskStateKnownCondition, &_mutex);
     }
+}
+
+- (void)lockForStartup
+{
+    __unused int result = pthread_mutex_lock(&_mutex);
+    NSAssert(result == 0, @"Failed to lock PINDiskCache %@. Code: %d", self, result);
 }
 
 - (void)lock
