@@ -297,11 +297,10 @@ static NSURL *_sharedTrashURL;
             return @"";
         }
         
-        if ([decodedKey respondsToSelector:@selector(stringByAddingPercentEncodingWithAllowedCharacters:)]) {
+        if (@available(macOS 10.9, iOS 7.0, tvOS 9.0, watchOS 2.0, *)) {
             NSString *encodedString = [decodedKey stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
             return encodedString;
-        }
-        else {
+        } else {
             CFStringRef static const charsToEscape = CFSTR(".:/%");
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -324,10 +323,9 @@ static NSURL *_sharedTrashURL;
             return @"";
         }
         
-        if ([encodedKey respondsToSelector:@selector(stringByRemovingPercentEncoding)]) {
+        if (@available(macOS 10.9, iOS 7.0, tvOS 9.0, watchOS 2.0, *)) {
             return [encodedKey stringByRemovingPercentEncoding];
-        }
-        else {
+        } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
             CFStringRef unescapedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
@@ -504,14 +502,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)asynchronouslySetFileModificationDate:(NSDate *)date forURL:(NSURL *)fileURL
 {
-    __weak PINDiskCache *weakSelf = self;
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (strongSelf) {
-            [strongSelf lockForWriting];
-                [strongSelf _locked_setFileModificationDate:date forURL:fileURL];
-            [strongSelf unlock];
-        }
+    [self.operationQueue scheduleOperation:^{
+        [self lockForWriting];
+            [self _locked_setFileModificationDate:date forURL:fileURL];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityLow];
 }
 
@@ -664,14 +658,10 @@ static NSURL *_sharedTrashURL;
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSinceNow:-ageLimit];
     [self trimDiskToDate:date];
     
-    __weak PINDiskCache *weakSelf = self;
-    
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_ageLimit * NSEC_PER_SEC));
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf.operationQueue addOperation:^{
-            PINDiskCache *strongSelf = weakSelf;
-            [strongSelf trimToAgeLimitRecursively];
+        [self.operationQueue scheduleOperation:^{
+            [self trimToAgeLimitRecursively];
         } withPriority:PINOperationQueuePriorityLow];
     });
 }
@@ -683,13 +673,11 @@ static NSURL *_sharedTrashURL;
     if (block == nil) {
       return;
     }
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf lockForWriting];
-            block(strongSelf);
-        [strongSelf unlock];
+
+    [self.operationQueue scheduleOperation:^{
+        [self lockForWriting];
+            block(self);
+        [self unlock];
     } withPriority:PINOperationQueuePriorityLow];
 }
 
@@ -698,24 +686,18 @@ static NSURL *_sharedTrashURL;
     if (!key || !block)
         return;
     
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        block([strongSelf containsObjectForKey:key]);
+    [self.operationQueue scheduleOperation:^{
+        block([self containsObjectForKey:key]);
     } withPriority:PINOperationQueuePriorityLow];
 }
 
 - (void)objectForKeyAsync:(NSString *)key completion:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
+    [self.operationQueue scheduleOperation:^{
         NSURL *fileURL = nil;
-        id <NSCoding> object = [strongSelf objectForKey:key fileURL:&fileURL];
+        id <NSCoding> object = [self objectForKey:key fileURL:&fileURL];
         
-        block(strongSelf, key, object);
+        block(self, key, object);
     } withPriority:PINOperationQueuePriorityLow];
 }
 
@@ -724,29 +706,24 @@ static NSURL *_sharedTrashURL;
     if (block == nil) {
       return;
     }
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        NSURL *fileURL = [strongSelf fileURLForKey:key];
+
+    [self.operationQueue scheduleOperation:^{
+        NSURL *fileURL = [self fileURLForKey:key];
       
-        [strongSelf lockForWriting];
+        [self lockForWriting];
             block(key, fileURL);
-        [strongSelf unlock];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityLow];
 }
 
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key completion:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
+    [self.operationQueue scheduleOperation:^{
         NSURL *fileURL = nil;
-        [strongSelf setObject:object forKey:key fileURL:&fileURL];
+        [self setObject:object forKey:key fileURL:&fileURL];
         
         if (block) {
-            block(strongSelf, key, object);
+            block(self, key, object);
         }
     } withPriority:PINOperationQueuePriorityLow];
 }
@@ -758,15 +735,12 @@ static NSURL *_sharedTrashURL;
 
 - (void)removeObjectForKeyAsync:(NSString *)key completion:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
+    [self.operationQueue scheduleOperation:^{
         NSURL *fileURL = nil;
-        [strongSelf removeObjectForKey:key fileURL:&fileURL];
+        [self removeObjectForKey:key fileURL:&fileURL];
         
         if (block) {
-            block(strongSelf, key, nil);
+            block(self, key, nil);
         }
     } withPriority:PINOperationQueuePriorityLow];
 }
@@ -784,12 +758,12 @@ static NSURL *_sharedTrashURL;
         };
     }
     
-    [self.operationQueue addOperation:operation
-                         withPriority:PINOperationQueuePriorityLow
-                           identifier:PINDiskCacheOperationIdentifierTrimToSize
-                       coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
-                  dataCoalescingBlock:PINDiskTrimmingSizeCoalescingBlock
-                           completion:completion];
+    [self.operationQueue scheduleOperation:operation
+                              withPriority:PINOperationQueuePriorityLow
+                                identifier:PINDiskCacheOperationIdentifierTrimToSize
+                            coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
+                       dataCoalescingBlock:PINDiskTrimmingSizeCoalescingBlock
+                                completion:completion];
 }
 
 - (void)trimToDateAsync:(NSDate *)trimDate completion:(PINCacheBlock)block
@@ -805,12 +779,12 @@ static NSURL *_sharedTrashURL;
         };
     }
     
-    [self.operationQueue addOperation:operation
-                         withPriority:PINOperationQueuePriorityLow
-                           identifier:PINDiskCacheOperationIdentifierTrimToDate
-                       coalescingData:trimDate
-                  dataCoalescingBlock:PINDiskTrimmingDateCoalescingBlock
-                           completion:completion];
+    [self.operationQueue scheduleOperation:operation
+                              withPriority:PINOperationQueuePriorityLow
+                                identifier:PINDiskCacheOperationIdentifierTrimToDate
+                            coalescingData:trimDate
+                       dataCoalescingBlock:PINDiskTrimmingDateCoalescingBlock
+                                completion:completion];
 }
 
 - (void)trimToSizeByDateAsync:(NSUInteger)trimByteCount completion:(PINCacheBlock)block
@@ -826,38 +800,32 @@ static NSURL *_sharedTrashURL;
         };
     }
     
-    [self.operationQueue addOperation:operation
-                         withPriority:PINOperationQueuePriorityLow
-                           identifier:PINDiskCacheOperationIdentifierTrimToSizeByDate
-                       coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
-                  dataCoalescingBlock:PINDiskTrimmingSizeCoalescingBlock
-                           completion:completion];
+    [self.operationQueue scheduleOperation:operation
+                              withPriority:PINOperationQueuePriorityLow
+                                identifier:PINDiskCacheOperationIdentifierTrimToSizeByDate
+                            coalescingData:[NSNumber numberWithUnsignedInteger:trimByteCount]
+                       dataCoalescingBlock:PINDiskTrimmingSizeCoalescingBlock
+                                completion:completion];
 }
 
 - (void)removeAllObjectsAsync:(PINCacheBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf removeAllObjects];
+    [self.operationQueue scheduleOperation:^{
+        [self removeAllObjects];
         
         if (block) {
-            block(strongSelf);
+            block(self);
         }
     } withPriority:PINOperationQueuePriorityLow];
 }
 
 - (void)enumerateObjectsWithBlockAsync:(PINDiskCacheFileURLEnumerationBlock)block completionBlock:(PINCacheBlock)completionBlock
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        [strongSelf enumerateObjectsWithBlock:block];
+    [self.operationQueue scheduleOperation:^{
+        [self enumerateObjectsWithBlock:block];
         
         if (completionBlock) {
-            completionBlock(strongSelf);
+            completionBlock(self);
         }
     } withPriority:PINOperationQueuePriorityLow];
 }
@@ -1197,15 +1165,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)setWillAddObjectBlock:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        [strongSelf lock];
-            strongSelf->_willAddObjectBlock = [block copy];
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_willAddObjectBlock = [block copy];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1222,16 +1185,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)setWillRemoveObjectBlock:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        
-        [strongSelf lock];
-            strongSelf->_willRemoveObjectBlock = [block copy];
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_willRemoveObjectBlock = [block copy];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1248,16 +1205,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)setWillRemoveAllObjectsBlock:(PINCacheBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        
-        [strongSelf lock];
-            strongSelf->_willRemoveAllObjectsBlock = [block copy];
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_willRemoveAllObjectsBlock = [block copy];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1274,16 +1225,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)setDidAddObjectBlock:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        
-        [strongSelf lock];
-            strongSelf->_didAddObjectBlock = [block copy];
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_didAddObjectBlock = [block copy];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1300,16 +1245,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)setDidRemoveObjectBlock:(PINDiskCacheObjectBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        
-        [strongSelf lock];
-            strongSelf->_didRemoveObjectBlock = [block copy];
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_didRemoveObjectBlock = [block copy];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1326,16 +1265,10 @@ static NSURL *_sharedTrashURL;
 
 - (void)setDidRemoveAllObjectsBlock:(PINCacheBlock)block
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        
-        [strongSelf lock];
-            strongSelf->_didRemoveAllObjectsBlock = [block copy];
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_didRemoveAllObjectsBlock = [block copy];
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1352,19 +1285,13 @@ static NSURL *_sharedTrashURL;
 
 - (void)setByteLimit:(NSUInteger)byteLimit
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-        
-        [strongSelf lock];
-            strongSelf->_byteLimit = byteLimit;
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_byteLimit = byteLimit;
+        [self unlock];
         
         if (byteLimit > 0)
-            [strongSelf trimDiskToSizeByDate:byteLimit];
+            [self trimDiskToSizeByDate:byteLimit];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1381,18 +1308,12 @@ static NSURL *_sharedTrashURL;
 
 - (void)setAgeLimit:(NSTimeInterval)ageLimit
 {
-    __weak PINDiskCache *weakSelf = self;
-    
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_ageLimit = ageLimit;
+        [self unlock];
         
-        [strongSelf lock];
-            strongSelf->_ageLimit = ageLimit;
-        [strongSelf unlock];
-        
-        [strongSelf trimToAgeLimitRecursively];
+        [self trimToAgeLimitRecursively];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1407,16 +1328,10 @@ static NSURL *_sharedTrashURL;
 }
 
 - (void)setTtlCache:(BOOL)ttlCache {
-    __weak PINDiskCache *weakSelf = self;
-
-    [self.operationQueue addOperation:^{
-        PINDiskCache *strongSelf = weakSelf;
-        if (!strongSelf)
-            return;
-
-        [strongSelf lock];
-            strongSelf->_ttlCache = ttlCache;
-        [strongSelf unlock];
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_ttlCache = ttlCache;
+        [self unlock];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -1432,18 +1347,12 @@ static NSURL *_sharedTrashURL;
 }
 
 - (void)setWritingProtectionOption:(NSDataWritingOptions)writingProtectionOption {
-  __weak PINDiskCache *weakSelf = self;
-  
-  [self.operationQueue addOperation:^{
-    PINDiskCache *strongSelf = weakSelf;
-    if (!strongSelf)
-      return;
-    
+  [self.operationQueue scheduleOperation:^{
     NSDataWritingOptions option = NSDataWritingFileProtectionMask & writingProtectionOption;
     
-    [strongSelf lock];
-        strongSelf->_writingProtectionOption = option;
-    [strongSelf unlock];
+    [self lock];
+        self->_writingProtectionOption = option;
+    [self unlock];
   } withPriority:PINOperationQueuePriorityHigh];
 }
 #endif
