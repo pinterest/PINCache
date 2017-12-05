@@ -896,11 +896,15 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)containsObjectForKey:(NSString *)key
 {
-    // TODO(mjlazar): Check _metadata[key].ageLimit
     [self lock];
         if (_metadata[key] != nil || _diskStateKnown == NO) {
+            BOOL objectExpired = NO;
+            if (self->_ttlCache && _metadata[key].date != nil) {
+                NSTimeInterval ageLimit = _metadata[key].hasAgeLimit ? _metadata[key].ageLimit : self->_ageLimit;
+                objectExpired = ageLimit > 0 && fabs([_metadata[key].date timeIntervalSinceDate:[NSDate date]]) > ageLimit;
+            }
             [self unlock];
-            return ([self fileURLForKey:key updateFileModificationDate:NO] != nil);
+            return ([self fileURLForKey:key updateFileModificationDate:NO] != nil && !objectExpired);
         }
     [self unlock];
     return NO;
