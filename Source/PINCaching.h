@@ -79,6 +79,18 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 - (void)setObjectAsync:(id)object forKey:(NSString *)key completion:(nullable PINCacheObjectBlock)block;
 
 /**
+ Stores an object in the cache for the specified key and the specified age limit. This method returns immediately
+ and executes the passed block after the object has been stored, potentially in parallel with other blocks
+ on the <concurrentQueue>.
+
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ @param block A block to be executed concurrently after the object has been stored, or nil.
+ */
+- (void)setObjectAsync:(id)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit completion:(nullable PINCacheObjectBlock)block;
+
+/**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
  to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method returns immediately
  and executes the passed block after the object has been stored, potentially in parallel with other blocks
@@ -90,6 +102,20 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
 - (void)setObjectAsync:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(nullable PINCacheObjectBlock)block;
+
+/**
+ Stores an object in the cache for the specified key and the specified memory cost and age limit. If the cost causes the total
+ to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method returns immediately
+ and executes the passed block after the object has been stored, potentially in parallel with other blocks
+ on the <concurrentQueue>.
+
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param cost An amount to add to the <memoryCache.totalCost>.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ @param block A block to be executed concurrently after the object has been stored, or nil.
+ */
+- (void)setObjectAsync:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit completion:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed
@@ -151,6 +177,17 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 - (void)setObject:(nullable id)object forKey:(NSString *)key;
 
 /**
+ Stores an object in the cache for the specified key and age limit. This method blocks the calling thread until the
+ object has been set. Uses a lock to achieve synchronicity on the disk cache.
+
+ @see setObjectAsync:forKey:completion:
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ */
+- (void)setObject:(nullable id)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit;
+
+/**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
  to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method blocks the calling thread
  until the object has been stored.
@@ -160,6 +197,18 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param cost An amount to add to the <memoryCache.totalCost>.
  */
 - (void)setObject:(nullable id)object forKey:(NSString *)key withCost:(NSUInteger)cost;
+
+/**
+ Stores an object in the cache for the specified key and the specified memory cost and age limit. If the cost causes the total
+ to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method blocks the calling thread
+ until the object has been stored.
+
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param cost An amount to add to the <memoryCache.totalCost>.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ */
+- (void)setObject:(nullable id)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit;
 
 /**
  Removes the object for the specified key. This method blocks the calling thread until the object
