@@ -9,6 +9,7 @@
 #endif
 
 #import <pthread.h>
+#import <sys/xattr.h>
 
 #import <PINOperation/PINOperation.h>
 
@@ -18,6 +19,9 @@ __LINE__, [error localizedDescription]); }
 
 #define PINDiskCacheException(exception) if (exception) { NSAssert(NO, [exception reason]); }
 
+const char * PINDiskCacheAgeLimitAttributeName = "com.pinterest.PINDiskCache.ageLimit";
+NSString * const PINDiskCacheErrorDomain = @"com.pinterest.PINDiskCache";
+NSErrorUserInfoKey const PINDiskCacheErrorWriteFailureCodeKey = @"PINDiskCacheErrorWriteFailureCodeKey";
 NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
@@ -43,6 +47,8 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @interface PINDiskCacheMetadata : NSObject
 @property (nonatomic, strong) NSDate *date;
 @property (nonatomic, strong) NSNumber *size;
+@property (nonatomic) NSTimeInterval ageLimit;
+@property (nonatomic, readonly) BOOL hasAgeLimit;
 @end
 
 @interface PINDiskCache () {
@@ -485,6 +491,11 @@ static NSURL *_sharedTrashURL;
                 _metadata[key].size = fileSize;
                 byteCount += [fileSize unsignedIntegerValue];
             }
+
+            NSTimeInterval ageLimit;
+            if(getxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0)) {
+                _metadata[key].ageLimit = ageLimit;
+            }
         [self unlock];
     }
     
@@ -529,6 +540,38 @@ static NSURL *_sharedTrashURL;
     }
     
     return success;
+}
+
+- (void)asynchronouslySetAgeLimit:(NSTimeInterval)ageLimit forURL:(NSURL *)fileURL
+{
+    [self.operationQueue scheduleOperation:^{
+        [self lockForWriting];
+            [self _locked_setAgeLimit:ageLimit forURL:fileURL];
+        [self unlock];
+    } withPriority:PINOperationQueuePriorityLow];
+}
+
+- (BOOL)_locked_setAgeLimit:(NSTimeInterval)ageLimit forURL:(NSURL *)fileURL
+{
+    if (ageLimit <= 0.0 || !fileURL) {
+        return NO;
+    }
+
+    NSError *error = nil;
+    if (setxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0) != 0) {
+        NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorWriteFailureCodeKey : @(errno)};
+        error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorWriteFailure userInfo:userInfo];
+        PINDiskCacheError(error);
+    }
+
+    if (!error) {
+        NSString *key = [self keyForEncodedFileURL:fileURL];
+        if (key) {
+            _metadata[key].ageLimit = ageLimit;
+        }
+    }
+
+    return !error;
 }
 
 - (BOOL)removeFileAndExecuteBlocksForKey:(NSString *)key
@@ -718,9 +761,14 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key completion:(PINDiskCacheObjectBlock)block
 {
+    [self setObjectAsync:object forKey:key withAgeLimit:0.0 completion:(PINDiskCacheObjectBlock)block];
+}
+
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit completion:(nullable PINDiskCacheObjectBlock)block
+{
     [self.operationQueue scheduleOperation:^{
         NSURL *fileURL = nil;
-        [self setObject:object forKey:key fileURL:&fileURL];
+        [self setObject:object forKey:key withAgeLimit:ageLimit fileURL:&fileURL];
         
         if (block) {
             block(self, key, object);
@@ -731,6 +779,11 @@ static NSURL *_sharedTrashURL;
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(nullable PINCacheObjectBlock)block
 {
     [self setObjectAsync:object forKey:key completion:(PINDiskCacheObjectBlock)block];
+}
+
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit completion:(nullable PINCacheObjectBlock)block
+{
+    [self setObjectAsync:object forKey:key withAgeLimit:ageLimit completion:(PINDiskCacheObjectBlock)block];
 }
 
 - (void)removeObjectForKeyAsync:(NSString *)key completion:(PINDiskCacheObjectBlock)block
@@ -843,6 +896,7 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)containsObjectForKey:(NSString *)key
 {
+    // TODO(mjlazar): Check _metadata[key].ageLimit
     [self lock];
         if (_metadata[key] != nil || _diskStateKnown == NO) {
             [self unlock];
@@ -881,8 +935,9 @@ static NSURL *_sharedTrashURL;
             [self unlock];
             [self lockAndWaitForKnownState];
         }
-    
-        if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([_metadata[key].date timeIntervalSinceDate:now]) < self->_ageLimit) {
+
+        NSTimeInterval ageLimit = _metadata[key].hasAgeLimit ? _metadata[key].ageLimit : self->_ageLimit;
+        if (!self->_ttlCache || ageLimit <= 0 || fabs([_metadata[key].date timeIntervalSinceDate:now]) < ageLimit) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             
             NSData *objectData = [[NSData alloc] initWithContentsOfFile:[fileURL path]];
@@ -946,7 +1001,17 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key
 {
-    [self setObject:object forKey:key fileURL:nil];
+    [self setObject:object forKey:key withAgeLimit:0.0];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit
+{
+    [self setObject:object forKey:key withAgeLimit:ageLimit fileURL:nil];
+}
+
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit
+{
+    [self setObject:object forKey:key withAgeLimit:ageLimit];
 }
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost
@@ -963,7 +1028,7 @@ static NSURL *_sharedTrashURL;
     }
 }
 
-- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key fileURL:(NSURL **)outFileURL
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit fileURL:(NSURL **)outFileURL
 {
     if (!key || !object)
         return;
@@ -1025,7 +1090,9 @@ static NSURL *_sharedTrashURL;
             if (date) {
                 self->_metadata[key].date = date;
             }
-            
+            if (ageLimit > 0.0) {
+                [self asynchronouslySetAgeLimit:ageLimit forURL:fileURL];
+            }
             if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
                 [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
         } else {
@@ -1140,7 +1207,8 @@ static NSURL *_sharedTrashURL;
             NSURL *fileURL = [self encodedFileURLForKey:key];
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and the object is still alive
             NSDate *date = _metadata[key].date;
-            if (!self->_ttlCache || self->_ageLimit <= 0 || (date && fabs([date timeIntervalSinceDate:now]) < self->_ageLimit)) {
+            NSTimeInterval ageLimit = _metadata[key].hasAgeLimit ? _metadata[key].ageLimit : self->_ageLimit;
+            if (!self->_ttlCache || ageLimit <= 0 || (date && fabs([date timeIntervalSinceDate:now]) < ageLimit)) {
                 BOOL stop = NO;
                 block(key, fileURL, &stop);
                 if (stop)
@@ -1453,4 +1521,10 @@ static NSURL *_sharedTrashURL;
 @end
 
 @implementation PINDiskCacheMetadata
+
+- (void)setAgeLimit:(NSTimeInterval)ageLimit {
+    _ageLimit = ageLimit;
+    _hasAgeLimit = YES;
+}
+
 @end

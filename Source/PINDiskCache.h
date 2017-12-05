@@ -13,7 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class PINDiskCache;
 @class PINOperationQueue;
 
+extern NSString * const PINDiskCacheErrorDomain;
+extern NSErrorUserInfoKey const PINDiskCacheErrorWriteFailureCodeKey;
 extern NSString * const PINDiskCachePrefix;
+
+typedef NS_ENUM(NSInteger, PINDiskCacheError) {
+  PINDiskCacheErrorWriteFailure = -1000,
+};
 
 /**
  A callback block which provides the cache, key and object as arguments
@@ -351,6 +357,17 @@ PIN_SUBCLASSING_RESTRICTED
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key completion:(nullable PINDiskCacheObjectBlock)block;
 
 /**
+ Stores an object in the cache for the specified key and age limit. This method returns immediately and executes the
+ passed block as soon as the object has been stored.
+
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ @param block A block to be executed serially after the object has been stored, or nil.
+ */
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit completion:(nullable PINDiskCacheObjectBlock)block;
+
+/**
  Stores an object in the cache for the specified key and the specified memory cost. If the cost causes the total
  to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method returns immediately
  and executes the passed block after the object has been stored, potentially in parallel with other blocks
@@ -362,6 +379,20 @@ PIN_SUBCLASSING_RESTRICTED
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(nullable PINCacheObjectBlock)block;
+
+/**
+ Stores an object in the cache for the specified key and the specified memory cost and age limit. If the cost causes the total
+ to go over the <memoryCache.costLimit> the cache is trimmed (oldest objects first). This method returns immediately
+ and executes the passed block after the object has been stored, potentially in parallel with other blocks
+ on the <concurrentQueue>.
+
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param cost An amount to add to the <memoryCache.totalCost>.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ @param block A block to be executed concurrently after the object has been stored, or nil.
+ */
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit completion:(nullable PINCacheObjectBlock)block;
 
 /**
  Removes the object for the specified key. This method returns immediately and executes the passed block
@@ -450,6 +481,17 @@ PIN_SUBCLASSING_RESTRICTED
  @param key A key to associate with the object. This string will be copied.
  */
 - (void)setObject:(nullable id <NSCoding>)object forKey:(NSString *)key;
+
+/**
+ Stores an object in the cache for the specified key and age limit. This method blocks the calling thread until
+ the object has been stored.
+
+ @see setObjectAsync:forKey:completion:
+ @param object An object to store in the cache.
+ @param key A key to associate with the object. This string will be copied.
+ @param ageLimit The age limit (in seconds) to associate with the object.
+ */
+- (void)setObject:(nullable id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit;
 
 /**
  Removes objects from the cache, largest first, until the cache is equal to or smaller than the
