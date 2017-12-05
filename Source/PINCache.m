@@ -134,7 +134,17 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [self setObjectAsync:object forKey:key withCost:0 completion:block];
 }
 
+- (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit completion:(PINCacheObjectBlock)block
+{
+    [self setObjectAsync:object forKey:key withCost:0 ageLimit:ageLimit completion:block];
+}
+
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost completion:(PINCacheObjectBlock)block
+{
+    [self setObjectAsync:object forKey:key withCost:cost ageLimit:0.0 completion:block];
+}
+
+- (void)setObjectAsync:(nonnull id)object forKey:(nonnull NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit completion:(nullable PINCacheObjectBlock)block
 {
     if (!key || !object)
         return;
@@ -142,10 +152,10 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
-        [_memoryCache setObject:object forKey:key withCost:cost];
+        [_memoryCache setObject:object forKey:key withCost:cost ageLimit:ageLimit];
     }];
     [group addOperation:^{
-        [_diskCache setObject:object forKey:key];
+        [_diskCache setObject:object forKey:key withAgeLimit:ageLimit];
     }];
   
     if (block) {
@@ -269,13 +279,23 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [self setObject:object forKey:key withCost:0];
 }
 
+- (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit
+{
+    [self setObject:object forKey:key withCost:0 ageLimit:ageLimit];
+}
+
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost
+{
+    [self setObject:object forKey:key withCost:cost ageLimit:0.0];
+}
+
+- (void)setObject:(nullable id)object forKey:(nonnull NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit
 {
     if (!key || !object)
         return;
     
-    [_memoryCache setObject:object forKey:key withCost:cost];
-    [_diskCache setObject:object forKey:key];
+    [_memoryCache setObject:object forKey:key withCost:cost ageLimit:ageLimit];
+    [_diskCache setObject:object forKey:key withAgeLimit:ageLimit];
 }
 
 - (nullable id)objectForKeyedSubscript:(NSString *)key
