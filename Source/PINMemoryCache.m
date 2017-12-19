@@ -5,6 +5,7 @@
 #import "PINMemoryCache.h"
 
 #import <pthread.h>
+#import <PINCache/PINCacheKeyObserverManager.h>
 #import <PINOperation/PINOperation.h>
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
@@ -21,6 +22,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 @property (strong, nonatomic) NSMutableDictionary *dictionary;
 @property (strong, nonatomic) NSMutableDictionary *dates;
 @property (strong, nonatomic) NSMutableDictionary *costs;
+@property (strong, nonatomic) PINCacheKeyObserverManager *observerManager;
 @end
 
 @implementation PINMemoryCache
@@ -72,6 +74,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         _dates = [[NSMutableDictionary alloc] init];
         _costs = [[NSMutableDictionary alloc] init];
         
+        _observerManager = [[PINCacheKeyObserverManager alloc] initWithCache:self];
+
         _willAddObjectBlock = nil;
         _willRemoveObjectBlock = nil;
         _willRemoveAllObjectsBlock = nil;
@@ -159,6 +163,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
     if (willRemoveObjectBlock)
         willRemoveObjectBlock(self, key, object);
+    
+    [_observerManager deletedValueForKey:key];
 
     [self lock];
         if (cost)
@@ -351,6 +357,9 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         
         if (block)
             block(self);
+        
+        [_observerManager deletedAllValues];
+        
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
@@ -448,6 +457,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     if (didAddObjectBlock)
         didAddObjectBlock(self, key, object);
     
+    [_observerManager updatedKey:key withValue:object];
+    
     if (costLimit > 0)
         [self trimToCostByDate:costLimit];
 }
@@ -493,6 +504,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     if (willRemoveAllObjectsBlock)
         willRemoveAllObjectsBlock(self);
     
+    [_observerManager deletedAllValues];
+    
     [self lock];
         [_dictionary removeAllObjects];
         [_dates removeAllObjects];
@@ -525,6 +538,16 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
             }
         }
     [self unlock];
+}
+
+- (void)addObserver:(id)observer selector:(SEL)selector forKey:(NSString *)key
+{
+    [_observerManager addObserver:observer selector:selector forKey:key];
+}
+
+- (void)removeObserver:(id)observer forKey:(NSString *)key
+{
+    [_observerManager removeObserver:observer forKey:key];
 }
 
 #pragma mark - Public Thread Safe Accessors -

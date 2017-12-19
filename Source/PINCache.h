@@ -5,6 +5,7 @@
 #import <Foundation/Foundation.h>
 
 #import <PINCache/PINCacheMacros.h>
+#import <PINCache/PINCacheKeyObserving.h>
 #import <PINCache/PINCaching.h>
 #import <PINCache/PINDiskCache.h>
 #import <PINCache/PINMemoryCache.h>
@@ -32,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 PIN_SUBCLASSING_RESTRICTED
-@interface PINCache : NSObject <PINCaching, PINCacheObjectSubscripting>
+@interface PINCache : NSObject <PINCaching, PINCacheKeyObserving, PINCacheObjectSubscripting>
 
 #pragma mark -
 /// @name Core
