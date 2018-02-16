@@ -362,7 +362,8 @@ PIN_SUBCLASSING_RESTRICTED
 
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
- @param ageLimit The age limit (in seconds) to associate with the object.
+ @param ageLimit The age limit (in seconds) to associate with the object. An age limit <= 0 means there is no object-level age limit and the cache-level TTL
+                 will be used for this object.
  @param block A block to be executed serially after the object has been stored, or nil.
  */
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit completion:(nullable PINDiskCacheObjectBlock)block;
@@ -389,7 +390,8 @@ PIN_SUBCLASSING_RESTRICTED
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
  @param cost An amount to add to the <memoryCache.totalCost>.
- @param ageLimit The age limit (in seconds) to associate with the object.
+ @param ageLimit The age limit (in seconds) to associate with the object. An age limit <= 0 means there is no object-level age limit and the cache-level TTL will be used for
+                 this object.
  @param block A block to be executed concurrently after the object has been stored, or nil.
  */
 - (void)setObjectAsync:(id <NSCoding>)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit completion:(nullable PINCacheObjectBlock)block;
@@ -489,7 +491,8 @@ PIN_SUBCLASSING_RESTRICTED
  @see setObjectAsync:forKey:completion:
  @param object An object to store in the cache.
  @param key A key to associate with the object. This string will be copied.
- @param ageLimit The age limit (in seconds) to associate with the object.
+ @param ageLimit The age limit (in seconds) to associate with the object. An age limit <= 0 means there is
+                 no object-level age limit and the cache-level TTL will be used for this object.
  */
 - (void)setObject:(nullable id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit;
 
