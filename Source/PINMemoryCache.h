@@ -61,6 +61,9 @@ PIN_SUBCLASSING_RESTRICTED
  - When attempting to access an object in the cache that has lived longer than self.ageLimit,
  the cache will behave as if the object does not exist
  
+ @note If an object-level age limit is set via one of the @c -setObject:forKey:withAgeLimit methods,
+       that age limit overrides self.ageLimit. The overridden object age limit could be greater or
+       less than self.agelimit but must be greater than zero.
  */
 @property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache;
 
