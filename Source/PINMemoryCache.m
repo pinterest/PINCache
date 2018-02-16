@@ -395,7 +395,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     if (!key)
         return nil;
     
-    NSDate *now = [[NSDate alloc] init];
+    NSDate *now = [NSDate date];
     [self lock];
         id object = nil;
         // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
@@ -540,7 +540,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         return;
     
     [self lock];
-        NSDate *now = [[NSDate alloc] init];
+        NSDate *now = [NSDate date];
         NSArray *keysSortedByDate = [_dates keysSortedByValueUsingSelector:@selector(compare:)];
         
         for (NSString *key in keysSortedByDate) {

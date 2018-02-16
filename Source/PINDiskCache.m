@@ -932,7 +932,7 @@ static NSURL *_sharedTrashURL;
     id <NSCoding> object = nil;
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
-    NSDate *now = [[NSDate alloc] init];
+    NSDate *now = [NSDate date];
     [self lock];
         if (self->_ttlCache) {
             // We actually need to know the entire disk state if we're a TTL cache.
@@ -988,7 +988,7 @@ static NSURL *_sharedTrashURL;
         return nil;
     }
     
-    NSDate *now = [[NSDate alloc] init];
+    NSDate *now = [NSDate date];
     NSURL *fileURL = [self encodedFileURLForKey:key];
     
     [self lockForWriting];
