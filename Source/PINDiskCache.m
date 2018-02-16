@@ -1050,6 +1050,8 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit fileURL:(NSURL **)outFileURL
 {
+    NSAssert(ageLimit <= 0.0 || (ageLimit > 0.0 && !_ttlCache), @"ttlCache must be set to YES if setting an object-level age limit.");
+
     if (!key || !object)
         return;
     
