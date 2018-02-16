@@ -49,6 +49,7 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @property (nonatomic, strong) NSNumber *size;
 @property (nonatomic) NSTimeInterval ageLimit;
 @property (nonatomic, readonly) BOOL hasAgeLimit;
+- (void)clearAgeLimit;
 @end
 
 @interface PINDiskCache () {
@@ -553,21 +554,36 @@ static NSURL *_sharedTrashURL;
 
 - (BOOL)_locked_setAgeLimit:(NSTimeInterval)ageLimit forURL:(NSURL *)fileURL
 {
-    if (ageLimit <= 0.0 || !fileURL) {
+    if (!fileURL) {
         return NO;
     }
 
     NSError *error = nil;
-    if (setxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0) != 0) {
-        NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorWriteFailureCodeKey : @(errno)};
-        error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorWriteFailure userInfo:userInfo];
-        PINDiskCacheError(error);
+    if (ageLimit <= 0.0) {
+        if (removexattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, 0) != 0) {
+          // Ignore if the extended attribute was never recorded for this file.
+          if (errno != ENOATTR) {
+            NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorWriteFailureCodeKey : @(errno)};
+            error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorWriteFailure userInfo:userInfo];
+            PINDiskCacheError(error);
+          }
+        }
+    } else {
+        if (setxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0) != 0) {
+            NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorWriteFailureCodeKey : @(errno)};
+            error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorWriteFailure userInfo:userInfo];
+            PINDiskCacheError(error);
+        }
     }
 
     if (!error) {
         NSString *key = [self keyForEncodedFileURL:fileURL];
         if (key) {
-            _metadata[key].ageLimit = ageLimit;
+            if (ageLimit <= 0.0) {
+                [_metadata[key] clearAgeLimit];
+            } else {
+                _metadata[key].ageLimit = ageLimit;
+            }
         }
     }
 
@@ -1094,9 +1110,7 @@ static NSURL *_sharedTrashURL;
             if (date) {
                 self->_metadata[key].date = date;
             }
-            if (ageLimit > 0.0) {
-                [self asynchronouslySetAgeLimit:ageLimit forURL:fileURL];
-            }
+            [self asynchronouslySetAgeLimit:ageLimit forURL:fileURL];
             if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
                 [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
         } else {
@@ -1526,9 +1540,16 @@ static NSURL *_sharedTrashURL;
 
 @implementation PINDiskCacheMetadata
 
-- (void)setAgeLimit:(NSTimeInterval)ageLimit {
+- (void)setAgeLimit:(NSTimeInterval)ageLimit
+{
     _ageLimit = ageLimit;
     _hasAgeLimit = YES;
+}
+
+- (void)clearAgeLimit
+{
+    _ageLimit = 0.0;
+    _hasAgeLimit = NO;
 }
 
 @end

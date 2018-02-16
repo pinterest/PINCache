@@ -466,8 +466,11 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         _dates[key] = [[NSDate alloc] init];
         _costs[key] = @(cost);
 
-        if (ageLimit > 0.0)
+        if (ageLimit > 0.0) {
             _ageLimits[key] = @(ageLimit);
+        } else {
+            [_ageLimits removeObjectForKey:key];
+        }
 
         _totalCost += cost;
     [self unlock];
