@@ -914,7 +914,7 @@ static NSURL *_sharedTrashURL;
                 objectExpired = ageLimit > 0 && fabs([_metadata[key].date timeIntervalSinceDate:[NSDate date]]) > ageLimit;
             }
             [self unlock];
-            return ([self fileURLForKey:key updateFileModificationDate:NO] != nil && !objectExpired);
+            return (!objectExpired && [self fileURLForKey:key updateFileModificationDate:NO] != nil);
         }
     [self unlock];
     return NO;
