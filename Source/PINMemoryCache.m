@@ -445,7 +445,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost ageLimit:(NSTimeInterval)ageLimit
 {
-    NSAssert(ageLimit <= 0.0 || (ageLimit > 0.0 && !_ttlCache), @"ttlCache must be set to YES if setting an object-level age limit.");
+    NSAssert(ageLimit <= 0.0 || (ageLimit > 0.0 && _ttlCache), @"ttlCache must be set to YES if setting an object-level age limit.");
 
     if (!key || !object)
         return;

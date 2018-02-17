@@ -48,8 +48,6 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @property (nonatomic, strong) NSDate *date;
 @property (nonatomic, strong) NSNumber *size;
 @property (nonatomic) NSTimeInterval ageLimit;
-@property (nonatomic, readonly) BOOL hasAgeLimit;
-- (void)clearAgeLimit;
 @end
 
 @interface PINDiskCache () {
@@ -579,11 +577,7 @@ static NSURL *_sharedTrashURL;
     if (!error) {
         NSString *key = [self keyForEncodedFileURL:fileURL];
         if (key) {
-            if (ageLimit <= 0.0) {
-                [_metadata[key] clearAgeLimit];
-            } else {
-                _metadata[key].ageLimit = ageLimit;
-            }
+            _metadata[key].ageLimit = ageLimit;
         }
     }
 
@@ -916,7 +910,7 @@ static NSURL *_sharedTrashURL;
         if (_metadata[key] != nil || _diskStateKnown == NO) {
             BOOL objectExpired = NO;
             if (self->_ttlCache && _metadata[key].date != nil) {
-                NSTimeInterval ageLimit = _metadata[key].hasAgeLimit ? _metadata[key].ageLimit : self->_ageLimit;
+                NSTimeInterval ageLimit = _metadata[key].ageLimit > 0.0 ? _metadata[key].ageLimit : self->_ageLimit;
                 objectExpired = ageLimit > 0 && fabs([_metadata[key].date timeIntervalSinceDate:[NSDate date]]) > ageLimit;
             }
             [self unlock];
@@ -956,7 +950,7 @@ static NSURL *_sharedTrashURL;
             [self lockAndWaitForKnownState];
         }
 
-        NSTimeInterval ageLimit = _metadata[key].hasAgeLimit ? _metadata[key].ageLimit : self->_ageLimit;
+        NSTimeInterval ageLimit = _metadata[key].ageLimit > 0.0 ? _metadata[key].ageLimit : self->_ageLimit;
         if (!self->_ttlCache || ageLimit <= 0 || fabs([_metadata[key].date timeIntervalSinceDate:now]) < ageLimit) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             
@@ -1050,7 +1044,7 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit fileURL:(NSURL **)outFileURL
 {
-    NSAssert(ageLimit <= 0.0 || (ageLimit > 0.0 && !_ttlCache), @"ttlCache must be set to YES if setting an object-level age limit.");
+    NSAssert(ageLimit <= 0.0 || (ageLimit > 0.0 && _ttlCache), @"ttlCache must be set to YES if setting an object-level age limit.");
 
     if (!key || !object)
         return;
@@ -1227,7 +1221,7 @@ static NSURL *_sharedTrashURL;
             NSURL *fileURL = [self encodedFileURLForKey:key];
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and the object is still alive
             NSDate *date = _metadata[key].date;
-            NSTimeInterval ageLimit = _metadata[key].hasAgeLimit ? _metadata[key].ageLimit : self->_ageLimit;
+            NSTimeInterval ageLimit = _metadata[key].ageLimit > 0.0 ? _metadata[key].ageLimit : self->_ageLimit;
             if (!self->_ttlCache || ageLimit <= 0 || (date && fabs([date timeIntervalSinceDate:now]) < ageLimit)) {
                 BOOL stop = NO;
                 block(key, fileURL, &stop);
@@ -1541,17 +1535,4 @@ static NSURL *_sharedTrashURL;
 @end
 
 @implementation PINDiskCacheMetadata
-
-- (void)setAgeLimit:(NSTimeInterval)ageLimit
-{
-    _ageLimit = ageLimit;
-    _hasAgeLimit = YES;
-}
-
-- (void)clearAgeLimit
-{
-    _ageLimit = 0.0;
-    _hasAgeLimit = NO;
-}
-
 @end
