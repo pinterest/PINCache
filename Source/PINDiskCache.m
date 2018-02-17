@@ -21,6 +21,7 @@ __LINE__, [error localizedDescription]); }
 
 const char * PINDiskCacheAgeLimitAttributeName = "com.pinterest.PINDiskCache.ageLimit";
 NSString * const PINDiskCacheErrorDomain = @"com.pinterest.PINDiskCache";
+NSErrorUserInfoKey const PINDiskCacheErrorReadFailureCodeKey = @"PINDiskCacheErrorReadFailureCodeKey";
 NSErrorUserInfoKey const PINDiskCacheErrorWriteFailureCodeKey = @"PINDiskCacheErrorWriteFailureCodeKey";
 NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
@@ -492,8 +493,16 @@ static NSURL *_sharedTrashURL;
             }
 
             NSTimeInterval ageLimit;
-            if(getxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0)) {
+            ssize_t res = getxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
+            if(res) {
                 _metadata[key].ageLimit = ageLimit;
+            } else if (res == -1) {
+                // Ignore if the extended attribute was never recorded for this file.
+                if (errno != ENOATTR) {
+                  NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorReadFailureCodeKey : @(errno)};
+                  error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorReadFailure userInfo:userInfo];
+                  PINDiskCacheError(error);
+                }
             }
         [self unlock];
     }

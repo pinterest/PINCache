@@ -14,11 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class PINOperationQueue;
 
 extern NSString * const PINDiskCacheErrorDomain;
+extern NSErrorUserInfoKey const PINDiskCacheErrorReadFailureCodeKey;
 extern NSErrorUserInfoKey const PINDiskCacheErrorWriteFailureCodeKey;
 extern NSString * const PINDiskCachePrefix;
 
 typedef NS_ENUM(NSInteger, PINDiskCacheError) {
-  PINDiskCacheErrorWriteFailure = -1000,
+  PINDiskCacheErrorReadFailure = -1000,
+  PINDiskCacheErrorWriteFailure = -1001,
 };
 
 /**
