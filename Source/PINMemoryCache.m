@@ -125,6 +125,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     if (self.removeAllObjectsOnMemoryWarning)
         [self removeAllObjectsAsync:nil];
 
+    [self removeExpiredObjects];
+
     [self.operationQueue scheduleOperation:^{
         [self lock];
             PINCacheBlock didReceiveMemoryWarningBlock = self->_didReceiveMemoryWarningBlock;
