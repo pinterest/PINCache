@@ -1078,6 +1078,54 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     [NSDate stopMockingDate];
 }
 
+- (void)testRemoveExpiredObjects
+{
+  [self.cache removeAllObjects];
+  self.cache.memoryCache.ttlCache = YES;
+  self.cache.diskCache.ttlCache = YES;
+  NSString *key1 = @"key1";
+  NSString *key2 = @"key2";
+
+  [self.cache setObject:[self image] forKey:key1 withAgeLimit:60.0];
+  [self.cache setObject:[self image] forKey:key2 withAgeLimit:120.0];
+
+  // Fast forward 90 seconds.
+  [NSDate startMockingDateWithDate:[NSDate dateWithTimeIntervalSinceNow:90]];
+
+  // The first object has been expired for 30 seconds and should be cleared out.
+  [self.cache removeExpiredObjects];
+
+  // Go back to current time, so we can check if objects exist in cache. If we don't do this, the getters will return nil
+  // even if the objects are in the cache.
+  [NSDate stopMockingDate];
+
+  XCTestExpectation *memObjectForKey1Expectation = [self expectationWithDescription:@"memoryCache objectForKeyAsync - #1"];
+  [self.cache.memoryCache objectForKeyAsync:key1 completion:^(PINMemoryCache *cache, NSString *key, id object) {
+    XCTAssertNil(object, @"should not be in memory cache");
+    [memObjectForKey1Expectation fulfill];
+  }];
+
+  XCTestExpectation *memObjectForKey2Expectation = [self expectationWithDescription:@"memoryCache objectForKeyAsync - #2"];
+  [self.cache.memoryCache objectForKeyAsync:key2 completion:^(PINMemoryCache *cache, NSString *key, id object) {
+    XCTAssertNotNil(object, @"should not be in memory cache");
+    [memObjectForKey2Expectation fulfill];
+  }];
+
+  XCTestExpectation *diskObjectForKey1Expectation = [self expectationWithDescription:@"diskCache objectForKeyAsync - #1"];
+  [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    XCTAssertNil(object, @"should not be in disk cache");
+    [diskObjectForKey1Expectation fulfill];
+  }];
+
+  XCTestExpectation *diskObjectForKey2Expectation = [self expectationWithDescription:@"diskCache objectForKeyAsync - #2"];
+  [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    XCTAssertNotNil(object, @"should not be in disk cache");
+    [diskObjectForKey2Expectation fulfill];
+  }];
+
+  [self waitForExpectationsWithTimeout:0.1 handler:nil];
+}
+
 - (void)testAsyncDiskInitialization
 {
     NSString * const cacheName = @"testAsyncDiskInitialization";
