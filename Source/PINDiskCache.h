@@ -427,6 +427,8 @@ PIN_SUBCLASSING_RESTRICTED
 
  @param byteCount The cache will be trimmed equal to or smaller than this size.
  @param block A block to be executed serially after the cache has been trimmed, or nil.
+
+ @note This will not remove objects that have been added via one of the @c -setObject:forKey:withAgeLimit methods.
  */
 - (void)trimToSizeByDateAsync:(NSUInteger)byteCount completion:(nullable PINCacheBlock)block;
 
@@ -517,6 +519,8 @@ PIN_SUBCLASSING_RESTRICTED
  
  @see trimToSizeByDateAsync:
  @param byteCount The cache will be trimmed equal to or smaller than this size.
+
+ @note This will not remove objects that have been added via one of the @c -setObject:forKey:withAgeLimit methods.
  */
 - (void)trimToSizeByDate:(NSUInteger)byteCount;
 

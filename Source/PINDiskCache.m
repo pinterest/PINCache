@@ -692,7 +692,7 @@ static NSURL *_sharedTrashURL;
         
         for (NSString *key in keysSortedByDate) { // oldest files first
             NSDate *accessDate = _metadata[key].date;
-            if (!accessDate)
+            if (!accessDate || _metadata[key].ageLimit > 0.0)
                 continue;
             
             if ([accessDate compare:trimDate] == NSOrderedAscending) { // older than trim date
