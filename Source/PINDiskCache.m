@@ -455,6 +455,7 @@ static NSURL *_sharedTrashURL;
 - (void)initializeDiskProperties
 {
     NSUInteger byteCount = 0;
+    BOOL hasAtLeastOneAgeLimit = NO;
     NSArray *keys = @[ NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey ];
     
     NSError *error = nil;
@@ -496,6 +497,7 @@ static NSURL *_sharedTrashURL;
             ssize_t res = getxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
             if(res) {
                 _metadata[key].ageLimit = ageLimit;
+                hasAtLeastOneAgeLimit = YES;
             } else if (res == -1) {
                 // Ignore if the extended attribute was never recorded for this file.
                 if (errno != ENOATTR) {
@@ -513,6 +515,9 @@ static NSURL *_sharedTrashURL;
     
         if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
             [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
+
+        if (hasAtLeastOneAgeLimit)
+            [self removeExpiredObjects];
     
         _diskStateKnown = YES;
         pthread_cond_broadcast(&_diskStateKnownCondition);
