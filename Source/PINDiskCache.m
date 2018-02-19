@@ -880,6 +880,17 @@ static NSURL *_sharedTrashURL;
                                 completion:completion];
 }
 
+- (void)removeExpiredObjectsAsync:(PINCacheBlock)block
+{
+    [self.operationQueue scheduleOperation:^{
+        [self removeExpiredObjects];
+
+        if (block) {
+            block(self);
+        }
+    } withPriority:PINOperationQueuePriorityLow];
+}
+
 - (void)removeAllObjectsAsync:(PINCacheBlock)block
 {
     [self.operationQueue scheduleOperation:^{
@@ -1187,6 +1198,32 @@ static NSURL *_sharedTrashURL;
     }
     
     [self trimDiskToSizeByDate:trimByteCount];
+}
+
+- (void)removeExpiredObjects
+{
+    [self lockForWriting];
+
+        NSDate *now = [NSDate date];
+        NSMutableArray<NSString *> *expiredObjectKeys = [NSMutableArray array];
+        [_metadata enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, PINDiskCacheMetadata * _Nonnull obj, BOOL * _Nonnull stop) {
+            NSTimeInterval ageLimit = obj.ageLimit > 0.0 ? obj.ageLimit : self->_ageLimit;
+            NSDate *expirationDate = [obj.date dateByAddingTimeInterval:ageLimit];
+            if ([expirationDate compare:now] == NSOrderedDescending) { // Expiration date has passed
+                [expiredObjectKeys addObject:key];
+            }
+        }];
+
+        for (NSString *key in expiredObjectKeys) {
+            [self unlock];
+
+                //unlock, removeFileAndExecuteBlocksForKey handles locking itself
+                [self removeFileAndExecuteBlocksForKey:key];
+
+            [self lock];
+        }
+
+    [self unlock];
 }
 
 - (void)removeAllObjects

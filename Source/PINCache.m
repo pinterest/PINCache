@@ -233,6 +233,26 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group start];
 }
 
+- (void)removeExpiredObjectsAsync:(PINCacheBlock)block
+{
+    PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
+
+    [group addOperation:^{
+        [_memoryCache removeExpiredObjects];
+    }];
+    [group addOperation:^{
+        [_diskCache removeExpiredObjects];
+    }];
+
+    if (block) {
+        [group setCompletion:^{
+            block(self);
+        }];
+    }
+
+    [group start];
+}
+
 #pragma mark - Public Synchronous Accessors -
 
 - (NSUInteger)diskByteCount
@@ -328,6 +348,12 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     
     [_memoryCache trimToDate:date];
     [_diskCache trimToDate:date];
+}
+
+- (void)removeExpiredObjects
+{
+    [_memoryCache removeExpiredObjects];
+    [_diskCache removeExpiredObjects];
 }
 
 - (void)removeAllObjects

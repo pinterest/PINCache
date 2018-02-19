@@ -138,6 +138,15 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 - (void)trimToDateAsync:(NSDate *)date completion:(nullable PINCacheBlock)block;
 
 /**
+ Removes all expired objects from the cache. This includes objects that are considered expired due to the cache-level ageLimit
+ as well as object-level ageLimits. This method returns immediately and executes the passed block after the objects have been removed,
+ potentially in parallel with other blocks on the <concurrentQueue>.
+
+ @param block A block to be executed concurrently after the objects have been removed, or nil.
+ */
+- (void)removeExpiredObjectsAsync:(nullable PINCacheBlock)block;
+
+/**
  Removes all objects from the cache.This method returns immediately and executes the passed block after the
  cache has been cleared, potentially in parallel with other blocks on the <concurrentQueue>.
  
@@ -233,6 +242,13 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  @param date Objects that haven't been accessed since this date are removed from the cache.
  */
 - (void)trimToDate:(NSDate *)date;
+
+/**
+ Removes all expired objects from the cache. This includes objects that are considered expired due to the cache-level ageLimit
+ as well as object-level ageLimits. This method blocks the calling thread until the objects have been removed.
+ Uses a lock to achieve synchronicity on the disk cache.
+ */
+- (void)removeExpiredObjects;
 
 /**
  Removes all objects from the cache. This method blocks the calling thread until the cache has been cleared.

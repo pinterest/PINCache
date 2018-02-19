@@ -198,6 +198,27 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     }
 }
 
+- (void)removeExpiredObjects
+{
+    [self lock];
+        NSDictionary<NSString *, NSDate *> *dates = [_dates copy];
+        NSDictionary<NSString *, NSNumber *> *ageLimits = [_ageLimits copy];
+    [self unlock];
+
+    NSDate *now = [NSDate date];
+    for (NSString *key in ageLimits) {
+        NSDate *accessDate = dates[key];
+        NSTimeInterval ageLimit = [_ageLimits[key] doubleValue] ?: self->_ageLimit;
+        if (!accessDate)
+            continue;
+
+        NSDate *expirationDate = [accessDate dateByAddingTimeInterval:ageLimit];
+        if ([expirationDate compare:now] == NSOrderedDescending) { // Expiration date has passed
+            [self removeObjectAndExecuteBlocksForKey:key];
+        }
+    }
+}
+
 - (void)trimToCostLimit:(NSUInteger)limit
 {
     NSUInteger totalCost = 0;
@@ -354,6 +375,16 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     [self.operationQueue scheduleOperation:^{
         [self trimToCostByDate:cost];
         
+        if (block)
+            block(self);
+    } withPriority:PINOperationQueuePriorityHigh];
+}
+
+- (void)removeExpiredObjectsAsync:(PINCacheBlock)block
+{
+    [self.operationQueue scheduleOperation:^{
+        [self removeExpiredObjects];
+
         if (block)
             block(self);
     } withPriority:PINOperationQueuePriorityHigh];
