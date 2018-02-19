@@ -1214,7 +1214,7 @@ static NSURL *_sharedTrashURL;
         [_metadata enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, PINDiskCacheMetadata * _Nonnull obj, BOOL * _Nonnull stop) {
             NSTimeInterval ageLimit = obj.ageLimit > 0.0 ? obj.ageLimit : self->_ageLimit;
             NSDate *expirationDate = [obj.date dateByAddingTimeInterval:ageLimit];
-            if ([expirationDate compare:now] == NSOrderedDescending) { // Expiration date has passed
+            if ([expirationDate compare:now] == NSOrderedAscending) { // Expiration date has passed
                 [expiredObjectKeys addObject:key];
             }
         }];

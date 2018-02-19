@@ -215,7 +215,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
             continue;
 
         NSDate *expirationDate = [accessDate dateByAddingTimeInterval:ageLimit];
-        if ([expirationDate compare:now] == NSOrderedDescending) { // Expiration date has passed
+        if ([expirationDate compare:now] == NSOrderedAscending) { // Expiration date has passed
             [self removeObjectAndExecuteBlocksForKey:key];
         }
     }
