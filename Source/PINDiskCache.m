@@ -1217,14 +1217,12 @@ static NSURL *_sharedTrashURL;
             }
         }];
 
-        for (NSString *key in expiredObjectKeys) {
-            [self unlock];
-
+        [self unlock];
+            for (NSString *key in expiredObjectKeys) {
                 //unlock, removeFileAndExecuteBlocksForKey handles locking itself
                 [self removeFileAndExecuteBlocksForKey:key];
-
-            [self lock];
-        }
+            }
+        [self lock];
 
     [self unlock];
 }
