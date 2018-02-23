@@ -577,48 +577,64 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToSize:(NSUInteger)trimByteCount
 {
+    NSMutableArray *keysToRemove = nil;
+    
     [self lockForWriting];
         if (_byteCount > trimByteCount) {
+            keysToRemove = [[NSMutableArray alloc] init];
+            
             NSArray *keysSortedBySize = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.size compare:obj2.size];
             }];
             
+            NSUInteger bytesSaved = 0;
             for (NSString *key in [keysSortedBySize reverseObjectEnumerator]) { // largest objects first
-                [self unlock];
-                
-                //unlock, removeFileAndExecuteBlocksForKey handles locking itself
-                [self removeFileAndExecuteBlocksForKey:key];
-                
-                [self lock];
-                
-                if (_byteCount <= trimByteCount)
+                [keysToRemove addObject:key];
+                NSNumber *byteSize = _metadata[key].size;
+                if (byteSize) {
+                    bytesSaved += [byteSize unsignedIntegerValue];
+                }
+                if (_byteCount - bytesSaved <= trimByteCount) {
                     break;
+                }
             }
         }
     [self unlock];
+    
+    for (NSString *key in keysToRemove) {
+        [self removeFileAndExecuteBlocksForKey:key];
+    }
 }
 
 - (void)trimDiskToSizeByDate:(NSUInteger)trimByteCount
 {
+    NSMutableArray *keysToRemove = nil;
+    
     [self lockForWriting];
         if (_byteCount > trimByteCount) {
+            keysToRemove = [[NSMutableArray alloc] init];
+            
             NSArray *keysSortedByDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.date compare:obj2.date];
             }];
             
+            NSUInteger bytesSaved = 0;
             for (NSString *key in keysSortedByDate) { // oldest objects first
-                [self unlock];
-                
-                //unlock, removeFileAndExecuteBlocksForKey handles locking itself
-                [self removeFileAndExecuteBlocksForKey:key];
-                
-                [self lock];
-                
-                if (_byteCount <= trimByteCount)
+                [keysToRemove addObject:key];
+                NSNumber *byteSize = _metadata[key].size;
+                if (byteSize) {
+                    bytesSaved += [byteSize unsignedIntegerValue];
+                }
+                if (_byteCount - bytesSaved <= trimByteCount) {
                     break;
+                }
             }
         }
     [self unlock];
+    
+    for (NSString *key in keysToRemove) {
+        [self removeFileAndExecuteBlocksForKey:key];
+    }
 }
 
 - (void)trimDiskToDate:(NSDate *)trimDate
@@ -627,6 +643,8 @@ static NSURL *_sharedTrashURL;
         NSArray *keysSortedByDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
             return [obj1.date compare:obj2.date];
         }];
+    
+        NSMutableArray *keysToRemove = [[NSMutableArray alloc] init];
         
         for (NSString *key in keysSortedByDate) { // oldest files first
             NSDate *accessDate = _metadata[key].date;
@@ -634,17 +652,16 @@ static NSURL *_sharedTrashURL;
                 continue;
             
             if ([accessDate compare:trimDate] == NSOrderedAscending) { // older than trim date
-                [self unlock];
-                
-                //unlock, removeFileAndExecuteBlocksForKey handles locking itself
-                [self removeFileAndExecuteBlocksForKey:key];
-                
-                [self lock];
+                [keysToRemove addObject:key];
             } else {
                 break;
             }
         }
     [self unlock];
+    
+    for (NSString *key in keysToRemove) {
+        [self removeFileAndExecuteBlocksForKey:key];
+    }
 }
 
 - (void)trimToAgeLimitRecursively
