@@ -517,7 +517,7 @@ static NSURL *_sharedTrashURL;
             [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
 
         if (hasAtLeastOneAgeLimit)
-            [self removeExpiredObjects];
+            [self removeExpiredObjectsAsync:nil];
     
         _diskStateKnown = YES;
         pthread_cond_broadcast(&_diskStateKnownCondition);
