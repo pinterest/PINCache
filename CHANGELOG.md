@@ -1,6 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
+- [fix] Fix up warnings and upgrade to PINOperation 1.1.1: [#213](https://github.com/pinterest/PINCache/pull/213)
 
 ## 3.0.1 -- Beta 6
 - [fix] Add some sane limits to the disk cache: [#201]https://github.com/pinterest/PINCache/pull/201
