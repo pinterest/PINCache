@@ -145,10 +145,10 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
-        [_memoryCache setObject:object forKey:key withCost:cost];
+        [self->_memoryCache setObject:object forKey:key withCost:cost];
     }];
     [group addOperation:^{
-        [_diskCache setObject:object forKey:key];
+        [self->_diskCache setObject:object forKey:key];
     }];
     
     [group setCompletion:^{
@@ -169,10 +169,10 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
-        [_memoryCache removeObjectForKey:key];
+        [self->_memoryCache removeObjectForKey:key];
     }];
     [group addOperation:^{
-        [_diskCache removeObjectForKey:key];
+        [self->_diskCache removeObjectForKey:key];
     }];
     
     [group setCompletion:^{
@@ -190,10 +190,10 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
-        [_memoryCache removeAllObjects];
+        [self->_memoryCache removeAllObjects];
     }];
     [group addOperation:^{
-        [_diskCache removeAllObjects];
+        [self->_diskCache removeAllObjects];
     }];
     
     [group setCompletion:^{
@@ -214,10 +214,10 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
     
     [group addOperation:^{
-        [_memoryCache trimToDate:date];
+        [self->_memoryCache trimToDate:date];
     }];
     [group addOperation:^{
-        [_diskCache trimToDate:date];
+        [self->_diskCache trimToDate:date];
     }];
   
     if (block) {
