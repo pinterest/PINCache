@@ -45,6 +45,17 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
     return (result == NSOrderedDescending) ? newDate : existingDate;
 };
 
+const char * PINDiskCacheFileSystemRepresentation(NSURL *url)
+{
+#ifdef __MAC_10_13 // Xcode >= 9
+    // -fileSystemRepresentation is available on macOS >= 10.9
+    if (@available(macOS 10.9, iOS 7.0, watchOS 2.0, tvOS 9.0, *)) {
+      return url.fileSystemRepresentation;
+    }
+#endif
+    return [url.path cStringUsingEncoding:NSUTF8StringEncoding];
+}
+
 @interface PINDiskCacheMetadata : NSObject
 @property (nonatomic, strong) NSDate *date;
 @property (nonatomic, strong) NSNumber *size;
@@ -494,7 +505,7 @@ static NSURL *_sharedTrashURL;
             }
 
             NSTimeInterval ageLimit;
-            ssize_t res = getxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
+            ssize_t res = getxattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
             if(res) {
                 _metadata[key].ageLimit = ageLimit;
                 hasAtLeastOneAgeLimit = YES;
@@ -572,7 +583,7 @@ static NSURL *_sharedTrashURL;
 
     NSError *error = nil;
     if (ageLimit <= 0.0) {
-        if (removexattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, 0) != 0) {
+        if (removexattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, 0) != 0) {
           // Ignore if the extended attribute was never recorded for this file.
           if (errno != ENOATTR) {
             NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorWriteFailureCodeKey : @(errno)};
@@ -581,7 +592,7 @@ static NSURL *_sharedTrashURL;
           }
         }
     } else {
-        if (setxattr([fileURL fileSystemRepresentation], PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0) != 0) {
+        if (setxattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0) != 0) {
             NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorWriteFailureCodeKey : @(errno)};
             error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorWriteFailure userInfo:userInfo];
             PINDiskCacheError(error);

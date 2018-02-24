@@ -238,10 +238,10 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     PINOperationGroup *group = [PINOperationGroup asyncOperationGroupWithQueue:_operationQueue];
 
     [group addOperation:^{
-        [_memoryCache removeExpiredObjects];
+        [self->_memoryCache removeExpiredObjects];
     }];
     [group addOperation:^{
-        [_diskCache removeExpiredObjects];
+        [self->_diskCache removeExpiredObjects];
     }];
 
     if (block) {
