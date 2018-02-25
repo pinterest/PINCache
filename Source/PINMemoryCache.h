@@ -65,7 +65,7 @@ PIN_SUBCLASSING_RESTRICTED
        that age limit overrides self.ageLimit. The overridden object age limit could be greater or
        less than self.agelimit but must be greater than zero.
  */
-@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache;
+@property (nonatomic, readonly, getter=isTTLCache) BOOL ttlCache;
 
 /**
  When `YES` on iOS the cache will remove all objects when the app receives a memory warning.
@@ -148,7 +148,9 @@ PIN_SUBCLASSING_RESTRICTED
 
 - (instancetype)initWithOperationQueue:(PINOperationQueue *)operationQueue;
 
-- (instancetype)initWithName:(NSString *)name operationQueue:(PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithName:(NSString *)name operationQueue:(PINOperationQueue *)operationQueue;
+
+- (instancetype)initWithName:(NSString *)name operationQueue:(PINOperationQueue *)operationQueue ttlCache:(BOOL)ttlCache NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Asynchronous Methods
 /// @name Asynchronous Methods
@@ -237,6 +239,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
 - (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
 - (void)removeAllObjects:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
 - (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock __attribute__((deprecated));
+- (void)setTtlCache:(BOOL)ttlCache __attribute__((unavailable("ttlCache is no longer a settable property and must now be set via initializer.")));
 @end
 
 NS_ASSUME_NONNULL_END

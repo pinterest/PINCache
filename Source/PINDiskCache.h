@@ -194,7 +194,7 @@ PIN_SUBCLASSING_RESTRICTED
  than self.agelimit but must be greater than zero.
  
  */
-@property (nonatomic, assign, getter=isTTLCache) BOOL ttlCache;
+@property (nonatomic, readonly, getter=isTTLCache) BOOL ttlCache;
 
 #pragma mark - Event Blocks
 /// @name Event Blocks
@@ -294,7 +294,7 @@ PIN_SUBCLASSING_RESTRICTED
 
 /**
  The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
- 
+
  @see name
  @param name The name of the cache.
  @param prefix The prefix for the cache name. Defaults to com.pinterest.PINDiskCache
@@ -313,7 +313,32 @@ PIN_SUBCLASSING_RESTRICTED
                 deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
                   keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
-              operationQueue:(nonnull PINOperationQueue *)operationQueue NS_DESIGNATED_INITIALIZER;
+              operationQueue:(nonnull PINOperationQueue *)operationQueue;
+
+/**
+ The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
+ 
+ @see name
+ @param name The name of the cache.
+ @param prefix The prefix for the cache name. Defaults to com.pinterest.PINDiskCache
+ @param rootPath The path of the cache.
+ @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
+ @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
+ @param keyEncoder A block used to encode key(filename). If nil provided, default url encoder will be used
+ @param keyDecoder A block used to decode key(filename). If nil provided, default url decoder will be used
+ @param operationQueue A PINOperationQueue to run asynchronous operations
+ @param ttlCache Whether or not the cache should behave as a TTL cache.
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(nonnull NSString *)name
+                      prefix:(nonnull NSString *)prefix
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
+              operationQueue:(nonnull PINOperationQueue *)operationQueue
+                    ttlCache:(BOOL)ttlCache NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Asynchronous Methods
 /// @name Asynchronous Methods
@@ -565,6 +590,7 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 - (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
 - (void)removeAllObjects:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
 - (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock __attribute__((deprecated));
+- (void)setTtlCache:(BOOL)ttlCache __attribute__((unavailable("ttlCache is no longer a settable property and must now be set via initializer.")));
 @end
 
 NS_ASSUME_NONNULL_END

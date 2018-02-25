@@ -23,12 +23,14 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 + (dispatch_queue_t)sharedTrashQueue;
 - (NSString *)encodedString:(NSString *)string;
+- (void)setTtlCache:(BOOL)ttlCache;
 
 @end
 
 @interface PINMemoryCache ()
 
 - (void)didReceiveEnterBackgroundNotification:(NSNotification *)notification;
+- (void)setTtlCache:(BOOL)ttlCache;
 
 @end
 
@@ -778,7 +780,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // Wait until time 3 so that we know the object should be expired, the 1st cache clearing has happened, and the 2nd cache clearing hasn't happened yet
     sleep(2);
 
-    [self.cache.diskCache setTtlCache:YES];
+    self.cache.diskCache.ttlCache = YES;
     [self.cache.memoryCache setTtlCache:YES];
 
     dispatch_group_t group = dispatch_group_create();

@@ -45,6 +45,17 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                   keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
 {
+    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:keyEncoder keyDecoder:keyDecoder ttlCache:NO];
+}
+
+- (instancetype)initWithName:(NSString *)name
+                    rootPath:(NSString *)rootPath
+                  serializer:(PINDiskCacheSerializerBlock)serializer
+                deserializer:(PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
+                    ttlCache:(BOOL)ttlCache
+{
     if (!name)
         return nil;
     
@@ -60,7 +71,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                            deserializer:deserializer
                                              keyEncoder:nil
                                              keyDecoder:nil
-                                         operationQueue:_operationQueue];
+                                         operationQueue:_operationQueue
+                                               ttlCache:ttlCache];
         _memoryCache = [[PINMemoryCache alloc] initWithOperationQueue:_operationQueue];
     }
     return self;

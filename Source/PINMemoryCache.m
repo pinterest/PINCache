@@ -62,12 +62,18 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (instancetype)initWithName:(NSString *)name operationQueue:(PINOperationQueue *)operationQueue
 {
+    return [self initWithName:name operationQueue:operationQueue ttlCache:NO];
+}
+
+- (instancetype)initWithName:(NSString *)name operationQueue:(PINOperationQueue *)operationQueue ttlCache:(BOOL)ttlCache
+{
     if (self = [super init]) {
         __unused int result = pthread_mutex_init(&_mutex, NULL);
         NSAssert(result == 0, @"Failed to init lock in PINMemoryCache %@. Code: %d", self, result);
         
         _name = [name copy];
         _operationQueue = operationQueue;
+        _ttlCache = ttlCache;
         
         _dictionary = [[NSMutableDictionary alloc] init];
         _dates = [[NSMutableDictionary alloc] init];

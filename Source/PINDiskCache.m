@@ -159,6 +159,26 @@ static NSURL *_sharedTrashURL;
                   keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
               operationQueue:(PINOperationQueue *)operationQueue
 {
+    return [self initWithName:name prefix:prefix
+                     rootPath:rootPath
+                   serializer:serializer
+                 deserializer:deserializer
+                   keyEncoder:keyEncoder
+                   keyDecoder:keyDecoder
+               operationQueue:operationQueue
+                     ttlCache:NO];
+}
+
+- (instancetype)initWithName:(NSString *)name
+                      prefix:(NSString *)prefix
+                    rootPath:(NSString *)rootPath
+                  serializer:(PINDiskCacheSerializerBlock)serializer
+                deserializer:(PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
+              operationQueue:(PINOperationQueue *)operationQueue
+                    ttlCache:(BOOL)ttlCache
+{
     if (!name)
         return nil;
     
@@ -176,6 +196,7 @@ static NSURL *_sharedTrashURL;
         _name = [name copy];
         _prefix = [prefix copy];
         _operationQueue = operationQueue;
+        _ttlCache = ttlCache;
         _willAddObjectBlock = nil;
         _willRemoveObjectBlock = nil;
         _willRemoveAllObjectsBlock = nil;
@@ -504,17 +525,19 @@ static NSURL *_sharedTrashURL;
                 byteCount += [fileSize unsignedIntegerValue];
             }
 
-            NSTimeInterval ageLimit;
-            ssize_t res = getxattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
-            if(res) {
-                _metadata[key].ageLimit = ageLimit;
-                hasAtLeastOneAgeLimit = YES;
-            } else if (res == -1) {
-                // Ignore if the extended attribute was never recorded for this file.
-                if (errno != ENOATTR) {
-                  NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorReadFailureCodeKey : @(errno)};
-                  error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorReadFailure userInfo:userInfo];
-                  PINDiskCacheError(error);
+            if (_ttlCache) {
+                NSTimeInterval ageLimit;
+                ssize_t res = getxattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
+                if(res) {
+                    _metadata[key].ageLimit = ageLimit;
+                    hasAtLeastOneAgeLimit = YES;
+                } else if (res == -1) {
+                    // Ignore if the extended attribute was never recorded for this file.
+                    if (errno != ENOATTR) {
+                      NSDictionary<NSErrorUserInfoKey, id> *userInfo = @{ PINDiskCacheErrorReadFailureCodeKey : @(errno)};
+                      error = [NSError errorWithDomain:PINDiskCacheErrorDomain code:PINDiskCacheErrorReadFailure userInfo:userInfo];
+                      PINDiskCacheError(error);
+                    }
                 }
             }
         [self unlock];
