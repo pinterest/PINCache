@@ -211,12 +211,13 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     [self lock];
         NSDictionary<NSString *, NSDate *> *dates = [_dates copy];
         NSDictionary<NSString *, NSNumber *> *ageLimits = [_ageLimits copy];
+        NSTimeInterval globalAgeLimit = self->_ageLimit;
     [self unlock];
 
     NSDate *now = [NSDate date];
     for (NSString *key in ageLimits) {
         NSDate *accessDate = dates[key];
-        NSTimeInterval ageLimit = [_ageLimits[key] doubleValue] ?: self->_ageLimit;
+        NSTimeInterval ageLimit = [ageLimits[key] doubleValue] ?: globalAgeLimit;
         if (!accessDate)
             continue;
 
@@ -254,6 +255,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (void)trimToCostLimitByDate:(NSUInteger)limit
 {
+    if (self.isTTLCache) {
+        [self removeExpiredObjects];
+    }
+
     NSUInteger totalCost = 0;
     
     [self lock];

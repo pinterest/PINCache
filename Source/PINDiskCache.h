@@ -279,9 +279,7 @@ PIN_SUBCLASSING_RESTRICTED
  */
 - (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer;
 
-/**
- The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
- 
+/** 
  @see name
  @param name The name of the cache.
  @param rootPath The path of the cache.
@@ -293,8 +291,6 @@ PIN_SUBCLASSING_RESTRICTED
 - (instancetype)initWithName:(nonnull NSString *)name rootPath:(nonnull NSString *)rootPath serializer:(nullable PINDiskCacheSerializerBlock)serializer deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer operationQueue:(nonnull PINOperationQueue *)operationQueue __attribute__((deprecated));
 
 /**
- The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
-
  @see name
  @param name The name of the cache.
  @param prefix The prefix for the cache name. Defaults to com.pinterest.PINDiskCache

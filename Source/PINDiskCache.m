@@ -487,7 +487,6 @@ static NSURL *_sharedTrashURL;
 - (void)initializeDiskProperties
 {
     NSUInteger byteCount = 0;
-    BOOL hasAtLeastOneAgeLimit = NO;
     NSArray *keys = @[ NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey ];
     
     NSError *error = nil;
@@ -530,7 +529,6 @@ static NSURL *_sharedTrashURL;
                 ssize_t res = getxattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
                 if(res) {
                     _metadata[key].ageLimit = ageLimit;
-                    hasAtLeastOneAgeLimit = YES;
                 } else if (res == -1) {
                     // Ignore if the extended attribute was never recorded for this file.
                     if (errno != ENOATTR) {
@@ -550,7 +548,7 @@ static NSURL *_sharedTrashURL;
         if (self->_byteLimit > 0 && self->_byteCount > self->_byteLimit)
             [self trimToSizeByDateAsync:self->_byteLimit completion:nil];
 
-        if (hasAtLeastOneAgeLimit)
+        if (self->_ttlCache)
             [self removeExpiredObjectsAsync:nil];
     
         _diskStateKnown = YES;
@@ -709,8 +707,12 @@ static NSURL *_sharedTrashURL;
 
 - (void)trimDiskToSizeByDate:(NSUInteger)trimByteCount
 {
+    if (self.isTTLCache) {
+        [self removeExpiredObjects];
+    }
+
     NSMutableArray *keysToRemove = nil;
-    
+  
     [self lockForWriting];
         if (_byteCount > trimByteCount) {
             keysToRemove = [[NSMutableArray alloc] init];
@@ -1048,9 +1050,8 @@ static NSURL *_sharedTrashURL;
               }
               [self lock];
             }
-            if (object && !self->_ttlCache) {
+            if (object)
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
-            }
         }
     [self unlock];
     
@@ -1120,6 +1121,8 @@ static NSURL *_sharedTrashURL;
 
 - (void)setObject:(id <NSCoding>)object forKey:(NSString *)key withAgeLimit:(NSTimeInterval)ageLimit fileURL:(NSURL **)outFileURL
 {
+    NSAssert(ageLimit <= 0.0 || (ageLimit > 0.0 && _ttlCache), @"ttlCache must be set to YES if setting an object-level age limit.");
+
     if (!key || !object)
         return;
     
@@ -1257,7 +1260,6 @@ static NSURL *_sharedTrashURL;
 - (void)removeExpiredObjects
 {
     [self lockForWriting];
-
         NSDate *now = [NSDate date];
         NSMutableArray<NSString *> *expiredObjectKeys = [NSMutableArray array];
         [_metadata enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, PINDiskCacheMetadata * _Nonnull obj, BOOL * _Nonnull stop) {
@@ -1267,15 +1269,12 @@ static NSURL *_sharedTrashURL;
                 [expiredObjectKeys addObject:key];
             }
         }];
-
-        [self unlock];
-            for (NSString *key in expiredObjectKeys) {
-                //unlock, removeFileAndExecuteBlocksForKey handles locking itself
-                [self removeFileAndExecuteBlocksForKey:key];
-            }
-        [self lock];
-
     [self unlock];
+
+    for (NSString *key in expiredObjectKeys) {
+        //unlock, removeFileAndExecuteBlocksForKey handles locking itself
+        [self removeFileAndExecuteBlocksForKey:key];
+    }
 }
 
 - (void)removeAllObjects
