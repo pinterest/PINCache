@@ -116,10 +116,10 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         __weak typeof(self) weakSelf = self;
         dispatch_async(_asyncQueue, ^{
             //should always be able to aquire the lock unless the below code is running.
-            [_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
+            [self->_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
             [weakSelf createCacheDirectory];
             [weakSelf initializeDiskProperties];
-            [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
+            [self->_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
         });
     }
     return self;
