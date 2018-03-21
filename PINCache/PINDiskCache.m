@@ -113,12 +113,13 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         _cacheURL = [NSURL fileURLWithPathComponents:@[ rootPath, pathComponent ]];
         
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
+        __weak typeof(self) weakSelf = self;
         dispatch_async(_asyncQueue, ^{
             //should always be able to aquire the lock unless the below code is running.
-            [_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
-                [self createCacheDirectory];
-                [self initializeDiskProperties];
-            [_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
+            [weakSelf.instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
+            [weakSelf createCacheDirectory];
+            [weakSelf initializeDiskProperties];
+            [weakSelf.instanceLock unlockWithCondition:PINDiskCacheConditionReady];
         });
     }
     return self;
