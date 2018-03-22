@@ -115,12 +115,11 @@ typedef NS_ENUM(NSUInteger, PINDiskCacheCondition) {
         //we don't want to do anything without setting up the disk cache, but we also don't want to block init, it can take a while to initialize
         __weak typeof(self) weakSelf = self;
         dispatch_async(_asyncQueue, ^{
-            __strong typeof(self) strongSelf = weakSelf;
             //should always be able to aquire the lock unless the below code is running.
-            [strongSelf->_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
+            [self->_instanceLock lockWhenCondition:PINDiskCacheConditionNotReady];
             [weakSelf createCacheDirectory];
             [weakSelf initializeDiskProperties];
-            [strongSelf->_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
+            [self->_instanceLock unlockWithCondition:PINDiskCacheConditionReady];
         });
     }
     return self;
