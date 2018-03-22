@@ -58,8 +58,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                                rootPath:rootPath
                                              serializer:serializer
                                            deserializer:deserializer
-                                             keyEncoder:nil
-                                             keyDecoder:nil
+                                             keyEncoder:keyEncoder
+                                             keyDecoder:keyDecoder
                                          operationQueue:_operationQueue];
         _memoryCache = [[PINMemoryCache alloc] initWithOperationQueue:_operationQueue];
     }
