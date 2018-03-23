@@ -4,6 +4,7 @@
 
 #import "PINCache.h"
 
+#import <PINCache/PINCacheKeyObserverManager.h>
 #import <PINOperation/PINOperation.h>
 
 static NSString * const PINCachePrefix = @"com.pinterest.PINCache";
@@ -12,6 +13,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 @interface PINCache ()
 @property (copy, nonatomic) NSString *name;
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
+@property (strong, nonatomic) PINCacheKeyObserverManager *observerManager;
 @end
 
 @implementation PINCache
@@ -62,6 +64,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                              keyDecoder:keyDecoder
                                          operationQueue:_operationQueue];
         _memoryCache = [[PINMemoryCache alloc] initWithOperationQueue:_operationQueue];
+        _observerManager = [[PINCacheKeyObserverManager alloc] initWithCache:self];
     }
     return self;
 }
@@ -147,12 +150,13 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [self->_diskCache setObject:object forKey:key];
     }];
-  
-    if (block) {
-        [group setCompletion:^{
+    
+    [group setCompletion:^{
+        [_observerManager updatedKey:key withValue:object];
+        if (block) {
             block(self, key, object);
-        }];
-    }
+        }
+    }];
     
     [group start];
 }
@@ -170,12 +174,13 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [self->_diskCache removeObjectForKey:key];
     }];
-
-    if (block) {
-        [group setCompletion:^{
+    
+    [group setCompletion:^{
+        [_observerManager deletedValueForKey:key];
+        if (block) {
             block(self, key, nil);
-        }];
-    }
+        }
+    }];
     
     [group start];
 }
@@ -190,12 +195,13 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [group addOperation:^{
         [self->_diskCache removeAllObjects];
     }];
-
-    if (block) {
-        [group setCompletion:^{
+    
+    [group setCompletion:^{
+        if (block) {
             block(self);
-        }];
-    }
+        }
+        [_observerManager deletedAllValues];
+    }];
     
     [group start];
 }
@@ -276,6 +282,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     
     [_memoryCache setObject:object forKey:key withCost:cost];
     [_diskCache setObject:object forKey:key];
+    [_observerManager updatedKey:key withValue:object];
 }
 
 - (nullable id)objectForKeyedSubscript:(NSString *)key
@@ -314,6 +321,17 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 {
     [_memoryCache removeAllObjects];
     [_diskCache removeAllObjects];
+    [_observerManager deletedAllValues];
+}
+
+- (void)addObserver:(id)observer selector:(SEL)selector forKey:(NSString *)key
+{
+    [self.observerManager addObserver:observer selector:selector forKey:key];
+}
+
+- (void)removeObserver:(id)observer forKey:(nonnull NSString *)key
+{
+    [self.observerManager removeObserver:observer forKey:key];
 }
 
 @end

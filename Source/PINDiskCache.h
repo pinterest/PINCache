@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import <PINCache/PINCacheKeyObserving.h>
 #import <PINCache/PINCacheMacros.h>
 #import <PINCache/PINCaching.h>
 #import <PINCache/PINCacheObjectSubscripting.h>
@@ -99,7 +100,7 @@ typedef NSString *_Nonnull(^PINDiskCacheKeyDecoderBlock)(NSString *encodedKey);
  */
 
 PIN_SUBCLASSING_RESTRICTED
-@interface PINDiskCache : NSObject <PINCaching, PINCacheObjectSubscripting>
+@interface PINDiskCache : NSObject <PINCaching, PINCacheKeyObserving, PINCacheObjectSubscripting>
 
 #pragma mark - Class
 

@@ -10,6 +10,7 @@
 
 #import <pthread.h>
 
+#import <PINCache/PINCacheKeyObserverManager.h>
 #import <PINOperation/PINOperation.h>
 
 #define PINDiskCacheError(error) if (error) { NSLog(@"%@ (%d) ERROR: %@", \
@@ -63,6 +64,7 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @property (assign, nonatomic) BOOL diskWritable;
 @property (assign, nonatomic) pthread_cond_t diskStateKnownCondition;
 @property (assign, nonatomic) BOOL diskStateKnown;
+@property (strong, nonatomic) PINCacheKeyObserverManager *observerManager;
 @end
 
 @implementation PINDiskCache
@@ -165,6 +167,8 @@ static NSURL *_sharedTrashURL;
         _didAddObjectBlock = nil;
         _didRemoveObjectBlock = nil;
         _didRemoveAllObjectsBlock = nil;
+        
+        _observerManager = [[PINCacheKeyObserverManager alloc] initWithCache:self];
         
         _byteCount = 0;
         
@@ -571,6 +575,8 @@ static NSURL *_sharedTrashURL;
         }
     
     [self unlock];
+    
+    [_observerManager deletedValueForKey:key];
     
     return YES;
 }
@@ -1055,7 +1061,10 @@ static NSURL *_sharedTrashURL;
                 didAddObjectBlock(self, key, object);
             [self lock];
         }
+    
     [self unlock];
+    
+    [self.observerManager updatedKey:key withValue:object];
     
     if (outFileURL) {
         *outFileURL = fileURL;
@@ -1165,6 +1174,16 @@ static NSURL *_sharedTrashURL;
             }
         }
     [self unlock];
+}
+
+- (void)addObserver:(id)observer selector:(SEL)selector forKey:(NSString *)key;
+{
+    [_observerManager addObserver:observer selector:selector forKey:key];
+}
+
+- (void)removeObserver:(id)observer forKey:(NSString *)key
+{
+    [_observerManager removeObserver:observer forKey:key];
 }
 
 #pragma mark - Public Thread Safe Accessors -

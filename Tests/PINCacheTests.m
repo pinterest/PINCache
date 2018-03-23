@@ -4,6 +4,7 @@
 
 #import "PINCacheTests.h"
 #import <PINCache/PINCache.h>
+#import "PINCacheKeyObserverManager.h"
 #import <PINOperation/PINOperation.h>
 
 
@@ -33,9 +34,15 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 @interface PINCacheTests ()
 @property (strong, nonatomic) PINCache *cache;
+@property (assign, nonatomic) BOOL didUpdateKey;
+@property (assign, nonatomic) BOOL didDeleteKey;
+@property (strong, nonatomic) XCTestExpectation *keyUpdateExpectation;
 @end
 
 @implementation PINCacheTests
+
+@synthesize didUpdateKey = _didUpdateKey;
+@synthesize didDeleteKey = _didDeleteKey;
 
 #pragma mark - XCTestCase -
 
@@ -43,15 +50,19 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 {
     [super setUp];
     self.cache = [[PINCache alloc] initWithName:[[NSUUID UUID] UUIDString]];
+    self.didUpdateKey = NO;
+    self.didDeleteKey = NO;
     
     XCTAssertNotNil(self.cache, @"test cache does not exist");
 }
 
 - (void)tearDown
 {
+    self.keyUpdateExpectation = nil;
+    
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
-
+    
     [self.cache removeAllObjects];
 
     // Wait for disk cache to clean up its trash
@@ -1080,6 +1091,61 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     NSString *encodedKey = [[testCache fileURLForKey:@"test_key"] lastPathComponent];
     XCTAssertEqualObjects(@"test_key", encodedKey, @"Encoded key should be equal to decoded one");
 
+}
+
+- (void)testKeyObservers {
+    PINMemoryCache *memoryCache = [PINMemoryCache sharedCache];
+    PINDiskCache *diskCache = [PINDiskCache sharedCache];
+    
+    [self testKeyObserversWithCache:self.cache];
+    [self testKeyObserversWithCache:memoryCache];
+    [self testKeyObserversWithCache:diskCache];
+}
+
+- (void)testKeyObserversWithCache:(id<PINCaching, PINCacheKeyObserving>)cache {
+    NSString *testKey = @"test_observer";
+    
+    XCTAssertEqual(self.didUpdateKey, NO);
+    XCTAssertEqual(self.didDeleteKey, NO);
+    [cache addObserver:self selector:@selector(didUpdateKey:) forKey:testKey];
+    XCTAssertEqual(self.didUpdateKey, NO);
+    XCTAssertEqual(self.didDeleteKey, NO);
+    
+    self.keyUpdateExpectation = [self expectationWithDescription:@"Test key update observing"];
+    [cache setObjectAsync:@(0) forKey:testKey completion:nil];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    XCTAssertEqual(self.didUpdateKey, YES);
+    XCTAssertEqual(self.didDeleteKey, NO);
+    
+    self.keyUpdateExpectation = [self expectationWithDescription:@"Test key update observing"];
+    [cache setObjectAsync:@(1) forKey:testKey completion:nil];
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    XCTAssertEqual(self.didUpdateKey, YES);
+    XCTAssertEqual(self.didDeleteKey, NO);
+
+    self.keyUpdateExpectation = [self expectationWithDescription:@"Test key delete observing"];
+    [cache removeObjectForKeyAsync:testKey completion:nil]; // Both memory and disk caches can trigger updates.
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    XCTAssertEqual(self.didUpdateKey, NO);
+    XCTAssertEqual(self.didDeleteKey, YES);
+    
+    [cache removeObserver:self forKey:testKey];
+    self.didUpdateKey = self.didDeleteKey = NO;
+}
+
+#pragma mark - Private
+
+- (void)didUpdateKey:(NSNotification *)notification {
+    NSString *changedValue = notification.userInfo[PINCacheKeyChangedValue];
+    if (changedValue != nil) {
+        self.didUpdateKey = YES;
+        self.didDeleteKey = NO;
+    } else {
+        self.didUpdateKey = NO;
+        self.didDeleteKey = YES;
+    }
+    
+    [self.keyUpdateExpectation fulfill];
 }
 
 @end
