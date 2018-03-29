@@ -63,6 +63,7 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 @property (assign, nonatomic) BOOL diskWritable;
 @property (assign, nonatomic) pthread_cond_t diskStateKnownCondition;
 @property (assign, nonatomic) BOOL diskStateKnown;
+@property (assign, nonatomic) BOOL writingProtectionOptionSet;
 @end
 
 @implementation PINDiskCache
@@ -81,6 +82,7 @@ static NSURL *_sharedTrashURL;
 
 #if TARGET_OS_IPHONE
 @synthesize writingProtectionOption = _writingProtectionOption;
+@synthesize writingProtectionOptionSet = _writingProtectionOptionSet;
 #endif
 
 #pragma mark - Initialization -
@@ -174,7 +176,9 @@ static NSURL *_sharedTrashURL;
         _ageLimit = 60 * 60 * 24 * 30;
         
 #if TARGET_OS_IPHONE
-        _writingProtectionOption = NSDataWritingFileProtectionNone;
+        _writingProtectionOptionSet = NO;
+        // This is currently the default for files, but we'd rather not write it if it's unspecified.
+        _writingProtectionOption = NSDataWritingFileProtectionCompleteUntilFirstUserAuthentication;
 #endif
         
         _metadata = [[NSMutableDictionary alloc] init];
@@ -985,10 +989,11 @@ static NSURL *_sharedTrashURL;
     if (!key || !object)
         return;
     
+    NSDataWritingOptions writeOptions = NSDataWritingAtomic;
     #if TARGET_OS_IPHONE
-      NSDataWritingOptions writeOptions = NSDataWritingAtomic | self.writingProtectionOption;
-    #else
-      NSDataWritingOptions writeOptions = NSDataWritingAtomic;
+    if (self.writingProtectionOptionSet) {
+        writeOptions |= self.writingProtectionOption;
+    }
     #endif
   
     // Remain unlocked here so that we're not locked while serializing.
@@ -1334,7 +1339,8 @@ static NSURL *_sharedTrashURL;
     } withPriority:PINOperationQueuePriorityHigh];
 }
 
-- (BOOL)isTTLCache {
+- (BOOL)isTTLCache
+{
     BOOL isTTLCache;
     
     [self lock];
@@ -1344,7 +1350,8 @@ static NSURL *_sharedTrashURL;
     return isTTLCache;
 }
 
-- (void)setTtlCache:(BOOL)ttlCache {
+- (void)setTtlCache:(BOOL)ttlCache
+{
     [self.operationQueue scheduleOperation:^{
         [self lock];
             self->_ttlCache = ttlCache;
@@ -1353,7 +1360,8 @@ static NSURL *_sharedTrashURL;
 }
 
 #if TARGET_OS_IPHONE
-- (NSDataWritingOptions)writingProtectionOption {
+- (NSDataWritingOptions)writingProtectionOption
+{
     NSDataWritingOptions option;
   
     [self lock];
@@ -1363,13 +1371,15 @@ static NSURL *_sharedTrashURL;
     return option;
 }
 
-- (void)setWritingProtectionOption:(NSDataWritingOptions)writingProtectionOption {
+- (void)setWritingProtectionOption:(NSDataWritingOptions)writingProtectionOption
+{
   [self.operationQueue scheduleOperation:^{
-    NSDataWritingOptions option = NSDataWritingFileProtectionMask & writingProtectionOption;
+      NSDataWritingOptions option = NSDataWritingFileProtectionMask & writingProtectionOption;
     
-    [self lock];
-        self->_writingProtectionOption = option;
-    [self unlock];
+      [self lock];
+          self->_writingProtectionOptionSet = YES;
+          self->_writingProtectionOption = option;
+      [self unlock];
   } withPriority:PINOperationQueuePriorityHigh];
 }
 #endif
