@@ -517,7 +517,7 @@ static NSURL *_sharedTrashURL;
 
             NSDate *createdDate = [dictionary objectForKey:NSURLCreationDateKey];
             if (createdDate && key)
-              _metadata[key].createdDate = createdDate;
+                _metadata[key].createdDate = createdDate;
         
             NSDate *lastModifiedDate = [dictionary objectForKey:NSURLContentModificationDateKey];
             if (lastModifiedDate && key)
@@ -1186,7 +1186,7 @@ static NSURL *_sharedTrashURL;
             }
             NSDate *createdDate = [values objectForKey:NSURLCreationDateKey];
             if (createdDate) {
-              self->_metadata[key].createdDate = createdDate;
+                self->_metadata[key].createdDate = createdDate;
             }
             NSDate *lastModifiedDate = [values objectForKey:NSURLContentModificationDateKey];
             if (lastModifiedDate) {
