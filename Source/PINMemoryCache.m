@@ -19,7 +19,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 @property (strong, nonatomic) PINOperationQueue *operationQueue;
 @property (assign, nonatomic) pthread_mutex_t mutex;
 @property (strong, nonatomic) NSMutableDictionary *dictionary;
-@property (strong, nonatomic) NSMutableDictionary *dates;
+@property (strong, nonatomic) NSMutableDictionary *createdDates;
+@property (strong, nonatomic) NSMutableDictionary *accessDates;
 @property (strong, nonatomic) NSMutableDictionary *costs;
 @property (strong, nonatomic) NSMutableDictionary *ageLimits;
 @end
@@ -76,7 +77,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         _ttlCache = ttlCache;
         
         _dictionary = [[NSMutableDictionary alloc] init];
-        _dates = [[NSMutableDictionary alloc] init];
+        _createdDates = [[NSMutableDictionary alloc] init];
+        _accessDates = [[NSMutableDictionary alloc] init];
         _costs = [[NSMutableDictionary alloc] init];
         _ageLimits = [[NSMutableDictionary alloc] init];
         
@@ -175,7 +177,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
             _totalCost -= [cost unsignedIntegerValue];
 
         [_dictionary removeObjectForKey:key];
-        [_dates removeObjectForKey:key];
+        [_createdDates removeObjectForKey:key];
+        [_accessDates removeObjectForKey:key];
         [_costs removeObjectForKey:key];
         [_ageLimits removeObjectForKey:key];
     [self unlock];
@@ -187,18 +190,18 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 - (void)trimMemoryToDate:(NSDate *)trimDate
 {
     [self lock];
-        NSArray *keysSortedByDate = [_dates keysSortedByValueUsingSelector:@selector(compare:)];
-        NSDictionary *dates = [_dates copy];
+        NSArray *keysSortedByCreatedDate = [_createdDates keysSortedByValueUsingSelector:@selector(compare:)];
+        NSDictionary *createdDates = [_createdDates copy];
         NSDictionary *ageLimits = [_ageLimits copy];
     [self unlock];
     
-    for (NSString *key in keysSortedByDate) { // oldest objects first
-        NSDate *accessDate = dates[key];
+    for (NSString *key in keysSortedByCreatedDate) { // oldest objects first
+        NSDate *createdDate = createdDates[key];
         NSTimeInterval ageLimit = [ageLimits[key] doubleValue];
-        if (!accessDate || ageLimit > 0.0)
+        if (!createdDate || ageLimit > 0.0)
             continue;
         
-        if ([accessDate compare:trimDate] == NSOrderedAscending) { // older than trim date
+        if ([createdDate compare:trimDate] == NSOrderedAscending) { // older than trim date
             [self removeObjectAndExecuteBlocksForKey:key];
         } else {
             break;
@@ -209,19 +212,19 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 - (void)removeExpiredObjects
 {
     [self lock];
-        NSDictionary<NSString *, NSDate *> *dates = [_dates copy];
+        NSDictionary<NSString *, NSDate *> *createdDates = [_createdDates copy];
         NSDictionary<NSString *, NSNumber *> *ageLimits = [_ageLimits copy];
         NSTimeInterval globalAgeLimit = self->_ageLimit;
     [self unlock];
 
     NSDate *now = [NSDate date];
     for (NSString *key in ageLimits) {
-        NSDate *accessDate = dates[key];
+        NSDate *createdDate = createdDates[key];
         NSTimeInterval ageLimit = [ageLimits[key] doubleValue] ?: globalAgeLimit;
-        if (!accessDate)
+        if (!createdDate)
             continue;
 
-        NSDate *expirationDate = [accessDate dateByAddingTimeInterval:ageLimit];
+        NSDate *expirationDate = [createdDate dateByAddingTimeInterval:ageLimit];
         if ([expirationDate compare:now] == NSOrderedAscending) { // Expiration date has passed
             [self removeObjectAndExecuteBlocksForKey:key];
         }
@@ -263,13 +266,13 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     
     [self lock];
         totalCost = _totalCost;
-        NSArray *keysSortedByDate = [_dates keysSortedByValueUsingSelector:@selector(compare:)];
+        NSArray *keysSortedByAccessDate = [_accessDates keysSortedByValueUsingSelector:@selector(compare:)];
     [self unlock];
     
     if (totalCost <= limit)
         return;
 
-    for (NSString *key in keysSortedByDate) { // oldest objects first
+    for (NSString *key in keysSortedByAccessDate) { // oldest objects first
         [self removeObjectAndExecuteBlocksForKey:key];
 
         [self lock];
@@ -446,14 +449,14 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         id object = nil;
         // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
         NSTimeInterval ageLimit = [_ageLimits[key] doubleValue] ?: self->_ageLimit;
-        if (!self->_ttlCache || ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < ageLimit) {
+        if (!self->_ttlCache || ageLimit <= 0 || fabs([[_createdDates objectForKey:key] timeIntervalSinceDate:now]) < ageLimit) {
             object = _dictionary[key];
         }
     [self unlock];
         
     if (object) {
         [self lock];
-            _dates[key] = now;
+            _accessDates[key] = now;
         [self unlock];
     }
 
@@ -510,8 +513,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         if (oldCost)
             _totalCost -= [oldCost unsignedIntegerValue];
 
+        NSDate *now = [[NSDate alloc] init];
         _dictionary[key] = object;
-        _dates[key] = [[NSDate alloc] init];
+        _createdDates[key] = now;
+        _accessDates[key] = now;
         _costs[key] = @(cost);
 
         if (ageLimit > 0.0) {
@@ -573,7 +578,8 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     
     [self lock];
         [_dictionary removeAllObjects];
-        [_dates removeAllObjects];
+        [_createdDates removeAllObjects];
+        [_accessDates removeAllObjects];
         [_costs removeAllObjects];
         [_ageLimits removeAllObjects];
     
@@ -592,12 +598,12 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     
     [self lock];
         NSDate *now = [NSDate date];
-        NSArray *keysSortedByDate = [_dates keysSortedByValueUsingSelector:@selector(compare:)];
+        NSArray *keysSortedByCreatedDate = [_createdDates keysSortedByValueUsingSelector:@selector(compare:)];
         
-        for (NSString *key in keysSortedByDate) {
+        for (NSString *key in keysSortedByCreatedDate) {
             // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
             NSTimeInterval ageLimit = [_ageLimits[key] doubleValue] ?: self->_ageLimit;
-            if (!self->_ttlCache || ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < ageLimit) {
+            if (!self->_ttlCache || ageLimit <= 0 || fabs([[_createdDates objectForKey:key] timeIntervalSinceDate:now]) < ageLimit) {
                 BOOL stop = NO;
                 block(self, key, _dictionary[key], &stop);
                 if (stop)
