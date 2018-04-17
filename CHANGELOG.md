@@ -1,7 +1,7 @@
 ## master
 
 * Add your own contributions to the next release on the line below this with your name.
-- [fix] Fix PINMemoryCache to check if TTL before updating last fetched date: [#222](https://github.com/pinterest/PINCache/pull/222) (jerelevine)
+- [fix] Fix PINMemoryCache to check TTL before updating last fetched date: [#222](https://github.com/pinterest/PINCache/pull/222) (jerelevine)
 - [fix] Fix up warnings and upgrade to PINOperation 1.1.1: [#213](https://github.com/pinterest/PINCache/pull/213)
 - [performance] Reduce locking churn in cleanup methods. [#212](https://github.com/pinterest/PINCache/pull/212)
 - [fix] Don't set file protection unless requested. [#220](https://github.com/pinterest/PINCache/pull/220)
