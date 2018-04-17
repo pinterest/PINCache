@@ -383,20 +383,17 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         return nil;
     
     NSDate *now = [[NSDate alloc] init];
+    id object = nil;
     [self lock];
-        id object = nil;
         // If the cache should behave like a TTL cache, then only fetch the object if there's a valid ageLimit and  the object is still alive
         if (!self->_ttlCache || self->_ageLimit <= 0 || fabs([[_dates objectForKey:key] timeIntervalSinceDate:now]) < self->_ageLimit) {
             object = _dictionary[key];
         }
-    [self unlock];
-        
-    if (object) {
-        [self lock];
+        if (object && !self->_ttlCache) {
             _dates[key] = now;
-        [self unlock];
-    }
-
+        }
+    [self unlock];
+    
     return object;
 }
 
