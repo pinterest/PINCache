@@ -513,7 +513,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         if (oldCost)
             _totalCost -= [oldCost unsignedIntegerValue];
 
-        NSDate *now = [[NSDate alloc] init];
+        NSDate *now = [NSDate date];
         _dictionary[key] = object;
         _createdDates[key] = now;
         _accessDates[key] = now;

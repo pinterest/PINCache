@@ -20,6 +20,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 @interface PINDiskCache()
 
 @property (assign, nonatomic) BOOL diskStateKnown;
+@property (strong, nonatomic) NSDictionary *metadata;
 
 + (dispatch_queue_t)sharedTrashQueue;
 - (NSString *)encodedString:(NSString *)string;
@@ -357,6 +358,51 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertTrue(self.cache.memoryCache.totalCost == 0, @"cache had an unexpected total cost");
 }
 
+- (void)testMemoryCostByDateWithObjectExpiration
+{
+    self.cache.memoryCache.ttlCache = YES;
+    [self.cache.memoryCache removeAllObjects];
+    NSString * const key1 = @"key1";
+    NSString * const key2 = @"key2";
+    NSString * const key3 = @"key3";
+    NSString * const key4 = @"key4";
+    const NSUInteger cost = 1;
+    const NSTimeInterval oldAgeLimit = 60.0;
+    const NSTimeInterval notSoOldAgeLimit = 30.0;
+
+    // Add the objects to the cache; set the age limit of one of them (key3) so it expires before the others.
+    [self.cache.memoryCache setObject:[self image] forKey:key1 withCost:cost ageLimit:oldAgeLimit];
+    [self.cache.memoryCache setObject:[self image] forKey:key2 withCost:cost ageLimit:oldAgeLimit];
+    [self.cache.memoryCache setObject:[self image] forKey:key3 withCost:cost ageLimit:notSoOldAgeLimit];
+    [self.cache.memoryCache setObject:[self image] forKey:key4 withCost:cost ageLimit:oldAgeLimit];
+
+    // Make the order of recently used key3, key1, key4, key2
+    [self.cache.memoryCache objectForKey:key2];
+    [self.cache.memoryCache objectForKey:key4];
+    [self.cache.memoryCache objectForKey:key1];
+    [self.cache.memoryCache objectForKey:key3];
+
+    // Fast forward 45 seconds. This should expire key3.
+    [NSDate startMockingDateWithDate:[NSDate dateWithTimeIntervalSinceNow:45]];
+
+    // Trim the cache enough to evict two objects.
+    [self.cache.memoryCache trimToCostByDate:self.cache.memoryCache.totalCost - cost * 2];
+
+    // Go back to current time, so we can check if objects exist in cache. If we don't do this, the getters will return nil
+    // even if the objects are in the cache.
+    [NSDate stopMockingDate];
+
+    // The only objects left should be the last two that were accessed (key3 && key1), but since key3 is expired it will be
+    // removed first leaving key1 and key4 to remain.
+    NSMutableArray *keys = [NSMutableArray array];
+    [self.cache.memoryCache enumerateObjectsWithBlock:^(id<PINCaching> cache, NSString * key, id object, BOOL *stop) {
+        [keys addObject:key];
+    }];
+    XCTAssertTrue(keys.count == 2);
+    XCTAssertTrue([keys.firstObject isEqualToString:key1] || [keys.firstObject isEqualToString:key4]);
+    XCTAssertTrue([keys.lastObject isEqualToString:key1] || [keys.lastObject isEqualToString:key4]);
+}
+
 - (void)testDiskByteCount
 {
     self.cache[@"image"] = [self image];
@@ -375,6 +421,54 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     self.cache[@"image2"] = [self image];
 
     XCTAssertTrue(self.cache.diskByteCount > initialDiskByteCount, @"disk cache byte count should increase with new key and object added to disk cache");
+}
+
+- (void)testDiskSizeByDateWithObjectExpiration
+{
+    self.cache.diskCache.ttlCache = YES;
+    [self.cache.diskCache removeAllObjects];
+    NSString * const key1 = @"key1";
+    NSString * const key2 = @"key2";
+    NSString * const key3 = @"key3";
+    NSString * const key4 = @"key4";
+    const NSUInteger cost = 1;
+    const NSTimeInterval oldAgeLimit = 60.0;
+    const NSTimeInterval notSoOldAgeLimit = 30.0;
+
+    // Add the objects to the cache; set the age limit of one of them (key3) so it expires before the others.
+    [self.cache.diskCache setObject:[self image] forKey:key1 withCost:cost ageLimit:oldAgeLimit];
+    [self.cache.diskCache setObject:[self image] forKey:key2 withCost:cost ageLimit:oldAgeLimit];
+    [self.cache.diskCache setObject:[self image] forKey:key3 withCost:cost ageLimit:notSoOldAgeLimit];
+    NSUInteger sizeOfThreeObjects = self.cache.diskCache.byteCount;
+    [self.cache.diskCache setObject:[self image] forKey:key4 withCost:cost ageLimit:oldAgeLimit];
+
+    // Make the order of recently used key3, key1, key4, key2
+    [self.cache.diskCache objectForKey:key2];
+    [self.cache.diskCache objectForKey:key4];
+    [self.cache.diskCache objectForKey:key1];
+    [self.cache.diskCache objectForKey:key3];
+
+    // Fast forward 45 seconds. This should expire key3.
+    [NSDate startMockingDateWithDate:[NSDate dateWithTimeIntervalSinceNow:45]];
+
+
+    // Trim the cache enough to evict two objects.
+    [self.cache.diskCache trimToSizeByDate:sizeOfThreeObjects - 1];
+
+    // Go back to current time, so we can check if objects exist in cache. If we don't do this, the getters will return nil
+    // even if the objects are in the cache.
+    [NSDate stopMockingDate];
+
+    // The only objects left should be the last two that were accessed (key3 && key1), but since key3 is expired it will be
+    // removed first leaving key1 and key4 to remain.
+    NSMutableArray *keys = [NSMutableArray array];
+    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL * _Nonnull stop) {
+        [keys addObject:key];
+    }];
+
+    XCTAssertTrue(keys.count == 2);
+    XCTAssertTrue([keys.firstObject isEqualToString:key1] || [keys.firstObject isEqualToString:key4]);
+    XCTAssertTrue([keys.lastObject isEqualToString:key1] || [keys.lastObject isEqualToString:key4]);
 }
 
 - (void)testOneThousandAndOneWrites
@@ -1126,6 +1220,36 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
 
     [self waitForExpectationsWithTimeout:0.1 handler:nil];
+}
+
+- (void)testDiskRehydrationOfObjectAgeLimit
+{
+    NSString * const cacheName = @"testDiskRehydrationOfObjectAgeLimit";
+    NSString * const key = @"key";
+    const NSTimeInterval ageLimit = 60.0;
+    PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:cacheName];
+    testCache.ttlCache = YES;
+    NSURL *testCacheURL = testCache.cacheURL;
+    NSError *error = nil;
+
+    //Make sure the cache URL does not exist.
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[testCacheURL path]]) {
+        [[NSFileManager defaultManager] removeItemAtURL:testCacheURL error:&error];
+        XCTAssertNil(error);
+    }
+
+    testCache = [[PINDiskCache alloc] initWithName:cacheName];
+    testCache.ttlCache = YES;
+    [testCache setObject:[self image] forKey:key withAgeLimit:ageLimit];
+
+    // Re-initialize the cache, this should read the age limit for the object from the extended file system attributes.
+    testCache = [[PINDiskCache alloc] initWithName:cacheName];
+    testCache.ttlCache = YES;
+    //This should not return until *after* disk cache directory has been created
+    [testCache setObject:@"some bogus object" forKey:@"some bogus key"];
+    id object = testCache.metadata[key];
+    id ageLimitFromDisk = [object valueForKey:@"ageLimit"];
+    XCTAssertEqual([ageLimitFromDisk doubleValue], ageLimit);
 }
 
 - (void)testAsyncDiskInitialization
