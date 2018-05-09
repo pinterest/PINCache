@@ -4,6 +4,7 @@
 
 #import "PINCacheTests.h"
 #import "NSDate+PINCacheTests.h"
+#import "PINDiskCache+PINCacheTests.h"
 #import <PINCache/PINCache.h>
 #import <PINOperation/PINOperation.h>
 
@@ -24,7 +25,6 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 + (dispatch_queue_t)sharedTrashQueue;
 - (NSString *)encodedString:(NSString *)string;
-- (void)setTtlCache:(BOOL)ttlCache;
 
 @end
 
@@ -360,7 +360,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)testMemoryCostByDateWithObjectExpiration
 {
-    self.cache.memoryCache.ttlCache = YES;
+    [self.cache.memoryCache setTtlCache:YES];
     [self.cache.memoryCache removeAllObjects];
     NSString * const key1 = @"key1";
     NSString * const key2 = @"key2";
@@ -425,7 +425,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)testDiskSizeByDateWithObjectExpiration
 {
-    self.cache.diskCache.ttlCache = YES;
+    [self.cache.diskCache setTtlCacheSync:YES];
     [self.cache.diskCache removeAllObjects];
     NSString * const key1 = @"key1";
     NSString * const key2 = @"key2";
@@ -874,7 +874,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // Wait until time 3 so that we know the object should be expired, the 1st cache clearing has happened, and the 2nd cache clearing hasn't happened yet
     sleep(2);
 
-    self.cache.diskCache.ttlCache = YES;
+    [self.cache.diskCache setTtlCacheSync:YES];
     [self.cache.memoryCache setTtlCache:YES];
 
     dispatch_group_t group = dispatch_group_create();
@@ -900,7 +900,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertNil(memObj, @"should not be in memory cache");
     XCTAssertNil(diskObj, @"should not be in disk cache");
 
-    [self.cache.diskCache setTtlCache:NO];
+    [self.cache.diskCache setTtlCacheSync:NO];
     [self.cache.memoryCache setTtlCache:NO];
 
     memObj = nil;
@@ -939,7 +939,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // Wait until time 3 so that we know the object should be expired, the 1st cache clearing has happened, and the 2nd cache clearing hasn't happened yet
     sleep(2);
 
-    [self.cache.diskCache setTtlCache:YES];
+    [self.cache.diskCache setTtlCacheSync:YES];
     [self.cache.memoryCache setTtlCache:YES];
 
     // Wait for ttlCache to be set
@@ -966,7 +966,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     XCTAssertEqual(objCount, expectedObjCount, @"Expected %lu objects in the cache", (unsigned long)expectedObjCount);
 
-    [self.cache.diskCache setTtlCache:NO];
+    [self.cache.diskCache setTtlCacheSync:NO];
     [self.cache.memoryCache setTtlCache:NO];
 
     // Wait for ttlCache to be set
@@ -1020,7 +1020,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // Wait a moment to ensure that the file modification time can be changed to something different
     sleep(1);
 
-    [self.cache.diskCache setTtlCache:YES];
+    [self.cache.diskCache setTtlCacheSync:YES];
     
     // Wait for ttlCache to be set
     sleep(1);
@@ -1037,7 +1037,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     XCTAssertEqualObjects(initialModificationDate, ttlCacheEnabledModificationDate, @"The modification date shouldn't change when accessing the file URL, when ttlCache is enabled");
 
-    [self.cache.diskCache setTtlCache:NO];
+    [self.cache.diskCache setTtlCacheSync:NO];
     
     // Wait for ttlCache to be set
     sleep(1);
@@ -1058,8 +1058,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)testObjectTTLObjectAccess
 {
-    self.cache.memoryCache.ttlCache = YES;
-    self.cache.diskCache.ttlCache = YES;
+    [self.cache.memoryCache setTtlCache:YES];
+    [self.cache.diskCache setTtlCacheSync:YES];
     [self.cache removeAllObjects];
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
@@ -1131,8 +1131,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)testObjectTTLObjectEnumeration
 {
-    self.cache.memoryCache.ttlCache = YES;
-    self.cache.diskCache.ttlCache = YES;
+    [self.cache.memoryCache setTtlCache:YES];
+    [self.cache.diskCache setTtlCacheSync:YES];
     [self.cache removeAllObjects];
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
@@ -1176,8 +1176,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)testRemoveExpiredObjects
 {
-    self.cache.memoryCache.ttlCache = YES;
-    self.cache.diskCache.ttlCache = YES;
+    [self.cache.memoryCache setTtlCache:YES];
+    [self.cache.diskCache setTtlCacheSync:YES];
     [self.cache removeAllObjects];
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
@@ -1228,7 +1228,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     NSString * const key = @"key";
     const NSTimeInterval ageLimit = 60.0;
     PINDiskCache *testCache = [[PINDiskCache alloc] initWithName:cacheName];
-    testCache.ttlCache = YES;
+    [testCache setTtlCacheSync:YES];
     NSURL *testCacheURL = testCache.cacheURL;
     NSError *error = nil;
 
@@ -1239,12 +1239,12 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }
 
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
-    testCache.ttlCache = YES;
+    [testCache setTtlCacheSync:YES];
     [testCache setObject:[self image] forKey:key withAgeLimit:ageLimit];
 
     // Re-initialize the cache, this should read the age limit for the object from the extended file system attributes.
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
-    testCache.ttlCache = YES;
+    [testCache setTtlCacheSync:YES];
     //This should not return until *after* disk cache directory has been created
     [testCache setObject:@"some bogus object" forKey:@"some bogus key"];
     id object = testCache.metadata[key];
