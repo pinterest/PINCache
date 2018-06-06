@@ -591,7 +591,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     
 }
 
-- (void)enumerateObjectsWithBlock:(PINCacheObjectEnumerationBlock)block
+- (void)enumerateObjectsWithBlock:(PIN_NOESCAPE PINCacheObjectEnumerationBlock)block
 {
     if (!block)
         return;
