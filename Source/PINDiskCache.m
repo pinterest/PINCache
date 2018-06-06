@@ -982,7 +982,7 @@ static NSURL *_sharedTrashURL;
 
 #pragma mark - Public Synchronous Methods -
 
-- (void)synchronouslyLockFileAccessWhileExecutingBlock:(PINCacheBlock)block
+- (void)synchronouslyLockFileAccessWhileExecutingBlock:(PIN_NOESCAPE PINCacheBlock)block
 {
     if (block) {
         [self lockForWriting];
@@ -1320,7 +1320,7 @@ static NSURL *_sharedTrashURL;
     [self unlock];
 }
 
-- (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLEnumerationBlock)block
+- (void)enumerateObjectsWithBlock:(PIN_NOESCAPE PINDiskCacheFileURLEnumerationBlock)block
 {
     if (!block)
         return;
