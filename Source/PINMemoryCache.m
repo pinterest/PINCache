@@ -302,7 +302,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         // rescheduled (another dispatch_after was issued) and should cancel.
         BOOL shouldReschedule = YES;
         [self lock];
-            if (ageLimit != _ageLimit) {
+            if (ageLimit != self->_ageLimit) {
                 shouldReschedule = NO;
             }
         [self unlock];
