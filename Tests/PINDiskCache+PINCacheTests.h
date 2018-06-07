@@ -8,4 +8,9 @@
  */
 - (void)setTtlCacheSync:(BOOL)ttlCache;
 
+/**
+ Waits until all metadata has been read off the disk
+ */
+- (void)waitForKnownState;
+
 @end

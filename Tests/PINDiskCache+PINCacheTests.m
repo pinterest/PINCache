@@ -5,6 +5,7 @@
 }
 
 - (void)lock;
+- (void)lockAndWaitForKnownState;
 - (void)unlock;
 
 @end
@@ -15,6 +16,12 @@
 {
     [self lock];
         self->_ttlCache = ttlCache;
+    [self unlock];
+}
+
+- (void)waitForKnownState
+{
+    [self lockAndWaitForKnownState];
     [self unlock];
 }
 
