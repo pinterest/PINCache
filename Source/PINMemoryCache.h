@@ -239,7 +239,7 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
 - (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
 - (void)removeAllObjects:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
 - (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock __attribute__((deprecated));
-- (void)setTtlCache:(BOOL)ttlCache __attribute__((unavailable("ttlCache is no longer a settable property and must now be set via initializer.")));
+- (void)setTtlCache:(BOOL)ttlCache DEPRECATED_MSG_ATTRIBUTE("ttlCache is no longer a settable property and must now be set via initializer.");
 @end
 
 NS_ASSUME_NONNULL_END

@@ -586,7 +586,7 @@ typedef void (^PINDiskCacheBlock)(PINDiskCache *cache);
 - (void)trimToSizeByDate:(NSUInteger)byteCount block:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
 - (void)removeAllObjects:(nullable PINDiskCacheBlock)block __attribute__((deprecated));
 - (void)enumerateObjectsWithBlock:(PINDiskCacheFileURLBlock)block completionBlock:(nullable PINDiskCacheBlock)completionBlock __attribute__((deprecated));
-- (void)setTtlCache:(BOOL)ttlCache __attribute__((unavailable("ttlCache is no longer a settable property and must now be set via initializer.")));
+- (void)setTtlCache:(BOOL)ttlCache DEPRECATED_MSG_ATTRIBUTE("ttlCache is no longer a settable property and must now be set via initializer.");
 @end
 
 NS_ASSUME_NONNULL_END

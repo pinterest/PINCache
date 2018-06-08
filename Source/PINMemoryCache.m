@@ -810,13 +810,6 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     return isTTLCache;
 }
 
-- (void)setTtlCache:(BOOL)ttlCache {
-    [self lock];
-        _ttlCache = ttlCache;
-    [self unlock];
-}
-
-
 - (void)lock
 {
     __unused int result = pthread_mutex_lock(&_mutex);
@@ -889,6 +882,13 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
             block(memoryCache, key, object);
         }
     } completionBlock:completionBlock];
+}
+
+- (void)setTtlCache:(BOOL)ttlCache
+{
+    [self lock];
+        _ttlCache = ttlCache;
+    [self unlock];
 }
 
 @end
