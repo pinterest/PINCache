@@ -586,13 +586,6 @@ static NSURL *_sharedTrashURL;
                                                            error:&error];
     PINDiskCacheError(error);
     
-    if (success) {
-        NSString *key = [self keyForEncodedFileURL:fileURL];
-        if (key) {
-            _metadata[key].lastModifiedDate = date;
-        }
-    }
-    
     return success;
 }
 
@@ -785,13 +778,24 @@ static NSURL *_sharedTrashURL;
         return;
     
     NSDate *date = [[NSDate alloc] initWithTimeIntervalSinceNow:-ageLimit];
-    [self trimDiskToDate:date];
+    [self trimToDateAsync:date completion:nil];
     
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ageLimit * NSEC_PER_SEC));
     dispatch_after(time, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self.operationQueue scheduleOperation:^{
-            [self trimToAgeLimitRecursively];
-        } withPriority:PINOperationQueuePriorityLow];
+        // Ensure that ageLimit is the same as when we were scheduled, otherwise, we've been
+        // rescheduled (another dispatch_after was issued) and should cancel.
+        BOOL shouldReschedule = YES;
+        [self lock];
+            if (ageLimit != self->_ageLimit) {
+                shouldReschedule = NO;
+            }
+        [self unlock];
+        
+        if (shouldReschedule) {
+            [self.operationQueue scheduleOperation:^{
+                [self trimToAgeLimitRecursively];
+            } withPriority:PINOperationQueuePriorityLow];
+        }
     });
 }
 
@@ -1059,8 +1063,10 @@ static NSURL *_sharedTrashURL;
               }
               [self lock];
             }
-            if (object)
+            if (object) {
+                _metadata[key].lastModifiedDate = now;
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
+            }
         }
     [self unlock];
     
@@ -1090,6 +1096,7 @@ static NSURL *_sharedTrashURL;
     [self lockForWriting];
         if (fileURL.path && [[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
             if (updateFileModificationDate) {
+                _metadata[key].lastModifiedDate = now;
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
         } else {
@@ -1506,7 +1513,9 @@ static NSURL *_sharedTrashURL;
             self->_ageLimit = ageLimit;
         [self unlock];
         
-        [self trimToAgeLimitRecursively];
+        [self.operationQueue scheduleOperation:^{
+            [self trimToAgeLimitRecursively];
+        } withPriority:PINOperationQueuePriorityLow];
     } withPriority:PINOperationQueuePriorityHigh];
 }
 

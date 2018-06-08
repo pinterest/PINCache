@@ -1245,8 +1245,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     // Re-initialize the cache, this should read the age limit for the object from the extended file system attributes.
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
     [testCache setTtlCacheSync:YES];
-    //This should not return until *after* disk cache directory has been created
-    [testCache setObject:@"some bogus object" forKey:@"some bogus key"];
+    
+    [testCache waitForKnownState];
     id object = testCache.metadata[key];
     id ageLimitFromDisk = [object valueForKey:@"ageLimit"];
     XCTAssertEqual([ageLimitFromDisk doubleValue], ageLimit);
