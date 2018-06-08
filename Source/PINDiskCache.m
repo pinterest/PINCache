@@ -1530,15 +1530,6 @@ static NSURL *_sharedTrashURL;
     return isTTLCache;
 }
 
-- (void)setTtlCache:(BOOL)ttlCache
-{
-    [self.operationQueue scheduleOperation:^{
-        [self lock];
-            self->_ttlCache = ttlCache;
-        [self unlock];
-    } withPriority:PINOperationQueuePriorityHigh];
-}
-
 #if TARGET_OS_IPHONE
 - (NSDataWritingOptions)writingProtectionOption
 {
@@ -1655,6 +1646,15 @@ static NSURL *_sharedTrashURL;
     [self enumerateObjectsWithBlockAsync:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL * _Nonnull stop) {
       block(key, fileURL);
     } completionBlock:completionBlock];
+}
+
+- (void)setTtlCache:(BOOL)ttlCache
+{
+    [self.operationQueue scheduleOperation:^{
+        [self lock];
+            self->_ttlCache = ttlCache;
+        [self unlock];
+    } withPriority:PINOperationQueuePriorityHigh];
 }
 
 @end
