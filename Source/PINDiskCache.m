@@ -586,13 +586,6 @@ static NSURL *_sharedTrashURL;
                                                            error:&error];
     PINDiskCacheError(error);
     
-    if (success) {
-        NSString *key = [self keyForEncodedFileURL:fileURL];
-        if (key) {
-            _metadata[key].lastModifiedDate = date;
-        }
-    }
-    
     return success;
 }
 
@@ -1070,8 +1063,10 @@ static NSURL *_sharedTrashURL;
               }
               [self lock];
             }
-            if (object)
+            if (object) {
+                _metadata[key].lastModifiedDate = now;
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
+            }
         }
     [self unlock];
     
@@ -1101,6 +1096,7 @@ static NSURL *_sharedTrashURL;
     [self lockForWriting];
         if (fileURL.path && [[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
             if (updateFileModificationDate) {
+                _metadata[key].lastModifiedDate = now;
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
         } else {
