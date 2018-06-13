@@ -489,29 +489,28 @@ static NSURL *_sharedTrashURL;
     return created;
 }
 
-- (void)_locked_initializeDiskPropertiesForFile:(NSURL *)fileURL resourceKeys:(NSArray *)resourceKeys byteCount:(NSUInteger *)pByteCount {
-    NSString *key = [self keyForEncodedFileURL:fileURL];
+- (void)_locked_initializeDiskPropertiesForFile:(NSURL *)fileURL fileKey:(NSString *)fileKey resourceKeys:(NSArray *)resourceKeys byteCount:(NSUInteger *)pByteCount {
 
     NSError *error = nil;
 
     NSDictionary *dictionary = [fileURL resourceValuesForKeys:resourceKeys error:&error];
     PINDiskCacheError(error);
 
-    if (_metadata[key] == nil) {
-        _metadata[key] = [[PINDiskCacheMetadata alloc] init];
+    if (_metadata[fileKey] == nil) {
+        _metadata[fileKey] = [[PINDiskCacheMetadata alloc] init];
     }
 
     NSDate *createdDate = [dictionary objectForKey:NSURLCreationDateKey];
-    if (createdDate && key)
-        _metadata[key].createdDate = createdDate;
+    if (createdDate && fileKey)
+        _metadata[fileKey].createdDate = createdDate;
 
     NSDate *lastModifiedDate = [dictionary objectForKey:NSURLContentModificationDateKey];
-    if (lastModifiedDate && key)
-        _metadata[key].lastModifiedDate = lastModifiedDate;
+    if (lastModifiedDate && fileKey)
+        _metadata[fileKey].lastModifiedDate = lastModifiedDate;
 
     NSNumber *fileSize = [dictionary objectForKey:NSURLTotalFileAllocatedSizeKey];
     if (fileSize) {
-        _metadata[key].size = fileSize;
+        _metadata[fileKey].size = fileSize;
         if (pByteCount) {
             *pByteCount += [fileSize unsignedIntegerValue];
         }
@@ -520,8 +519,8 @@ static NSURL *_sharedTrashURL;
     if (_ttlCache) {
         NSTimeInterval ageLimit;
         ssize_t res = getxattr(PINDiskCacheFileSystemRepresentation(fileURL), PINDiskCacheAgeLimitAttributeName, &ageLimit, sizeof(NSTimeInterval), 0, 0);
-        if(res) {
-            _metadata[key].ageLimit = ageLimit;
+        if(res > 0) {
+            _metadata[fileKey].ageLimit = ageLimit;
         } else if (res == -1) {
             // Ignore if the extended attribute was never recorded for this file.
             if (errno != ENOATTR) {
@@ -552,8 +551,11 @@ static NSURL *_sharedTrashURL;
     
     for (NSURL *fileURL in files) {
         // Continually grab and release lock while processing files to avoid contention
+        NSString *fileKey = [self keyForEncodedFileURL:fileURL];
         [self lock];
-        [self _locked_initializeDiskPropertiesForFile:fileURL resourceKeys:keys byteCount:&byteCount];
+        if (_metadata[fileKey] == nil) {
+            [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey resourceKeys:keys byteCount:&byteCount];
+        }
         [self unlock];
     }
     
