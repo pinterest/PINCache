@@ -57,9 +57,12 @@ const char * PINDiskCacheFileSystemRepresentation(NSURL *url)
 }
 
 @interface PINDiskCacheMetadata : NSObject
+// When the object was added to the disk cache
 @property (nonatomic, strong) NSDate *createdDate;
+// Last time the object was accessed
 @property (nonatomic, strong) NSDate *lastModifiedDate;
 @property (nonatomic, strong) NSNumber *size;
+// Age limit is used in conjuction with ttl
 @property (nonatomic) NSTimeInterval ageLimit;
 @end
 
@@ -707,6 +710,7 @@ static NSURL *_sharedTrashURL;
     }
 }
 
+// This is the default trimming method which happens automatically
 - (void)trimDiskToSizeByDate:(NSUInteger)trimByteCount
 {
     if (self.isTTLCache) {
@@ -719,12 +723,14 @@ static NSURL *_sharedTrashURL;
         if (_byteCount > trimByteCount) {
             keysToRemove = [[NSMutableArray alloc] init];
             
+            // last modified represents last access.
             NSArray *keysSortedByLastModifiedDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
                 return [obj1.lastModifiedDate compare:obj2.lastModifiedDate];
             }];
             
             NSUInteger bytesSaved = 0;
-            for (NSString *key in keysSortedByLastModifiedDate) { // oldest objects first
+            // objects accessed last first.
+            for (NSString *key in keysSortedByLastModifiedDate) {
                 [keysToRemove addObject:key];
                 NSNumber *byteSize = _metadata[key].size;
                 if (byteSize) {
