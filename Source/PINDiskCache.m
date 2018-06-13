@@ -267,7 +267,7 @@ static NSURL *_sharedTrashURL;
 
 - (NSString *)description
 {
-    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINDiskCachePrefix, _name, (void *)self];
+    return [[NSString alloc] initWithFormat:@"%@.%@.%p", PINDiskCachePrefix, _name, (__bridge void *)self];
 }
 
 + (PINDiskCache *)sharedCache
@@ -550,8 +550,8 @@ static NSURL *_sharedTrashURL;
     PINDiskCacheError(error);
     
     for (NSURL *fileURL in files) {
-        // Continually grab and release lock while processing files to avoid contention
         NSString *fileKey = [self keyForEncodedFileURL:fileURL];
+        // Continually grab and release lock while processing files to avoid contention
         [self lock];
         if (_metadata[fileKey] == nil) {
             [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey resourceKeys:keys byteCount:&byteCount];
@@ -1045,14 +1045,11 @@ static NSURL *_sharedTrashURL;
     NSDate *now = [NSDate date];
     [self lock];
         if (self->_ttlCache) {
-            // We actually need to know the entire disk state if we're a TTL cache. !! OH NOES
-//            [self unlock];
-//            [self lockAndWaitForKnownState]; so let's not and say we did
-
             if (!_diskStateKnown) {
                 if (_metadata[key]== nil) {
                     NSArray *keys = @[ NSURLCreationDateKey, NSURLContentModificationDateKey ];
-                    [self _locked_initializeDiskPropertiesForFile:fileURL resourceKeys:keys byteCount:nil];
+                    NSString *fileKey = [self keyForEncodedFileURL:fileURL];
+                    [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey resourceKeys:keys byteCount:nil];
                 }
             }
         }
@@ -1080,7 +1077,7 @@ static NSURL *_sharedTrashURL;
               [self lock];
             }
             if (object) {
-                _metadata[key].lastModifiedDate = now; // this isn't really lastModified, is it
+                _metadata[key].lastModifiedDate = now;
                 [self asynchronouslySetFileModificationDate:now forURL:fileURL];
             }
         }
@@ -1575,7 +1572,7 @@ static NSURL *_sharedTrashURL;
 {
     [self lock];
     
-    // spinlock if the disk isn't writable
+    // Lock if the disk isn't writable.
     if (_diskWritable == NO) {
         pthread_cond_wait(&_diskWritableCondition, &_mutex);
     }
@@ -1585,9 +1582,9 @@ static NSURL *_sharedTrashURL;
 {
     [self lock];
     
-    // spinlock if the disk state isn't known
+    // Lock if the disk state isn't known.
     if (_diskStateKnown == NO) {
-        pthread_cond_wait(&_diskStateKnownCondition, &_mutex); // this is NOT a spinlock?
+        pthread_cond_wait(&_diskStateKnownCondition, &_mutex);
     }
 }
 
