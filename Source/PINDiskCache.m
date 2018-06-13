@@ -489,26 +489,37 @@ static NSURL *_sharedTrashURL;
     return created;
 }
 
-- (void)_locked_initializeDiskPropertiesForFile:(NSURL *)fileURL fileKey:(NSString *)fileKey resourceKeys:(NSArray *)resourceKeys byteCount:(NSUInteger *)pByteCount {
++ (NSArray *)resourceKeys {
+    static NSArray *resourceKeys = nil;
+    static dispatch_once_t predicate;
+
+    dispatch_once(&predicate, ^{
+        resourceKeys = @[ NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey ];
+    });
+
+    return resourceKeys;
+}
+
+- (void)_locked_initializeDiskPropertiesForFile:(NSURL *)fileURL fileKey:(NSString *)fileKey byteCount:(NSUInteger *)pByteCount {
 
     NSError *error = nil;
 
-    NSDictionary *dictionary = [fileURL resourceValuesForKeys:resourceKeys error:&error];
+    NSDictionary *dictionary = [fileURL resourceValuesForKeys:[PINDiskCache resourceKeys] error:&error];
     PINDiskCacheError(error);
 
     if (_metadata[fileKey] == nil) {
         _metadata[fileKey] = [[PINDiskCacheMetadata alloc] init];
     }
 
-    NSDate *createdDate = [dictionary objectForKey:NSURLCreationDateKey];
+    NSDate *createdDate = dictionary[NSURLCreationDateKey];
     if (createdDate && fileKey)
         _metadata[fileKey].createdDate = createdDate;
 
-    NSDate *lastModifiedDate = [dictionary objectForKey:NSURLContentModificationDateKey];
+    NSDate *lastModifiedDate = dictionary[NSURLContentModificationDateKey];
     if (lastModifiedDate && fileKey)
         _metadata[fileKey].lastModifiedDate = lastModifiedDate;
 
-    NSNumber *fileSize = [dictionary objectForKey:NSURLTotalFileAllocatedSizeKey];
+    NSNumber *fileSize = dictionary[NSURLTotalFileAllocatedSizeKey];
     if (fileSize) {
         _metadata[fileKey].size = fileSize;
         if (pByteCount) {
@@ -536,13 +547,12 @@ static NSURL *_sharedTrashURL;
 - (void)initializeDiskProperties
 {
     NSUInteger byteCount = 0;
-    NSArray *keys = @[ NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLTotalFileAllocatedSizeKey ];
 
     NSError *error = nil;
     
     [self lock];
         NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:_cacheURL
-                                                       includingPropertiesForKeys:keys
+                                                       includingPropertiesForKeys:[PINDiskCache resourceKeys]
                                                                           options:NSDirectoryEnumerationSkipsHiddenFiles
                                                                             error:&error];
     [self unlock];
@@ -554,7 +564,7 @@ static NSURL *_sharedTrashURL;
         // Continually grab and release lock while processing files to avoid contention
         [self lock];
         if (_metadata[fileKey] == nil) {
-            [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey resourceKeys:keys byteCount:&byteCount];
+            [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey byteCount:&byteCount];
         }
         [self unlock];
     }
@@ -1049,7 +1059,7 @@ static NSURL *_sharedTrashURL;
                 if (_metadata[key]== nil) {
                     NSArray *keys = @[ NSURLCreationDateKey, NSURLContentModificationDateKey ];
                     NSString *fileKey = [self keyForEncodedFileURL:fileURL];
-                    [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey resourceKeys:keys byteCount:nil];
+                    [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey byteCount:nil];
                 }
             }
         }
