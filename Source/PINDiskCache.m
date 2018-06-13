@@ -1057,7 +1057,6 @@ static NSURL *_sharedTrashURL;
         if (self->_ttlCache) {
             if (!_diskStateKnown) {
                 if (_metadata[key]== nil) {
-                    NSArray *keys = @[ NSURLCreationDateKey, NSURLContentModificationDateKey ];
                     NSString *fileKey = [self keyForEncodedFileURL:fileURL];
                     [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey byteCount:nil];
                 }
