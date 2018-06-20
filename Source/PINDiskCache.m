@@ -492,7 +492,8 @@ static NSURL *_sharedTrashURL;
     return created;
 }
 
-+ (NSArray *)resourceKeys {
++ (NSArray *)resourceKeys
+{
     static NSArray *resourceKeys = nil;
     static dispatch_once_t predicate;
 
@@ -503,8 +504,11 @@ static NSURL *_sharedTrashURL;
     return resourceKeys;
 }
 
-- (void)_locked_initializeDiskPropertiesForFile:(NSURL *)fileURL fileKey:(NSString *)fileKey byteCount:(NSUInteger *)pByteCount {
-
+/**
+ * @return File size in bytes.
+ */
+- (NSUInteger)_locked_initializeDiskPropertiesForFile:(NSURL *)fileURL fileKey:(NSString *)fileKey
+{
     NSError *error = nil;
 
     NSDictionary *dictionary = [fileURL resourceValuesForKeys:[PINDiskCache resourceKeys] error:&error];
@@ -525,9 +529,6 @@ static NSURL *_sharedTrashURL;
     NSNumber *fileSize = dictionary[NSURLTotalFileAllocatedSizeKey];
     if (fileSize) {
         _metadata[fileKey].size = fileSize;
-        if (pByteCount) {
-            *pByteCount += [fileSize unsignedIntegerValue];
-        }
     }
 
     if (_ttlCache) {
@@ -545,6 +546,7 @@ static NSURL *_sharedTrashURL;
         }
     }
 
+    return [fileSize unsignedIntegerValue];
 }
 
 - (void)initializeDiskProperties
@@ -567,7 +569,7 @@ static NSURL *_sharedTrashURL;
         // Continually grab and release lock while processing files to avoid contention
         [self lock];
         if (_metadata[fileKey] == nil) {
-            [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey byteCount:&byteCount];
+            byteCount += [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey];
         }
         [self unlock];
     }
@@ -1062,7 +1064,7 @@ static NSURL *_sharedTrashURL;
     [self lock];
         if (self->_ttlCache) {
             if (!_diskStateKnown) {
-                if (_metadata[key]== nil) {
+                if (_metadata[key] == nil) {
                     NSString *fileKey = [self keyForEncodedFileURL:fileURL];
                     [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey byteCount:nil];
                 }
