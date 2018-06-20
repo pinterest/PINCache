@@ -1066,7 +1066,7 @@ static NSURL *_sharedTrashURL;
             if (!_diskStateKnown) {
                 if (_metadata[key] == nil) {
                     NSString *fileKey = [self keyForEncodedFileURL:fileURL];
-                    [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey byteCount:nil];
+                    [self _locked_initializeDiskPropertiesForFile:fileURL fileKey:fileKey];
                 }
             }
         }
