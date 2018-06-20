@@ -2,6 +2,9 @@
 
 * Add your own contributions to the next release on the line below this with your name.
 
+- [performance] Return TTL cache objects without waiting for all metadata to be read. [#228]
+(https://github.com/pinterest/PINCache/pull/228)
+
 ## 3.0.1 -- Beta 7
 - [fix] Fix up warnings and upgrade to PINOperation 1.1.1: [#213](https://github.com/pinterest/PINCache/pull/213)
 - [performance] Reduce locking churn in cleanup methods. [#212](https://github.com/pinterest/PINCache/pull/212)
