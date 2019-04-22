@@ -1338,7 +1338,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
             NSError *error = nil;
             unsigned long long tempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
             XCTAssertNil(error);
-            XCTAssertEqual(originalTempDirSize, tempDirSize);
+            XCTAssertEqual(originalTempDirSize, tempDirSize, @"Path: %@", tempDirPath);
             dispatch_group_leave(group);
         });
         
