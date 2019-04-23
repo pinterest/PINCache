@@ -24,6 +24,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 @property (strong, nonatomic) NSDictionary *metadata;
 
 + (dispatch_queue_t)sharedTrashQueue;
++ (NSURL *)sharedTrashURL;
 - (NSString *)encodedString:(NSString *)string;
 
 @end
@@ -1311,7 +1312,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 {
     const NSUInteger fileCount = 100;
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *tempDirPath = NSTemporaryDirectory();
+    NSString *tempDirPath = [[PINDiskCache sharedTrashURL] path];
     
     dispatch_group_t group = dispatch_group_create();
     
@@ -1332,13 +1333,10 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
         XCTAssertNil(error);
         XCTAssertLessThan(originalTempDirSize, tempDirSize);
         
-        // Temporary directory should get back to its original size at the end of the trash queue
+        // Temporary directory should be gone at the end of the trash queue.
         dispatch_group_enter(group);
         dispatch_async([PINDiskCache sharedTrashQueue], ^{
-            NSError *error = nil;
-            unsigned long long tempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
-            XCTAssertNil(error);
-            XCTAssertEqual(originalTempDirSize, tempDirSize);
+            XCTAssertFalse([fileManager fileExistsAtPath:tempDirPath isDirectory:NULL]);
             dispatch_group_leave(group);
         });
         
