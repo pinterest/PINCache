@@ -1312,12 +1312,12 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 {
     const NSUInteger fileCount = 100;
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *tempDirPath = [[PINDiskCache sharedTrashURL] path];
+    NSString *trashPath = [[PINDiskCache sharedTrashURL] path];
     
     dispatch_group_t group = dispatch_group_create();
     
     NSError *error = nil;
-    unsigned long long originalTempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
+    unsigned long long originalTempDirSize = [[fileManager attributesOfItemAtPath:trashPath error:&error] fileSize];
     XCTAssertNil(error);
     
     for (int i = 0; i < fileCount; i++) {
@@ -1329,14 +1329,14 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     [self.cache.diskCache removeAllObjectsAsync:^(PINDiskCache * _Nonnull cache) {
         // Temporary directory should be bigger now since the trash directory is still inside it
         NSError *error = nil;
-        unsigned long long tempDirSize = [[fileManager attributesOfItemAtPath:tempDirPath error:&error] fileSize];
+        unsigned long long tempDirSize = [[fileManager attributesOfItemAtPath:trashPath error:&error] fileSize];
         XCTAssertNil(error);
         XCTAssertLessThan(originalTempDirSize, tempDirSize);
         
         // Temporary directory should be gone at the end of the trash queue.
         dispatch_group_enter(group);
         dispatch_async([PINDiskCache sharedTrashQueue], ^{
-            XCTAssertFalse([fileManager fileExistsAtPath:tempDirPath isDirectory:NULL]);
+            XCTAssertFalse([fileManager fileExistsAtPath:trashPath isDirectory:NULL]);
             dispatch_group_leave(group);
         });
         
