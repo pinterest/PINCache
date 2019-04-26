@@ -815,8 +815,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     PINDiskCache *diskCache = [[PINDiskCache alloc] initWithName:cacheName];
     [diskCache removeAllObjects];
     
-    // store a bunch of objects
-    for (NSUInteger idx = 0; idx < 1000; idx++) {
+    // Store a bunch of objects so it will take a long time to initialize.
+    for (NSUInteger idx = 0; idx < 5000; idx++) {
         NSData *tmpData = [[@(idx) stringValue] dataUsingEncoding:NSUTF8StringEncoding];
         [diskCache setObject:tmpData forKey:[@(idx) stringValue]];
     }
@@ -826,7 +826,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     diskCache = [[PINDiskCache alloc] initWithName:cacheName];
     
     // Check to see if we can get an object before the disk state is known.
-    XCTAssertNotNil([diskCache objectForKey:[@(999) stringValue]]);
+    XCTAssertNotNil([diskCache objectForKey:[@(1) stringValue]]);
     XCTAssertFalse(diskCache.diskStateKnown);
     
     sleep(5);
@@ -1242,6 +1242,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
     [testCache setTtlCacheSync:YES];
     [testCache setObject:[self image] forKey:key withAgeLimit:ageLimit];
+  
+    // The age limit is set asynchronously, *even* when we set the object synchronously.
+    sleep(1);
 
     // Re-initialize the cache, this should read the age limit for the object from the extended file system attributes.
     testCache = [[PINDiskCache alloc] initWithName:cacheName];
