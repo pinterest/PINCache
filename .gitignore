@@ -7,7 +7,9 @@
 *.pbxuser
 *.perspectivev3
 xcuserdata
+xcshareddata
 
+export LANG=en_US.UTF-8
 #Ignore textmate build errors
 *.tm_build_errors
 
