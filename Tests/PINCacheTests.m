@@ -1376,4 +1376,10 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 }
 
+- (void)testTTLCacheIsSet {
+    PINCache *cache = [[PINCache alloc] initWithName:@"test" rootPath:PINDiskCachePrefix serializer:nil deserializer:nil keyEncoder:nil keyDecoder:nil ttlCache:YES];
+    XCTAssert(cache.diskCache.isTTLCache);
+    XCTAssert(cache.memoryCache.isTTLCache);
+}
+
 @end
