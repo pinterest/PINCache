@@ -115,14 +115,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 - (void)testDiskCacheURL
 {
-    // Wait for URL to be created
-    dispatch_group_t group = dispatch_group_create();
-    dispatch_group_enter(group);
-    [self.cache objectForKeyAsync:@"" completion:^(PINCache * _Nonnull cache, NSString * _Nonnull key, id  _Nullable object) {
-      dispatch_group_leave(group);
-    }];
-
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    // Wait for URL to be created. We use enumerateObjectsWithBlock because it waits for a known disk state.
+    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL * _Nonnull stop) {}];
     BOOL isDir = NO;
     BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:[self.cache.diskCache.cacheURL path] isDirectory:&isDir];
 
