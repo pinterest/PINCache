@@ -2,8 +2,9 @@
 
 * Add your own contributions to the next release on the line below this with your name.
 
-- [performance] Return TTL cache objects without waiting for all metadata to be read. [#228]
-(https://github.com/pinterest/PINCache/pull/228)
+## 3.0.1 -- Beta 8
+- [fix] Initing PINCache with TTL enabled should enable TTL on PINMemoryCache. [#246](https://github.com/pinterest/PINCache/pull/246)
+- [performance] Return TTL cache objects without waiting for all metadata to be read. [#228](https://github.com/pinterest/PINCache/pull/228)
 - [performance] Memory cache now performs some tasks such as trimming and removing experied objects with low priority. [#234](https://github.com/pinterest/PINCache/pull/234)
 
 ## 3.0.1 -- Beta 7
