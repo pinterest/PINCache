@@ -325,7 +325,14 @@ static NSURL *_sharedTrashURL;
 - (PINDiskCacheSerializerBlock)defaultSerializer
 {
     return ^NSData*(id<NSCoding> object, NSString *key){
-        return [NSKeyedArchiver archivedDataWithRootObject:object];
+        if (@available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, *)) {
+            NSError *error = nil;
+            NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object requiringSecureCoding:NO error:&error];
+            PINDiskCacheError(error);
+            return data;
+        } else {
+            return [NSKeyedArchiver archivedDataWithRootObject:object];
+        }
     };
 }
 
