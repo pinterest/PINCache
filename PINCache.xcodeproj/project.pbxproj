@@ -18,6 +18,11 @@
 		6928EED31E4160EE00B5D975 /* PINCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 6928EED21E4160EE00B5D975 /* PINCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6928EED41E4160FE00B5D975 /* PINCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 6928EED21E4160EE00B5D975 /* PINCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6928EED51E41610700B5D975 /* PINCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 6928EED21E4160EE00B5D975 /* PINCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		810865FA22B189A1008C3AEF /* PINPurgeableMemoryCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 810865F822B189A1008C3AEF /* PINPurgeableMemoryCache.h */; };
+		810865FB22B189A1008C3AEF /* PINPurgeableMemoryCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 810865F922B189A1008C3AEF /* PINPurgeableMemoryCache.m */; };
+		8108660122B18A35008C3AEF /* PINMemoryCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 810865FF22B189C9008C3AEF /* PINMemoryCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8108660222B18A35008C3AEF /* PINMemoryCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 810865FF22B189C9008C3AEF /* PINMemoryCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		811D0E6622B18A860098F7BC /* PINMemoryCaching.h in Headers */ = {isa = PBXBuildFile; fileRef = 810865FF22B189C9008C3AEF /* PINMemoryCaching.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C30EE1F520373D1900D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
 		C30EE1F620373D1A00D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
 		C30EE1F720373D1B00D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
@@ -177,6 +182,9 @@
 		6818C2901E564C1100875DB7 /* PINOperation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PINOperation.xcodeproj; path = Carthage/Checkouts/PINOperation/PINOperation.xcodeproj; sourceTree = "<group>"; };
 		68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINCacheMacros.h; sourceTree = "<group>"; };
 		6928EED21E4160EE00B5D975 /* PINCaching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCaching.h; sourceTree = "<group>"; };
+		810865F822B189A1008C3AEF /* PINPurgeableMemoryCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINPurgeableMemoryCache.h; sourceTree = "<group>"; };
+		810865F922B189A1008C3AEF /* PINPurgeableMemoryCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PINPurgeableMemoryCache.m; sourceTree = "<group>"; };
+		810865FF22B189C9008C3AEF /* PINMemoryCaching.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PINMemoryCaching.h; sourceTree = "<group>"; };
 		C30EE1E9203717DE00D78CB9 /* NSDate+PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDate+PINCacheTests.h"; sourceTree = "<group>"; };
 		C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDate+PINCacheTests.m"; sourceTree = "<group>"; };
 		C38F01A820A32E0200F47F0E /* PINDiskCache+PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PINDiskCache+PINCacheTests.h"; sourceTree = "<group>"; };
@@ -310,8 +318,11 @@
 				CC0106071E271A9000890935 /* PINCacheObjectSubscripting.h */,
 				CC0106081E271A9000890935 /* PINDiskCache.h */,
 				CC0106091E271A9000890935 /* PINDiskCache.m */,
+				810865FF22B189C9008C3AEF /* PINMemoryCaching.h */,
 				CC01060A1E271A9000890935 /* PINMemoryCache.h */,
 				CC01060B1E271A9000890935 /* PINMemoryCache.m */,
+				810865F822B189A1008C3AEF /* PINPurgeableMemoryCache.h */,
+				810865F922B189A1008C3AEF /* PINPurgeableMemoryCache.m */,
 				68A0FBFF1E4D3282000B552D /* PINCacheMacros.h */,
 			);
 			path = Source;
@@ -349,8 +360,10 @@
 			files = (
 				6928EED31E4160EE00B5D975 /* PINCaching.h in Headers */,
 				CC0106171E271AAF00890935 /* PINCache.h in Headers */,
+				810865FA22B189A1008C3AEF /* PINPurgeableMemoryCache.h in Headers */,
 				68A0FC001E4D32C4000B552D /* PINCacheMacros.h in Headers */,
 				CC0106181E271AAF00890935 /* PINCacheObjectSubscripting.h in Headers */,
+				811D0E6622B18A860098F7BC /* PINMemoryCaching.h in Headers */,
 				CC01061A1E271AAF00890935 /* PINMemoryCache.h in Headers */,
 				C38F01AA20A32E0200F47F0E /* PINDiskCache+PINCacheTests.h in Headers */,
 				CC0106191E271AAF00890935 /* PINDiskCache.h in Headers */,
@@ -363,6 +376,7 @@
 			files = (
 				6928EED41E4160FE00B5D975 /* PINCaching.h in Headers */,
 				CC01061B1E271AB000890935 /* PINCache.h in Headers */,
+				8108660122B18A35008C3AEF /* PINMemoryCaching.h in Headers */,
 				68A0FC011E4D32C6000B552D /* PINCacheMacros.h in Headers */,
 				CC01061C1E271AB000890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC01061E1E271AB000890935 /* PINMemoryCache.h in Headers */,
@@ -376,6 +390,7 @@
 			files = (
 				6928EED51E41610700B5D975 /* PINCaching.h in Headers */,
 				CC01061F1E271AB000890935 /* PINCache.h in Headers */,
+				8108660222B18A35008C3AEF /* PINMemoryCaching.h in Headers */,
 				68A0FC021E4D32C7000B552D /* PINCacheMacros.h in Headers */,
 				CC0106201E271AB000890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC0106221E271AB000890935 /* PINMemoryCache.h in Headers */,
@@ -659,6 +674,7 @@
 				CC0106101E271A9500890935 /* PINMemoryCache.m in Sources */,
 				C38F01AB20A32E0200F47F0E /* PINDiskCache+PINCacheTests.m in Sources */,
 				CC01060F1E271A9500890935 /* PINDiskCache.m in Sources */,
+				810865FB22B189A1008C3AEF /* PINPurgeableMemoryCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

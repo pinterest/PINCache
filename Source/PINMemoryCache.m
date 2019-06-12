@@ -40,6 +40,9 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 @synthesize didRemoveAllObjectsBlock = _didRemoveAllObjectsBlock;
 @synthesize didReceiveMemoryWarningBlock = _didReceiveMemoryWarningBlock;
 @synthesize didEnterBackgroundBlock = _didEnterBackgroundBlock;
+@synthesize removeAllObjectsOnMemoryWarning = _removeAllObjectsOnMemoryWarning;
+@synthesize removeAllObjectsOnEnteringBackground = _removeAllObjectsOnEnteringBackground;
+
 
 #pragma mark - Initialization -
 

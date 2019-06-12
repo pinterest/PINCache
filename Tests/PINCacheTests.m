@@ -7,7 +7,7 @@
 #import "PINDiskCache+PINCacheTests.h"
 #import <PINCache/PINCache.h>
 #import <PINOperation/PINOperation.h>
-
+#import <PINCache/PINMemoryCache.h>
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
   typedef UIImage PINImage;
@@ -39,6 +39,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 @interface PINCacheTests ()
 @property (strong, nonatomic) PINCache *cache;
 @end
+
+
 
 @implementation PINCacheTests
 

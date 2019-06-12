@@ -5,6 +5,8 @@
 #import "PINCache.h"
 
 #import <PINOperation/PINOperation.h>
+#import <PINCache/PINMemoryCache.h>
+#import <PINCache/PINPurgeableMemoryCache.h>
 
 static NSString * const PINCachePrefix = @"com.pinterest.PINCache";
 static NSString * const PINCacheSharedName = @"PINCacheShared";
@@ -56,6 +58,25 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                   keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
                     ttlCache:(BOOL)ttlCache
 {
+    return [self initWithName:name
+                     rootPath:rootPath
+                   serializer:serializer
+                 deserializer:deserializer
+                   keyEncoder:keyEncoder
+                   keyDecoder:keyDecoder
+                     ttlCache:ttlCache
+         purgeableMemoryCache:NO];
+}
+
+- (instancetype)initWithName:(nonnull NSString *)name
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
+                    ttlCache:(BOOL)ttlCache
+        purgeableMemoryCache:(BOOL)purgeableMemoryCache
+{
     if (!name)
         return nil;
     
@@ -73,7 +94,12 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                              keyDecoder:keyDecoder
                                          operationQueue:_operationQueue
                                                ttlCache:ttlCache];
-        _memoryCache = [[PINMemoryCache alloc] initWithName:_name operationQueue:_operationQueue ttlCache:ttlCache];
+        if (purgeableMemoryCache) {
+            _memoryCache = [[PINPurgeableMemoryCache alloc] initWithName:_name operationQueue:_operationQueue];
+        } else {
+            _memoryCache = [[PINMemoryCache alloc] initWithName:_name operationQueue:_operationQueue ttlCache:ttlCache];
+
+        }
     }
     return self;
 }
@@ -116,6 +142,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
 {
     if (!key || !block)
         return;
+
     
     [self.operationQueue scheduleOperation:^{
         [self->_memoryCache objectForKeyAsync:key completion:^(PINMemoryCache *memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
