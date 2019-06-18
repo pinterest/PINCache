@@ -7,7 +7,7 @@
 #import <pthread.h>
 #import <PINOperation/PINOperation.h>
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED 
 #import <UIKit/UIKit.h>
 #endif
 
@@ -100,7 +100,7 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         _removeAllObjectsOnMemoryWarning = YES;
         _removeAllObjectsOnEnteringBackground = YES;
         
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0 && !TARGET_OS_WATCH
+#if __IPHONE_OS_VERSION_MIN_REQUIRED && !TARGET_OS_WATCH
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(didReceiveEnterBackgroundNotification:)
                                                      name:UIApplicationDidEnterBackgroundNotification

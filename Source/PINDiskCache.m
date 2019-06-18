@@ -4,7 +4,7 @@
 
 #import "PINDiskCache.h"
 
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_4_0
+#if __IPHONE_OS_VERSION_MIN_REQUIRED
 #import <UIKit/UIKit.h>
 #endif
 
@@ -48,10 +48,7 @@ static PINOperationDataCoalescingBlock PINDiskTrimmingDateCoalescingBlock = ^id(
 const char * PINDiskCacheFileSystemRepresentation(NSURL *url)
 {
 #ifdef __MAC_10_13 // Xcode >= 9
-    // -fileSystemRepresentation is available on macOS >= 10.9
-    if (@available(macOS 10.9, iOS 7.0, watchOS 2.0, tvOS 9.0, *)) {
-      return url.fileSystemRepresentation;
-    }
+    return url.fileSystemRepresentation;
 #endif
     return [url.path cStringUsingEncoding:NSUTF8StringEncoding];
 }
@@ -84,7 +81,9 @@ const char * PINDiskCacheFileSystemRepresentation(NSURL *url)
 @property (assign, nonatomic) BOOL diskWritable;
 @property (assign, nonatomic) pthread_cond_t diskStateKnownCondition;
 @property (assign, nonatomic) BOOL diskStateKnown;
+#if TARGET_OS_IPHONE
 @property (assign, nonatomic) BOOL writingProtectionOptionSet;
+#endif
 @end
 
 @implementation PINDiskCache
@@ -349,23 +348,8 @@ static NSURL *_sharedTrashURL;
         if (![decodedKey length]) {
             return @"";
         }
-        
-        if (@available(macOS 10.9, iOS 7.0, tvOS 9.0, watchOS 2.0, *)) {
-            NSString *encodedString = [decodedKey stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
-            return encodedString;
-        } else {
-            CFStringRef static const charsToEscape = CFSTR(".:/%");
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            CFStringRef escapedString = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
-                                                                                (__bridge CFStringRef)decodedKey,
-                                                                                NULL,
-                                                                                charsToEscape,
-                                                                                kCFStringEncodingUTF8);
-#pragma clang diagnostic pop
-            
-            return (__bridge_transfer NSString *)escapedString;
-        }
+
+        return [decodedKey stringByAddingPercentEncodingWithAllowedCharacters:[[NSCharacterSet characterSetWithCharactersInString:@".:/%"] invertedSet]];
     };
 }
 
@@ -376,18 +360,7 @@ static NSURL *_sharedTrashURL;
             return @"";
         }
         
-        if (@available(macOS 10.9, iOS 7.0, tvOS 9.0, watchOS 2.0, *)) {
-            return [encodedKey stringByRemovingPercentEncoding];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            CFStringRef unescapedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault,
-                                                                                                  (__bridge CFStringRef)encodedKey,
-                                                                                                  CFSTR(""),
-                                                                                                  kCFStringEncodingUTF8);
-#pragma clang diagnostic pop
-            return (__bridge_transfer NSString *)unescapedString;
-        }
+        return [encodedKey stringByRemovingPercentEncoding];
     };
 }
 
@@ -1180,11 +1153,11 @@ static NSURL *_sharedTrashURL;
         return;
     
     NSDataWritingOptions writeOptions = NSDataWritingAtomic;
-    #if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
     if (self.writingProtectionOptionSet) {
         writeOptions |= self.writingProtectionOption;
     }
-    #endif
+#endif
   
     // Remain unlocked here so that we're not locked while serializing.
     NSData *data = _serializer(object, key);
