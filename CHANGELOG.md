@@ -2,6 +2,8 @@
 
 * Add your own contributions to the next release on the line below this with your name.
 
+- [performance] Optimization `PINMemoryCache` trim to date. [#252](https://github.com/pinterest/PINCache/pull/252)
+
 ## 3.0.1 -- Beta 8
 - [fix] Initing PINCache with TTL enabled should enable TTL on PINMemoryCache. [#246](https://github.com/pinterest/PINCache/pull/246)
 - [performance] Return TTL cache objects without waiting for all metadata to be read. [#228](https://github.com/pinterest/PINCache/pull/228)
