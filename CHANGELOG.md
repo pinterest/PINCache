@@ -2,6 +2,8 @@
 
 * Add your own contributions to the next release on the line below this with your name.
 
+- [performance] Optimize `PINMemoryCache` remove objects when receive memory warning notification. [#251](https://github.com/pinterest/PINCache/pull/251)
+
 ## 3.0.1 -- Beta 8
 - [fix] Initing PINCache with TTL enabled should enable TTL on PINMemoryCache. [#246](https://github.com/pinterest/PINCache/pull/246)
 - [performance] Return TTL cache objects without waiting for all metadata to be read. [#228](https://github.com/pinterest/PINCache/pull/228)
