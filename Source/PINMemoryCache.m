@@ -130,10 +130,11 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 #pragma mark - Private Methods -
 
 - (void)didReceiveMemoryWarningNotification:(NSNotification *)notification {
-    if (self.removeAllObjectsOnMemoryWarning)
+    if (self.removeAllObjectsOnMemoryWarning) {
         [self removeAllObjectsAsync:nil];
-
-    [self removeExpiredObjects];
+    } else {
+        [self removeExpiredObjects];
+    }
 
     [self.operationQueue scheduleOperation:^{
         [self lock];
