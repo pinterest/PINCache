@@ -268,7 +268,17 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
     self.cache[key] = [self image];
-    
+
+    __block BOOL willRemoveObjectBlockCalled = NO;
+    self.cache.diskCache.willRemoveObjectBlock = ^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
+        willRemoveObjectBlockCalled = YES;
+    };
+
+    __block BOOL didRemoveObjectBlockCalled = NO;
+    self.cache.diskCache.didRemoveObjectBlock = ^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
+        didRemoveObjectBlockCalled = YES;
+    };
+
     [self.cache removeObjectForKeyAsync:key completion:^(PINCache *cache, NSString *key, id object) {
         dispatch_semaphore_signal(semaphore);
     }];
@@ -276,8 +286,10 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     dispatch_semaphore_wait(semaphore, [self timeout]);
     
     id object = self.cache[key];
-    
+
     XCTAssertNil(object, @"object was not removed");
+    XCTAssertTrue(willRemoveObjectBlockCalled, @"willRemoveObjectBlock was not called");
+    XCTAssertTrue(didRemoveObjectBlockCalled, @"didRemoveObjectBlock was not called");
 }
 
 - (void)testObjectRemoveAll
@@ -288,7 +300,17 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     
     self.cache[key1] = key1;
     self.cache[key2] = key2;
-    
+
+    __block BOOL willRemoveAllObjectsBlockCalled = NO;
+    self.cache.diskCache.willRemoveAllObjectsBlock = ^(id<PINCaching> _Nonnull cache) {
+        willRemoveAllObjectsBlockCalled = YES;
+    };
+
+    __block BOOL didRemoveAllObjectsBlockCalled = NO;
+    self.cache.diskCache.didRemoveAllObjectsBlock = ^(id<PINCaching> _Nonnull cache) {
+        didRemoveAllObjectsBlockCalled = YES;
+    };
+
     [self.cache removeAllObjectsAsync:^(PINCache *cache) {
         dispatch_semaphore_signal(semaphore);
     }];
@@ -300,6 +322,8 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     
     XCTAssertNil(object1, @"not all objects were removed");
     XCTAssertNil(object2, @"not all objects were removed");
+    XCTAssertTrue(willRemoveAllObjectsBlockCalled, @"willRemoveAllObjectsBlock was not called");
+    XCTAssertTrue(didRemoveAllObjectsBlockCalled, @"didRemoveAllObjectsBlock was not called");
     XCTAssertTrue(self.cache.memoryCache.totalCost == 0, @"memory cache cost was not 0 after removing all objects");
     XCTAssertTrue(self.cache.diskByteCount == 0, @"disk cache byte count was not 0 after removing all objects");
 }

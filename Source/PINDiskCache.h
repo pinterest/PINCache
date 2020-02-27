@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, PINDiskCacheError) {
 /**
  A callback block which provides the cache, key and object as arguments
  */
-typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding>  _Nullable object);
+typedef void (^PINDiskCacheObjectBlock)(PINDiskCache *cache, NSString *key, id <NSCoding> _Nullable object);
 
 /**
  A callback block which provides the key and fileURL of the object
