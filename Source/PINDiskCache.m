@@ -666,10 +666,13 @@ static NSURL *_sharedTrashURL;
 - (BOOL)removeFileAndExecuteBlocksForKey:(NSString *)key
 {
     NSURL *fileURL = [self encodedFileURLForKey:key];
-    
+    if (!fileURL) {
+        return NO;
+    }
+
     // We only need to lock until writable at the top because once writable, always writable
     [self lockForWriting];
-        if (!fileURL || ![[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[fileURL path]]) {
             [self unlock];
             return NO;
         }
