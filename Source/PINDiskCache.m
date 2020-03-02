@@ -111,7 +111,7 @@ static NSURL *_sharedTrashURL;
 - (void)dealloc
 {
     __unused int result = pthread_mutex_destroy(&_mutex);
-    NSCAssert(result == 0, @"Failed to destroy lock in PINMemoryCache %p. Code: %d", (void *)self, result);
+    NSCAssert(result == 0, @"Failed to destroy lock in PINDiskCache %p. Code: %d", (void *)self, result);
     pthread_cond_destroy(&_diskWritableCondition);
     pthread_cond_destroy(&_diskStateKnownCondition);
 }
@@ -197,7 +197,7 @@ static NSURL *_sharedTrashURL;
     
     if (self = [super init]) {
         __unused int result = pthread_mutex_init(&_mutex, NULL);
-        NSAssert(result == 0, @"Failed to init lock in PINMemoryCache %@. Code: %d", self, result);
+        NSAssert(result == 0, @"Failed to init lock in PINDiskCache %@. Code: %d", self, result);
         
         _name = [name copy];
         _prefix = [prefix copy];
