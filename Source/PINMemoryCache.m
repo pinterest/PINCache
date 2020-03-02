@@ -191,23 +191,19 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 - (void)trimMemoryToDate:(NSDate *)trimDate
 {
     [self lock];
-        NSArray *keysSortedByCreatedDate = [_createdDates keysSortedByValueUsingSelector:@selector(compare:)];
         NSDictionary *createdDates = [_createdDates copy];
         NSDictionary *ageLimits = [_ageLimits copy];
     [self unlock];
     
-    for (NSString *key in keysSortedByCreatedDate) { // oldest objects first
-        NSDate *createdDate = createdDates[key];
+    [createdDates enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSDate * _Nonnull createdDate, BOOL * _Nonnull stop) {
         NSTimeInterval ageLimit = [ageLimits[key] doubleValue];
-        if (!createdDate || ageLimit > 0.0)
-            continue;
-        
+        if (!createdDate || ageLimit > 0.0) {
+            return;
+        }
         if ([createdDate compare:trimDate] == NSOrderedAscending) { // older than trim date
             [self removeObjectAndExecuteBlocksForKey:key];
-        } else {
-            break;
         }
-    }
+    }];
 }
 
 - (void)removeExpiredObjects
