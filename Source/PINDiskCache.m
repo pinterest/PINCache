@@ -185,15 +185,15 @@ static NSURL *_sharedTrashURL;
               operationQueue:(PINOperationQueue *)operationQueue
                     ttlCache:(BOOL)ttlCache
 {
-    if (!name)
+    if (!name) {
         return nil;
-    
+    }
 
     NSAssert(((!serializer && !deserializer) || (serializer && deserializer)),
              @"PINDiskCache must be initialized with a serializer AND deserializer.");
     
     NSAssert(((!keyEncoder && !keyDecoder) || (keyEncoder && keyDecoder)),
-              @"PINDiskCache must be initialized with a encoder AND decoder.");
+              @"PINDiskCache must be initialized with an encoder AND decoder.");
     
     if (self = [super init]) {
         __unused int result = pthread_mutex_init(&_mutex, NULL);
