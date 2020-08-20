@@ -833,42 +833,74 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
 
 - (void)objectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block
 {
-    [self objectForKeyAsync:key completion:block];
+    [self objectForKeyAsync:key completion:^(id<PINCaching> memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache, memoryCacheKey, memoryCacheObject);
+        }
+    }];
 }
 
 - (void)setObject:(id)object forKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block
 {
-    [self setObjectAsync:object forKey:key completion:block];
+    [self setObjectAsync:object forKey:key completion:^(id<PINCaching> memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache, memoryCacheKey, memoryCacheObject);
+        }
+    }];
 }
 
 - (void)setObject:(id)object forKey:(NSString *)key withCost:(NSUInteger)cost block:(nullable PINMemoryCacheObjectBlock)block
 {
-    [self setObjectAsync:object forKey:key withCost:cost completion:block];
+    [self setObjectAsync:object forKey:key withCost:cost completion:^(id<PINCaching> memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache, memoryCacheKey, memoryCacheObject);
+        }
+    }];
 }
 
 - (void)removeObjectForKey:(NSString *)key block:(nullable PINMemoryCacheObjectBlock)block
 {
-    [self removeObjectForKeyAsync:key completion:block];
+    [self removeObjectForKeyAsync:key completion:^(id<PINCaching> memoryCache, NSString *memoryCacheKey, id memoryCacheObject) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache, memoryCacheKey, memoryCacheObject);
+        }
+    }];
 }
 
 - (void)trimToDate:(NSDate *)date block:(nullable PINMemoryCacheBlock)block
 {
-    [self trimToDateAsync:date completion:block];
+    [self trimToDateAsync:date completion:^(id<PINCaching> memoryCache) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache);
+        }
+    }];
 }
 
 - (void)trimToCost:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block
 {
-    [self trimToCostAsync:cost completion:block];
+    [self trimToCostAsync:cost completion:^(id<PINCaching> memoryCache) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache);
+        }
+    }];
 }
 
 - (void)trimToCostByDate:(NSUInteger)cost block:(nullable PINMemoryCacheBlock)block
 {
-    [self trimToCostByDateAsync:cost completion:block];
+    [self trimToCostByDateAsync:cost completion:^(id<PINCaching> memoryCache) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache);
+        }
+    }];
 }
 
 - (void)removeAllObjects:(nullable PINMemoryCacheBlock)block
 {
-    [self removeAllObjectsAsync:block];
+    [self removeAllObjectsAsync:^(id<PINCaching> memoryCache) {
+        if (block) {
+            block((PINMemoryCache *)memoryCache);
+        }
+    }];
 }
 
 - (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock
@@ -878,7 +910,11 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
             PINMemoryCache *memoryCache = (PINMemoryCache *)cache;
             block(memoryCache, key, object);
         }
-    } completionBlock:completionBlock];
+    } completionBlock:^(id<PINCaching> memoryCache) {
+        if (completionBlock) {
+            completionBlock((PINMemoryCache *)memoryCache);
+        }
+    }];
 }
 
 - (void)setTtlCache:(BOOL)ttlCache
