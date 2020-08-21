@@ -436,9 +436,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 320117AE24444DF7004FD783 /* Build configuration list for PBXNativeTarget "PINCache-watchOS" */;
 			buildPhases = (
-				3201179C24444DF7004FD783 /* Headers */,
 				3201179D24444DF7004FD783 /* Sources */,
 				3201179E24444DF7004FD783 /* Frameworks */,
+				3201179C24444DF7004FD783 /* Headers */,
 				3201179F24444DF7004FD783 /* Resources */,
 			);
 			buildRules = (
@@ -863,7 +863,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinterest.PINCache-watchOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -890,7 +890,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pinterest.PINCache-watchOS";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
