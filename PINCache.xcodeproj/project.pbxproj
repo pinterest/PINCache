@@ -30,8 +30,6 @@
 		C30EE1F520373D1900D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
 		C30EE1F620373D1A00D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
 		C30EE1F720373D1B00D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
-		C38F01AA20A32E0200F47F0E /* PINDiskCache+PINCacheTests.h in Headers */ = {isa = PBXBuildFile; fileRef = C38F01A820A32E0200F47F0E /* PINDiskCache+PINCacheTests.h */; };
-		C38F01AB20A32E0200F47F0E /* PINDiskCache+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C38F01A920A32E0200F47F0E /* PINDiskCache+PINCacheTests.m */; };
 		CC0105DF1E271A5C00890935 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105B11E271A1600890935 /* PINCache.framework */; };
 		CC0105EE1E271A6400890935 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105C11E271A4000890935 /* PINCache.framework */; };
 		CC01060E1E271A9500890935 /* PINCache.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0106061E271A9000890935 /* PINCache.m */; };
@@ -398,7 +396,6 @@
 				68A0FC001E4D32C4000B552D /* PINCacheMacros.h in Headers */,
 				CC0106181E271AAF00890935 /* PINCacheObjectSubscripting.h in Headers */,
 				CC01061A1E271AAF00890935 /* PINMemoryCache.h in Headers */,
-				C38F01AA20A32E0200F47F0E /* PINDiskCache+PINCacheTests.h in Headers */,
 				CC0106191E271AAF00890935 /* PINDiskCache.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -751,7 +748,6 @@
 			files = (
 				CC01060E1E271A9500890935 /* PINCache.m in Sources */,
 				CC0106101E271A9500890935 /* PINMemoryCache.m in Sources */,
-				C38F01AB20A32E0200F47F0E /* PINDiskCache+PINCacheTests.m in Sources */,
 				CC01060F1E271A9500890935 /* PINDiskCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -857,6 +853,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/watchOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -885,6 +885,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/watchOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
