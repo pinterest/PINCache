@@ -81,7 +81,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     
     if (!image) {
 #ifdef TEST_AS_SPM
-        NSBundle *bun = [NSBundle bundleWithURL:[[NSBundle bundleForClass:self.class] URLForResource:@"PINCache_PINCacheTests" withExtension:@"bundle"]];
+        NSBundle *bun = SWIFTPM_MODULE_BUNDLE;
 #else
         NSBundle *bun = [NSBundle bundleForClass:self.class];
 
