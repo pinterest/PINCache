@@ -37,15 +37,25 @@ jobs:
     name: CocoaPods
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Lint
         run: pod lib lint
   carthage:
     name: Carthage
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Update
         run: carthage update --no-use-binaries --no-build
       - name: Build
         run: carthage build --no-skip-current
+  SPM-Build:
+    runs-on: macos-latest
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_12_beta.app/Contents/Developer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Verify that PINCache can be build by SPM
+        run: xcrun swift build
