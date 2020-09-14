@@ -54,6 +54,12 @@ jobs:
     env:
       DEVELOPER_DIR: /Applications/Xcode_12_beta.app/Contents/Developer
     steps:
+      - name: "Add GitHub to the SSH known hosts file"
+        run: |
+          for ip in $(dig @8.8.8.8 github.com +short); do \
+            ssh-keyscan github.com,$ip; \
+            ssh-keyscan $ip; \
+          done 2>/dev/null >> ~/.ssh/known_hosts
       - name: Checkout
         uses: actions/checkout@v2
 
