@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Lint
-        run: make pod
+        run: make cocoapods
   carthage:
     name: Carthage
     runs-on: macOS-latest

@@ -2,9 +2,9 @@ PLATFORM="platform=iOS Simulator,name=iPhone 8"
 SDK="iphonesimulator"
 SHELL=/bin/bash -o pipefail
 
-.PHONY: all lint test carthage analyze
+.PHONY: all cocoapods test carthage analyze
 
-lint:
+cocoapods:
 	pod lib lint
 
 analyze:
@@ -25,4 +25,4 @@ carthage:
 	carthage update --no-use-binaries --no-build
 	carthage build --no-skip-current
 
-all: carthage lint test analyze
+all: carthage cocoapods test analyze
