@@ -735,13 +735,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key1 completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj1 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key2 completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj2 = object;
         dispatch_group_leave(group);
     }];
@@ -778,13 +778,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key1 completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj1 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj2 = object;
         dispatch_group_leave(group);
     }];
@@ -909,7 +909,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
 
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
@@ -933,7 +933,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
 
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
