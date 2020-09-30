@@ -52,10 +52,10 @@ jobs:
   SPM-Build:
     runs-on: macos-latest
     env:
-      DEVELOPER_DIR: /Applications/Xcode_12_beta.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Verify that PINCache can be build by SPM
-        run: xcrun swift build
+        run: make spm
