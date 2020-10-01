@@ -2,11 +2,12 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
+@import PINCache;
+@import PINOperation;
+
 #import "PINCacheTests.h"
 #import "NSDate+PINCacheTests.h"
 #import "PINDiskCache+PINCacheTests.h"
-#import <PINCache/PINCache.h>
-#import <PINOperation/PINOperation.h>
 
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
@@ -79,8 +80,14 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     static PINImage *image = nil;
     
     if (!image) {
+#ifdef TEST_AS_SPM
+        NSBundle *bun = SWIFTPM_MODULE_BUNDLE;
+#else
+        NSBundle *bun = [NSBundle bundleForClass:self.class];
+
+#endif
+        NSURL *imageURL = [bun URLForResource:@"Default-568h@2x" withExtension:@"png"];
         NSError *error = nil;
-        NSURL *imageURL = [[NSBundle bundleForClass:self.class] URLForResource:@"Default-568h@2x" withExtension:@"png"];
         NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
                                                           options:NSDataReadingUncached
                                                             error:&error];
