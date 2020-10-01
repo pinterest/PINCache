@@ -2,11 +2,12 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
+@import PINCache;
+@import PINOperation;
+
 #import "PINCacheTests.h"
 #import "NSDate+PINCacheTests.h"
 #import "PINDiskCache+PINCacheTests.h"
-#import <PINCache/PINCache.h>
-#import <PINOperation/PINOperation.h>
 
 
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
@@ -79,8 +80,14 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     static PINImage *image = nil;
     
     if (!image) {
+#ifdef TEST_AS_SPM
+        NSBundle *bun = SWIFTPM_MODULE_BUNDLE;
+#else
+        NSBundle *bun = [NSBundle bundleForClass:self.class];
+
+#endif
+        NSURL *imageURL = [bun URLForResource:@"Default-568h@2x" withExtension:@"png"];
         NSError *error = nil;
-        NSURL *imageURL = [[NSBundle bundleForClass:self.class] URLForResource:@"Default-568h@2x" withExtension:@"png"];
         NSData *imageData = [[NSData alloc] initWithContentsOfURL:imageURL
                                                           options:NSDataReadingUncached
                                                             error:&error];
@@ -735,13 +742,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key1 completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj1 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key2 completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj2 = object;
         dispatch_group_leave(group);
     }];
@@ -778,13 +785,13 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key1 completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key1 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj1 = object;
         dispatch_group_leave(group);
     }];
     
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache *cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key2 completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding>  _Nullable object) {
         diskObj2 = object;
         dispatch_group_leave(group);
     }];
@@ -909,7 +916,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
 
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
         diskObj = object;
         dispatch_group_leave(group);
     }];
@@ -933,7 +940,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }];
 
     dispatch_group_enter(group);
-    [self.cache.diskCache objectForKeyAsync:key completion:^(id<PINCaching> cache, NSString *key, id<NSCoding> object) {
+    [self.cache.diskCache objectForKeyAsync:key completion:^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
         diskObj = object;
         dispatch_group_leave(group);
     }];

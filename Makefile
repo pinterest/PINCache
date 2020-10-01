@@ -2,9 +2,9 @@ PLATFORM="platform=iOS Simulator,name=iPhone 8"
 SDK="iphonesimulator"
 SHELL=/bin/bash -o pipefail
 
-.PHONY: all lint test carthage analyze
+.PHONY: all cocoapods test carthage analyze spm
 
-lint:
+cocoapods:
 	pod lib lint
 
 analyze:
@@ -25,4 +25,10 @@ carthage:
 	carthage update --no-use-binaries --no-build
 	carthage build --no-skip-current
 
-all: carthage lint test analyze
+spm:
+# For now just check whether we can assemble it
+# TODO: replace it with "swift test --enable-test-discovery --sanitize=thread" when swiftPM resource-related bug would be fixed.
+# https://bugs.swift.org/browse/SR-13560
+	swift build
+
+all: carthage cocoapods test analyze spm
