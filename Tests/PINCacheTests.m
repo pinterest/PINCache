@@ -23,6 +23,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 @property (assign, nonatomic) BOOL diskStateKnown;
 @property (strong, nonatomic) NSDictionary *metadata;
+@property (readonly) PINOperationQueue *operationQueue;
 
 + (dispatch_queue_t)sharedTrashQueue;
 + (NSURL *)sharedTrashURL;
@@ -272,7 +273,6 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 - (void)testObjectRemove
 {
     NSString *key = @"key";
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
     self.cache[key] = [self image];
 
@@ -285,13 +285,12 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     self.cache.diskCache.didRemoveObjectBlock = ^(PINDiskCache * _Nonnull cache, NSString * _Nonnull key, id<NSCoding> _Nullable object) {
         didRemoveObjectBlockCalled = YES;
     };
+    
+    // Clear out operation queue to ensure blocks are set.
+    [self.cache.diskCache.operationQueue waitUntilAllOperationsAreFinished];
 
-    [self.cache removeObjectForKeyAsync:key completion:^(id<PINCaching> cache, NSString *key, id object) {
-        dispatch_semaphore_signal(semaphore);
-    }];
-    
-    dispatch_semaphore_wait(semaphore, [self timeout]);
-    
+    [self.cache removeObjectForKey:key];
+        
     id object = self.cache[key];
 
     XCTAssertNil(object, @"object was not removed");
@@ -303,7 +302,6 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 {
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
     self.cache[key1] = key1;
     self.cache[key2] = key2;
@@ -317,12 +315,10 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     self.cache.diskCache.didRemoveAllObjectsBlock = ^(id<PINCaching> _Nonnull cache) {
         didRemoveAllObjectsBlockCalled = YES;
     };
-
-    [self.cache removeAllObjectsAsync:^(id<PINCaching> cache) {
-        dispatch_semaphore_signal(semaphore);
-    }];
     
-    dispatch_semaphore_wait(semaphore, [self timeout]);
+    [self.cache.diskCache.operationQueue waitUntilAllOperationsAreFinished];
+
+    [self.cache removeAllObjects];
     
     id object1 = self.cache[key1];
     id object2 = self.cache[key2];
