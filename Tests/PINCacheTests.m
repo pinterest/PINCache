@@ -302,7 +302,6 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 {
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
-    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     
     self.cache[key1] = key1;
     self.cache[key2] = key2;
@@ -317,13 +316,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
         didRemoveAllObjectsBlockCalled = YES;
     };
     
-    
+    [self.cache.diskCache.operationQueue waitUntilAllOperationsAreFinished];
 
-    [self.cache removeAllObjectsAsync:^(id<PINCaching> cache) {
-        dispatch_semaphore_signal(semaphore);
-    }];
-    
-    dispatch_semaphore_wait(semaphore, [self timeout]);
+    [self.cache removeAllObjects];
     
     id object1 = self.cache[key1];
     id object2 = self.cache[key2];
