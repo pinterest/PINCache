@@ -2,8 +2,13 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
+#if SWIFT_PACKAGE
 @import PINCache;
 @import PINOperation;
+#else
+#import <PINCache/PINCache.h>
+#import <PINOperation/PINOperation.h>
+#endif
 
 #import "PINCacheTests.h"
 #import "NSDate+PINCacheTests.h"
