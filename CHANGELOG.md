@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.3](https://github.com/Pinterest/PINCache/tree/3.0.3) (2020-10-22)
+
+[Full Changelog](https://github.com/Pinterest/PINCache/compare/3.0.2...3.0.3)
+
+
+- Update PINOperation to fix imports [\#293](https://github.com/pinterest/PINCache/pull/293) ([garrettmoon](https://github.com/garrettmoon))
+- Add support for automated releases [\#292](https://github.com/pinterest/PINCache/pull/292) ([garrettmoon](https://github.com/garrettmoon))
+- Fix up imports [\#290](https://github.com/pinterest/PINCache/pull/290) ([garrettmoon](https://github.com/garrettmoon))
+- Fix build issues by removing nested PINOperation.xcodeproj [\#282](https://github.com/pinterest/PINCache/pull/282) ([elliottwilliams](https://github.com/elliottwilliams))
+
 ## [3.0.2](https://github.com/Pinterest/PINCache/tree/3.0.2) (2020-10-06)
 
 [Full Changelog](https://github.com/Pinterest/PINCache/compare/3.0.1...3.0.2)
