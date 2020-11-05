@@ -424,37 +424,43 @@ static NSURL *_sharedTrashURL;
 
 + (NSURL *)sharedTrashURL
 {
-    NSURL *trashURL = nil;
-    
-    [[PINDiskCache sharedLock] lock];
-        if (_sharedTrashURL == nil) {
-            NSString *uniqueString = [[NSProcessInfo processInfo] globallyUniqueString];
-            _sharedTrashURL = [[[NSURL alloc] initFileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:uniqueString isDirectory:YES];
-            
-            NSError *error = nil;
-            [[NSFileManager defaultManager] createDirectoryAtURL:_sharedTrashURL
-                                     withIntermediateDirectories:YES
-                                                      attributes:nil
-                                                           error:&error];
-            PINDiskCacheError(error);
-        }
-        trashURL = _sharedTrashURL;
-    [[PINDiskCache sharedLock] unlock];
-    
-    return trashURL;
+    NSAssert(![[PINDiskCache sharedLock] tryLock] || ([[PINDiskCache sharedLock] unlock], NO),
+             @"+[sharedTrashURL] must be called with +[sharedLock] held.");
+    if (_sharedTrashURL == nil) {
+        NSString *uniqueString = [[NSProcessInfo processInfo] globallyUniqueString];
+        _sharedTrashURL = [[[NSURL alloc] initFileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:uniqueString isDirectory:YES];
+
+        NSError *error = nil;
+        [[NSFileManager defaultManager] createDirectoryAtURL:_sharedTrashURL
+                                 withIntermediateDirectories:YES
+                                                  attributes:nil
+                                                       error:&error];
+        PINDiskCacheError(error);
+    }
+    return _sharedTrashURL;
 }
 
-+ (BOOL)moveItemAtURLToTrash:(NSURL *)itemURL
++ (BOOL)moveItemAtURLToTrashOrRemove:(NSURL *)itemURL
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:[itemURL path]])
         return NO;
     
     NSError *error = nil;
     NSString *uniqueString = [[NSProcessInfo processInfo] globallyUniqueString];
-    NSURL *uniqueTrashURL = [[PINDiskCache sharedTrashURL] URLByAppendingPathComponent:uniqueString isDirectory:NO];
-    BOOL moved = [[NSFileManager defaultManager] moveItemAtURL:itemURL toURL:uniqueTrashURL error:&error];
+
+    [[PINDiskCache sharedLock] lock];
+        NSURL *uniqueTrashURL = [[PINDiskCache sharedTrashURL] URLByAppendingPathComponent:uniqueString
+                                                                               isDirectory:NO];
+        BOOL moved = [[NSFileManager defaultManager] moveItemAtURL:itemURL toURL:uniqueTrashURL error:&error];
+    [[PINDiskCache sharedLock] unlock];
     PINDiskCacheError(error);
-    return moved;
+    BOOL removed = NO;
+    if (!moved) {
+        // Delete the item synchronously as a fallback.
+        removed = [[NSFileManager defaultManager] removeItemAtURL:itemURL error:&error];
+        PINDiskCacheError(error);
+    }
+    return moved || removed;
 }
 
 + (void)emptyTrash
@@ -688,7 +694,7 @@ static NSURL *_sharedTrashURL;
             [self lock];
         }
         
-        BOOL trashed = [PINDiskCache moveItemAtURLToTrash:fileURL];
+        BOOL trashed = [PINDiskCache moveItemAtURLToTrashOrRemove:fileURL];
         if (!trashed) {
             [self unlock];
             return NO;
@@ -1353,7 +1359,7 @@ static NSURL *_sharedTrashURL;
             [self lock];
         }
     
-        [PINDiskCache moveItemAtURLToTrash:self->_cacheURL];
+        [PINDiskCache moveItemAtURLToTrashOrRemove:self->_cacheURL];
         [PINDiskCache emptyTrash];
         
         [self _locked_createCacheDirectory];
