@@ -2,11 +2,16 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
-#if SWIFT_PACKAGE
-@import PINCache;
-@import PINOperation;
+
+#if !__has_include (<PINCache/PINCache.h>)
+#import "PINCache.h"
 #else
 #import <PINCache/PINCache.h>
+#endif
+
+#if !__has_include (<PINOperation/PINOperation.h>)
+#import "PINOperation.h"
+#else
 #import <PINOperation/PINOperation.h>
 #endif
 
