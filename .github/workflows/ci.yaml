@@ -48,7 +48,7 @@ jobs:
   swift-package-manager:
     runs-on: macos-latest
     env:
-      DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,18 +57,9 @@ jobs:
   xcode-spm-integration:
     name: Build iOS example project 
     runs-on: macOS-latest
-    env: 
-      DEVELOPER_DIR: /Applications/Xcode_12.1.1.app/Contents/Developer
-      IOS_EXAMPLE_PROJECT: IntegrationTests/PINCache-SPM-Integration/PINCache-SPM-Integration.xcodeproj
-      EXAMPLE_SCHEME: PINCache-SPM-Integration
-    strategy:
-      matrix:
-        destination: ["name=iPhone 12 Pro"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Check Xcode's spm integration
-        run: |
-          set -o pipefail
-          xcodebuild clean build -project "${{ env.IOS_EXAMPLE_PROJECT }}" -scheme "${{ env.EXAMPLE_SCHEME }}" -destination "${{ matrix.destination }}" ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO
+        run: make example
