@@ -26,18 +26,10 @@ test:
 	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	if [ ${XCODE_MAJOR_VERSION} -gt 11 ] ; then \
-		echo "Carthage no longer works in Xcode 12 https://github.com/Carthage/Carthage/blob/master/Documentation/Xcode12Workaround.md"; \
-		exit 1; \
-	fi
 	# To workaround https://github.com/Carthage/Carthage/issues/1974 on CI
-	# just rename example's project file before running carthage.
-	mv ${IOS_EXAMPLE_PROJECT} ${EXAMPLE_PROJECT_CARTHAGE_WORKAROUND}
-	# start crthage
-	carthage update --no-use-binaries --no-build
-	carthage build --no-skip-current
-	# revert back
-	mv ${EXAMPLE_PROJECT_CARTHAGE_WORKAROUND} ${IOS_EXAMPLE_PROJECT}
+	##### Apply workaround https://github.com/Carthage/Carthage/issues/3019#issuecomment-734415287
+	./carthage.sh update --no-use-binaries --no-build; \
+	./carthage.sh build --no-skip-current;
 
 spm:
 # For now just check whether we can assemble it
