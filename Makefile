@@ -3,7 +3,6 @@ SDK="iphonesimulator"
 SHELL=/bin/bash -o pipefail
 XCODE_MAJOR_VERSION=$(shell xcodebuild -version | HEAD -n 1 | sed -E 's/Xcode ([0-9]+).*/\1/')
 IOS_EXAMPLE_PROJECT="IntegrationTests/PINCache-SPM-Integration/PINCache-SPM-Integration.xcodeproj"
-EXAMPLE_PROJECT_CARTHAGE_WORKAROUND="IntegrationTests/PINCache-SPM-Integration/PINCache-SPM-Integration.carthageWorkaround"
 EXAMPLE_SCHEME="PINCache-SPM-Integration"
 
 .PHONY: all cocoapods test carthage analyze spm example
