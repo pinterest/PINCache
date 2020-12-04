@@ -39,8 +39,7 @@ jobs:
     name: Carthage
     runs-on: macOS-latest
     env:
-      # Carthage is broken in Xcode 12 and above https://github.com/Carthage/Carthage/blob/master/Documentation/Xcode12Workaround.md
-      DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: carthage
@@ -48,9 +47,18 @@ jobs:
   swift-package-manager:
     runs-on: macos-latest
     env:
-      DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Verify that PINCache can be build by SPM
         run: make spm
+  xcode-spm-integration:
+    name: Build iOS example project 
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Check Xcode's spm integration
+        run: make example

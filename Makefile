@@ -2,8 +2,10 @@ PLATFORM="platform=iOS Simulator,name=iPhone 8"
 SDK="iphonesimulator"
 SHELL=/bin/bash -o pipefail
 XCODE_MAJOR_VERSION=$(shell xcodebuild -version | HEAD -n 1 | sed -E 's/Xcode ([0-9]+).*/\1/')
+IOS_EXAMPLE_PROJECT="IntegrationTests/PINCache-SPM-Integration/PINCache-SPM-Integration.xcodeproj"
+EXAMPLE_SCHEME="PINCache-SPM-Integration"
 
-.PHONY: all cocoapods test carthage analyze spm
+.PHONY: all cocoapods test carthage analyze spm example
 
 cocoapods:
 	pod lib lint
@@ -23,12 +25,10 @@ test:
 	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	if [ ${XCODE_MAJOR_VERSION} -gt 11 ] ; then \
-		echo "Carthage no longer works in Xcode 12 https://github.com/Carthage/Carthage/blob/master/Documentation/Xcode12Workaround.md"; \
-		exit 1; \
-	fi
-	carthage update --no-use-binaries --no-build
-	carthage build --no-skip-current
+	# To workaround https://github.com/Carthage/Carthage/issues/1974 on CI
+	##### Apply workaround https://github.com/Carthage/Carthage/issues/3019#issuecomment-734415287
+	./carthage.sh update --no-use-binaries --no-build; \
+	./carthage.sh build --no-skip-current;
 
 spm:
 # For now just check whether we can assemble it
@@ -36,4 +36,14 @@ spm:
 # https://bugs.swift.org/browse/SR-13560
 	swift build
 
-all: carthage cocoapods test analyze spm
+
+example:
+	if [ ${XCODE_MAJOR_VERSION} -lt 12 ] ; then \
+		echo "Xcode 12 and Swift 5.3 reqiured to build example project"; \
+		exit 1; \
+	fi
+	xcodebuild clean build -project ${IOS_EXAMPLE_PROJECT} -scheme ${EXAMPLE_SCHEME} -destination ${PLATFORM} -sdk ${SDK} \
+	ONLY_ACTIVE_ARCH=NO \
+	CODE_SIGNING_REQUIRED=NO | xcpretty
+
+all: carthage cocoapods test analyze spm example
