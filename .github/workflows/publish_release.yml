@@ -16,8 +16,12 @@ jobs:
       # Make sure we can build with Carthage before the release
       - name: Build and archive framework for Carthage users
         env:
-          DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
-        run: carthage build --no-skip-current && carthage archive
+          DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
+        run: ./carthage.sh build --no-skip-current && ./carthage.sh archive
+      - name: Create XCFramework
+        uses: unsignedapps/swift-create-xcframework@v1.3
+        env:
+          DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
       - name: Create Release Branch
         env:
           GITHUB_CHANGELOG_API_KEY: ${{ secrets.GITHUB_TOKEN }}
@@ -38,18 +42,19 @@ jobs:
           release_name: ${{ env.RELEASE_TAG }}
           body_path: RELEASE_NOTES.md
           draft: false
+      - name: Upload artifacts
+        uses: csexton/release-asset-action@v2
+        env:
+          FRAMEWORK_NAME: "PINCache"
+        with:
+          files: |
+            ${{env.FRAMEWORK_NAME}}.framework.zip
+            ${{env.FRAMEWORK_NAME}}.zip
+            ${{env.FRAMEWORK_NAME}}.sha256
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-url: ${{ steps.create_release.outputs.upload_url }}
       - name: Push to Cocoapods
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: pod trunk push
-      - name: Upload binary framework to release asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          FRAMEWORK_NAME: PINCache
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ env.FRAMEWORK_NAME }}.framework.zip
-          asset_name: ${{ env.FRAMEWORK_NAME }}.framework.zip
-          asset_content_type: application/zip
+
