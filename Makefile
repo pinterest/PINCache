@@ -30,6 +30,9 @@ carthage:
 	./carthage.sh update --no-use-binaries --no-build; \
 	./carthage.sh build --no-skip-current;
 
+carthage_checkout:
+	./carthage.sh checkout
+
 spm:
 # For now just check whether we can assemble it
 # TODO: replace it with "swift test --enable-test-discovery --sanitize=thread" when swiftPM resource-related bug would be fixed.

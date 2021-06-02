@@ -22,7 +22,8 @@ xcuserdata
 /.buckconfig.local
 /.buckd
 
-Carthage/Build
+Carthage/
+Pods/
 
 # SPM
 .swiftpm/
