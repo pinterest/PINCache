@@ -25,10 +25,8 @@ test:
 	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	# To workaround https://github.com/Carthage/Carthage/issues/1974 on CI
-	##### Apply workaround https://github.com/Carthage/Carthage/issues/3019#issuecomment-734415287
-	./carthage.sh update --no-use-binaries --no-build; \
-	./carthage.sh build --no-skip-current;
+	carthage update --use-xcframeworks --new-resolver --no-use-binaries --no-build; \
+	carthage build --use-xcframeworks --no-skip-current;
 
 spm:
 # For now just check whether we can assemble it
