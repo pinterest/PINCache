@@ -343,7 +343,15 @@ static NSURL *_sharedTrashURL;
 - (PINDiskCacheDeserializerBlock)defaultDeserializer
 {
     return ^id(NSData * data, NSString *key){
-        return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        if (@available(iOS 11.0, macOS 10.13, tvOS 11.0, watchOS 4.0, *)) {
+            NSError *error = nil;
+            NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:data error:&error];
+            NSAssert(!error, @"unarchiver init failed with error");
+            unarchiver.requiresSecureCoding = NO;
+            return [unarchiver decodeObjectForKey:NSKeyedArchiveRootObjectKey];
+        } else {
+            return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        }
     };
 }
 
