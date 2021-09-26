@@ -33,7 +33,7 @@ let package = Package(
                       "build_docs.sh", "Cartfile",
                       "Cartfile.resolved", "Makefile",
                       "PINCache.podspec", "Info.plist"],
-            publicHeadersPath: "."),
+            publicHeadersPath: "include"),
         .testTarget(
             name: "PINCacheTests",
             dependencies: ["PINCache"],
