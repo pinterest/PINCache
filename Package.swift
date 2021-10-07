@@ -29,10 +29,7 @@ let package = Package(
             name: "PINCache",
             dependencies: ["PINOperation"],
             path: "Source",
-            exclude: ["Carthage", "docs",
-                      "build_docs.sh", "Cartfile",
-                      "Cartfile.resolved", "Makefile",
-                      "PINCache.podspec", "Info.plist"],
+            exclude: ["Info.plist"],
             publicHeadersPath: "."),
         .testTarget(
             name: "PINCacheTests",
