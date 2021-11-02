@@ -196,7 +196,7 @@ static NSURL *_sharedTrashURL;
                    keyEncoder:keyEncoder
                    keyDecoder:keyDecoder
                operationQueue:operationQueue
-                     ttlCache:NO
+                     ttlCache:ttlCache
                     byteLimit:50 * 1024 * 1024 // 50 MB by default
                      ageLimit:60 * 60 * 24 * 30]; // 30 days by default
 }
