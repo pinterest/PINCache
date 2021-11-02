@@ -189,6 +189,30 @@ static NSURL *_sharedTrashURL;
               operationQueue:(PINOperationQueue *)operationQueue
                     ttlCache:(BOOL)ttlCache
 {
+    return [self initWithName:name prefix:prefix
+                     rootPath:rootPath
+                   serializer:serializer
+                 deserializer:deserializer
+                   keyEncoder:keyEncoder
+                   keyDecoder:keyDecoder
+               operationQueue:operationQueue
+                     ttlCache:NO
+                    byteLimit:50 * 1024 * 1024 // 50 MB by default
+                     ageLimit:60 * 60 * 24 * 30]; // 30 days by default
+}
+
+- (instancetype)initWithName:(NSString *)name
+                      prefix:(NSString *)prefix
+                    rootPath:(NSString *)rootPath
+                  serializer:(PINDiskCacheSerializerBlock)serializer
+                deserializer:(PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
+              operationQueue:(PINOperationQueue *)operationQueue
+                    ttlCache:(BOOL)ttlCache
+                   byteLimit:(NSUInteger)byteLimit
+                    ageLimit:(NSTimeInterval)ageLimit
+{
     if (!name) {
         return nil;
     }
@@ -215,11 +239,8 @@ static NSURL *_sharedTrashURL;
         _didRemoveAllObjectsBlock = nil;
         
         _byteCount = 0;
-        
-        // 50 MB by default
-        _byteLimit = 50 * 1024 * 1024;
-        // 30 days by default
-        _ageLimit = 60 * 60 * 24 * 30;
+        _byteLimit = byteLimit;
+        _ageLimit = ageLimit;
         
 #if TARGET_OS_IPHONE
         _writingProtectionOptionSet = NO;
