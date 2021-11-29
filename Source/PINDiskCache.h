@@ -334,7 +334,36 @@ PIN_SUBCLASSING_RESTRICTED
                   keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
               operationQueue:(nonnull PINOperationQueue *)operationQueue
-                    ttlCache:(BOOL)ttlCache NS_DESIGNATED_INITIALIZER;
+                    ttlCache:(BOOL)ttlCache;
+
+/**
+ The designated initializer allowing you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization.
+ 
+ @see name
+ @param name The name of the cache.
+ @param prefix The prefix for the cache name. Defaults to com.pinterest.PINDiskCache
+ @param rootPath The path of the cache.
+ @param serializer   A block used to serialize object. If nil provided, default NSKeyedArchiver serialized will be used.
+ @param deserializer A block used to deserialize object. If nil provided, default NSKeyedUnarchiver serialized will be used.
+ @param keyEncoder A block used to encode key(filename). If nil provided, default url encoder will be used
+ @param keyDecoder A block used to decode key(filename). If nil provided, default url decoder will be used
+ @param operationQueue A PINOperationQueue to run asynchronous operations
+ @param ttlCache Whether or not the cache should behave as a TTL cache.
+ @param byteLimit The maximum number of bytes allowed on disk. Defaults to 50MB.
+ @param ageLimit The maximum number of seconds an object is allowed to exist in the cache. Defaults to 30 days.
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(nonnull NSString *)name
+                      prefix:(nonnull NSString *)prefix
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
+              operationQueue:(nonnull PINOperationQueue *)operationQueue
+                    ttlCache:(BOOL)ttlCache
+                   byteLimit:(NSUInteger)byteLimit
+                    ageLimit:(NSTimeInterval)ageLimit NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Asynchronous Methods
 /// @name Asynchronous Methods
