@@ -30,7 +30,10 @@ let package = Package(
             dependencies: ["PINOperation"],
             path: "Source",
             exclude: ["Info.plist"],
-            publicHeadersPath: "."),
+            publicHeadersPath: ".",
+            cSettings: [
+                .define("NS_BLOCK_ASSERTIONS", to: "1", .when(configuration: .release)),
+            ]),
         .testTarget(
             name: "PINCacheTests",
             dependencies: ["PINCache"],
@@ -39,6 +42,7 @@ let package = Package(
             resources: [.process("Default-568h@2x.png")],
             cSettings: [
                 .define("TEST_AS_SPM"),
+                .define("NS_BLOCK_ASSERTIONS", to: "1", .when(configuration: .release)),
             ]),
     ]
 )
