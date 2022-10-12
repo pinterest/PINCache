@@ -264,15 +264,16 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         [self removeExpiredObjects];
     }
 
-    NSUInteger totalCost = 0;
-    
     [self lock];
-        totalCost = _totalCost;
-        NSArray *keysSortedByAccessDate = [_accessDates keysSortedByValueUsingSelector:@selector(compare:)];
+        NSUInteger totalCost = _totalCost;
     [self unlock];
     
     if (totalCost <= limit)
         return;
+    
+    [self lock];
+        NSArray *keysSortedByAccessDate = [_accessDates keysSortedByValueUsingSelector:@selector(compare:)];
+    [self unlock];
 
     for (NSString *key in keysSortedByAccessDate) { // oldest objects first
         [self removeObjectAndExecuteBlocksForKey:key];
