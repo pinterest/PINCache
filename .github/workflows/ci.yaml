@@ -38,8 +38,6 @@ jobs:
   carthage:
     name: Carthage
     runs-on: macOS-latest
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: carthage
