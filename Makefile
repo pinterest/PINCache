@@ -25,8 +25,8 @@ test:
 	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	carthage update --use-xcframeworks --new-resolver --no-use-binaries --no-build; \
-	carthage build --use-xcframeworks --no-skip-current;
+	./carthage.sh update --use-xcframeworks --new-resolver --no-use-binaries --no-build;
+	./carthage.sh build --no-skip-current --use-xcframeworks;
 
 spm:
 # For now just check whether we can assemble it
