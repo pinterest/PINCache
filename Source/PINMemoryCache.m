@@ -250,10 +250,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     }
 
     [self lock];
-        NSArray *keysSortedByCost = [_costs copy];
+        NSDictionary *costs = [_costs copy];
     [self unlock];
 
-    keysSortedByCost = [keysSortedByCost keysSortedByValueUsingSelector:@selector(compare:)];
+    NSArray *keysSortedByCost = [costs keysSortedByValueUsingSelector:@selector(compare:)];
 
     for (NSString *key in [keysSortedByCost reverseObjectEnumerator]) { // costliest objects first
         [self removeObjectAndExecuteBlocksForKey:key];
@@ -281,10 +281,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         return;
     
     [self lock];
-        NSArray *keysSortedByAccessDate = [_accessDates copy];
+        NSDictionary *accessDates = [_accessDates copy];
     [self unlock];
 
-    keysSortedByAccessDate = [keysSortedByAccessDate keysSortedByValueUsingSelector:@selector(compare:)];
+    NSArray *keysSortedByAccessDate = [accessDates keysSortedByValueUsingSelector:@selector(compare:)];
 
     for (NSString *key in keysSortedByAccessDate) { // oldest objects first
         [self removeObjectAndExecuteBlocksForKey:key];
