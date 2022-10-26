@@ -175,6 +175,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         PINCacheObjectBlock didRemoveObjectBlock = _didRemoveObjectBlock;
     [self unlock];
 
+    if (object == nil) {
+        return;
+    }
+
     if (willRemoveObjectBlock)
         willRemoveObjectBlock(self, key, object);
 
@@ -239,12 +243,17 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
     
     [self lock];
         totalCost = _totalCost;
-        NSArray *keysSortedByCost = [_costs keysSortedByValueUsingSelector:@selector(compare:)];
     [self unlock];
     
     if (totalCost <= limit) {
         return;
     }
+
+    [self lock];
+        NSArray *keysSortedByCost = [_costs copy];
+    [self unlock];
+
+    keysSortedByCost = [keysSortedByCost keysSortedByValueUsingSelector:@selector(compare:)];
 
     for (NSString *key in [keysSortedByCost reverseObjectEnumerator]) { // costliest objects first
         [self removeObjectAndExecuteBlocksForKey:key];
@@ -272,8 +281,10 @@ static NSString * const PINMemoryCacheSharedName = @"PINMemoryCacheSharedName";
         return;
     
     [self lock];
-        NSArray *keysSortedByAccessDate = [_accessDates keysSortedByValueUsingSelector:@selector(compare:)];
+        NSArray *keysSortedByAccessDate = [_accessDates copy];
     [self unlock];
+
+    keysSortedByAccessDate = [keysSortedByAccessDate keysSortedByValueUsingSelector:@selector(compare:)];
 
     for (NSString *key in keysSortedByAccessDate) { // oldest objects first
         [self removeObjectAndExecuteBlocksForKey:key];
