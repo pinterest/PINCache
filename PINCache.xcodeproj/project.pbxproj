@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -27,6 +27,7 @@
 		C30EE1F520373D1900D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
 		C30EE1F620373D1A00D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
 		C30EE1F720373D1B00D78CB9 /* NSDate+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */; };
+		C386C3F326D2A9DA0072B770 /* PINOperation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = C386C3F226D2A9DA0072B770 /* PINOperation.xcframework */; };
 		C38F01AA20A32E0200F47F0E /* PINDiskCache+PINCacheTests.h in Headers */ = {isa = PBXBuildFile; fileRef = C38F01A820A32E0200F47F0E /* PINDiskCache+PINCacheTests.h */; };
 		C38F01AB20A32E0200F47F0E /* PINDiskCache+PINCacheTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C38F01A920A32E0200F47F0E /* PINDiskCache+PINCacheTests.m */; };
 		CC0105DF1E271A5C00890935 /* PINCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC0105B11E271A1600890935 /* PINCache.framework */; };
@@ -60,7 +61,6 @@
 		DD275346250AF8BC003A77F9 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD275345250AF8BC003A77F9 /* PINOperation.framework */; };
 		DD275348250AF8C9003A77F9 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD275347250AF8C9003A77F9 /* PINOperation.framework */; };
 		DD27534A250AF8D0003A77F9 /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD275349250AF8D0003A77F9 /* PINOperation.framework */; };
-		DDF93F55252D585200C6A4DC /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDF93F54252D585200C6A4DC /* PINOperation.framework */; };
 		DDF93F59252D585C00C6A4DC /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDF93F58252D585C00C6A4DC /* PINOperation.framework */; };
 		DDF93F5D252D586100C6A4DC /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDF93F5C252D586100C6A4DC /* PINOperation.framework */; };
 		DDF93F61252D587100C6A4DC /* PINOperation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDF93F60252D587100C6A4DC /* PINOperation.framework */; };
@@ -126,6 +126,7 @@
 		6928EED21E4160EE00B5D975 /* PINCaching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PINCaching.h; sourceTree = "<group>"; };
 		C30EE1E9203717DE00D78CB9 /* NSDate+PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDate+PINCacheTests.h"; sourceTree = "<group>"; };
 		C30EE1EA203717DE00D78CB9 /* NSDate+PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDate+PINCacheTests.m"; sourceTree = "<group>"; };
+		C386C3F226D2A9DA0072B770 /* PINOperation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PINOperation.xcframework; path = Carthage/Build/PINOperation.xcframework; sourceTree = "<group>"; };
 		C38F01A820A32E0200F47F0E /* PINDiskCache+PINCacheTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PINDiskCache+PINCacheTests.h"; sourceTree = "<group>"; };
 		C38F01A920A32E0200F47F0E /* PINDiskCache+PINCacheTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "PINDiskCache+PINCacheTests.m"; sourceTree = "<group>"; };
 		CC0105B11E271A1600890935 /* PINCache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PINCache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,7 +171,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DDF93F55252D585200C6A4DC /* PINOperation.framework in Frameworks */,
+				C386C3F326D2A9DA0072B770 /* PINOperation.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -223,6 +224,7 @@
 		6818C2861E55217D00875DB7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C386C3F226D2A9DA0072B770 /* PINOperation.xcframework */,
 				DDF93F60252D587100C6A4DC /* PINOperation.framework */,
 				DDF93F5C252D586100C6A4DC /* PINOperation.framework */,
 				DDF93F58252D585C00C6A4DC /* PINOperation.framework */,
@@ -706,7 +708,11 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
@@ -735,7 +741,11 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
@@ -875,7 +885,11 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -898,7 +912,11 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -921,7 +939,11 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
 				SDKROOT = appletvos;
@@ -946,7 +968,11 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
 				SDKROOT = appletvos;
@@ -973,7 +999,11 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
@@ -999,7 +1029,11 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCache;
 				PRODUCT_NAME = PINCache;
@@ -1012,7 +1046,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCacheTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1022,7 +1060,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.pinterest.PINCacheTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1032,7 +1074,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pinterest.PINCache-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1044,7 +1090,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pinterest.PINCache-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1062,7 +1112,11 @@
 					"$(PROJECT_DIR)/Carthage/Checkouts/PINOperation/build/Debug",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pinterest.PINCache-macOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1080,7 +1134,11 @@
 					"$(PROJECT_DIR)/Carthage/Checkouts/PINOperation/build/Debug",
 				);
 				INFOPLIST_FILE = Tests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pinterest.PINCache-macOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
