@@ -19,6 +19,8 @@ jobs:
         platform: ['iOS Simulator,name=iPhone 8']
     steps:
       - uses: actions/checkout@v2
+      - name: carthage
+        run: make carthage_checkout
       - name: Test
         run: make test
   analyze:
@@ -26,6 +28,8 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
+      - name: carthage
+        run: make carthage_checkout
       - name: analyze
         run: make analyze
   cocoapods:
