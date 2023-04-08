@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.frameworks    = 'Foundation'
   s.ios.weak_frameworks   = 'UIKit'
   s.osx.weak_frameworks   = 'AppKit'
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '11.0'
   s.osx.deployment_target = '10.8'
   s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '2.0'
