@@ -30,6 +30,7 @@ let package = Package(
             dependencies: ["PINOperation"],
             path: "Source",
             exclude: ["Info.plist"],
+            resources: [.copy("../PrivacyInfo.xcprivacy")],
             publicHeadersPath: ".",
             cSettings: [
                 .define("NS_BLOCK_ASSERTIONS", to: "1", .when(configuration: .release)),
