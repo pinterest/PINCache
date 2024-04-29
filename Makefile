@@ -25,7 +25,7 @@ test:
 	CODE_SIGNING_REQUIRED=NO | xcpretty
 
 carthage:
-	./carthage.sh update --no-use-binaries --no-build;
+	./carthage.sh update --use-xcframeworks --new-resolver --no-use-binaries --no-build;
 	./carthage.sh build --no-skip-current --use-xcframeworks;
 
 spm:
