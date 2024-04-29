@@ -22,6 +22,7 @@ EOS
   s.prefix_header_contents = pch_PIN
   s.subspec 'Core' do |sp|
       sp.source_files  = 'Source/*.{h,m}'
+      sp.resource_bundles = {'PINCache' => ['PrivacyInfo.xcprivacy']}
       sp.dependency 'PINOperation', '~> 1.2.1'
   end
   s.subspec 'Arc-exception-safe' do |sp|
