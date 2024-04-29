@@ -5,7 +5,6 @@ Pod::Spec.new do |s|
   s.summary       = 'Fast, thread safe, parallel object cache for iOS and OS X.'
   s.authors       = { 'Garrett Moon' => 'garrett@pinterest.com', 'Justin Ouellette' => 'jstn@tumblr.com' }
   s.source        = { :git => 'https://github.com/pinterest/PINCache.git', :tag => "#{s.version}" }
-  s.resource_bundles = {'PINCache' => ['PrivacyInfo.xcprivacy']}
   s.license       = { :type => 'Apache 2.0', :file => 'LICENSE.txt' }
   s.requires_arc  = true
   s.frameworks    = 'Foundation'
@@ -23,11 +22,13 @@ EOS
   s.prefix_header_contents = pch_PIN
   s.subspec 'Core' do |sp|
       sp.source_files  = 'Source/*.{h,m}'
+      sp.resource_bundles = {'PINCache' => ['PrivacyInfo.xcprivacy']}
       sp.dependency 'PINOperation', '~> 1.2.1'
   end
   s.subspec 'Arc-exception-safe' do |sp|
       sp.dependency 'PINCache/Core'
       sp.source_files = 'Source/PINDiskCache.m'
+      sp.resource_bundles = {'PINCache' => ['PrivacyInfo.xcprivacy']}
       sp.compiler_flags = '-fobjc-arc-exceptions'
   end
 end
