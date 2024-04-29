@@ -28,7 +28,6 @@ EOS
   s.subspec 'Arc-exception-safe' do |sp|
       sp.dependency 'PINCache/Core'
       sp.source_files = 'Source/PINDiskCache.m'
-      sp.resource_bundles = {'PINCache' => ['PrivacyInfo.xcprivacy']}
       sp.compiler_flags = '-fobjc-arc-exceptions'
   end
 end
