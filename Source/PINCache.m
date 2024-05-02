@@ -89,8 +89,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                              keyDecoder:keyDecoder
                                          operationQueue:_operationQueue
                                                ttlCache:ttlCache
-                                              byteLimit:50 * 1024 * 1024 // 50 MB by default
-                                               ageLimit:60 * 60 * 24 * 30 // 30 days by default
+                                              byteLimit:PINDiskCacheDefaultByteLimit
+                                               ageLimit:PINDiskCacheDefaultAgeLimit
                                        evictionStrategy:evictionStrategy];
         _memoryCache = [[PINMemoryCache alloc] initWithName:_name operationQueue:_operationQueue ttlCache:ttlCache evictionStrategy:evictionStrategy];
     }

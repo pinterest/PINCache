@@ -31,6 +31,9 @@ NSErrorUserInfoKey const PINDiskCacheErrorWriteFailureCodeKey = @"PINDiskCacheEr
 NSString * const PINDiskCachePrefix = @"com.pinterest.PINDiskCache";
 static NSString * const PINDiskCacheSharedName = @"PINDiskCacheShared";
 
+NSUInteger PINDiskCacheDefaultByteLimit = 50 * 1024 * 1024; // 50 MB by default
+NSTimeInterval PINDiskCacheDefaultAgeLimit = 60 * 60 * 24 * 30; // 30 days by default
+
 static NSString * const PINDiskCacheOperationIdentifierTrimToDate = @"PINDiskCacheOperationIdentifierTrimToDate";
 static NSString * const PINDiskCacheOperationIdentifierTrimToSize = @"PINDiskCacheOperationIdentifierTrimToSize";
 static NSString * const PINDiskCacheOperationIdentifierTrimToSizeByDate = @"PINDiskCacheOperationIdentifierTrimToSizeByDate";
@@ -200,8 +203,8 @@ static NSURL *_sharedTrashURL;
                    keyDecoder:keyDecoder
                operationQueue:operationQueue
                      ttlCache:ttlCache
-                    byteLimit:50 * 1024 * 1024 // 50 MB by default
-                     ageLimit:60 * 60 * 24 * 30]; // 30 days by default
+                    byteLimit:PINDiskCacheDefaultByteLimit
+                     ageLimit:PINDiskCacheDefaultAgeLimit];
 }
 
 - (instancetype)initWithName:(nonnull NSString *)name

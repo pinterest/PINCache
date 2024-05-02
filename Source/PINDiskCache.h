@@ -18,6 +18,9 @@ extern NSErrorUserInfoKey const PINDiskCacheErrorReadFailureCodeKey;
 extern NSErrorUserInfoKey const PINDiskCacheErrorWriteFailureCodeKey;
 extern NSString * const PINDiskCachePrefix;
 
+extern NSUInteger PINDiskCacheDefaultByteLimit;
+extern NSTimeInterval PINDiskCacheDefaultAgeLimit;
+
 typedef NS_ENUM(NSInteger, PINDiskCacheError) {
   PINDiskCacheErrorReadFailure = -1000,
   PINDiskCacheErrorWriteFailure = -1001,
