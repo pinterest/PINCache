@@ -52,6 +52,17 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:keyEncoder keyDecoder:keyDecoder ttlCache:NO];
 }
 
+- (instancetype)initWithName:(nonnull NSString *)name
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
+                    ttlCache:(BOOL)ttlCache
+{
+    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:keyEncoder keyDecoder:keyDecoder ttlCache:ttlCache evictionStrategy:PINCacheEvictionStrategyLeastRecentlyUsed];
+}
+
 - (instancetype)initWithName:(NSString *)name
                     rootPath:(NSString *)rootPath
                   serializer:(PINDiskCacheSerializerBlock)serializer
@@ -59,6 +70,7 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                   keyEncoder:(PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(PINDiskCacheKeyDecoderBlock)keyDecoder
                     ttlCache:(BOOL)ttlCache
+            evictionStrategy:(PINCacheEvictionStrategy)evictionStrategy
 {
     if (!name)
         return nil;
@@ -76,8 +88,11 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                              keyEncoder:keyEncoder
                                              keyDecoder:keyDecoder
                                          operationQueue:_operationQueue
-                                               ttlCache:ttlCache];
-        _memoryCache = [[PINMemoryCache alloc] initWithName:_name operationQueue:_operationQueue ttlCache:ttlCache];
+                                               ttlCache:ttlCache
+                                              byteLimit:50 * 1024 * 1024 // 50 MB by default
+                                               ageLimit:60 * 60 * 24 * 30 // 30 days by default
+                                       evictionStrategy:evictionStrategy];
+        _memoryCache = [[PINMemoryCache alloc] initWithName:_name operationQueue:_operationQueue ttlCache:ttlCache evictionStrategy:evictionStrategy];
     }
     return self;
 }
