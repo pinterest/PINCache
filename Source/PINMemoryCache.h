@@ -247,8 +247,8 @@ typedef void (^PINMemoryCacheContainmentBlock)(BOOL containsObject);
 - (void)removeAllObjects:(nullable PINMemoryCacheBlock)block __attribute__((deprecated));
 - (void)enumerateObjectsWithBlock:(PINMemoryCacheObjectBlock)block completionBlock:(nullable PINMemoryCacheBlock)completionBlock __attribute__((deprecated));
 - (void)setTtlCache:(BOOL)ttlCache DEPRECATED_MSG_ATTRIBUTE("ttlCache is no longer a settable property and must now be set via initializer.");
-- (void)trimToCostByDate:(NSUInteger)cost __attribute__((deprecated));
-- (void)trimToCostByDateAsync:(NSUInteger)cost completion:(nullable PINCacheBlock)block __attribute__((deprecated));
+- (void)trimToCostByDate:(NSUInteger)cost DEPRECATED_MSG_ATTRIBUTE("Use trimToCostByEvictionStrategy: instead");
+- (void)trimToCostByDateAsync:(NSUInteger)cost completion:(nullable PINCacheBlock)block DEPRECATED_MSG_ATTRIBUTE("Use trimToCostByEvictionStrategyAsync:completion: instead.");
 @end
 
 NS_ASSUME_NONNULL_END
