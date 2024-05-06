@@ -44,6 +44,8 @@ typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
  */
 @property (readonly) NSString *name;
 
+@property (nonatomic) NSUInteger maxConcurrentOperations;
+
 #pragma mark - Asynchronous Methods
 
 /// @name Asynchronous Methods
