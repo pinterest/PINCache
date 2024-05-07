@@ -1,4 +1,4 @@
-PLATFORM="platform=iOS Simulator,name=iPhone 8"
+PLATFORM="platform=iOS Simulator,name=iPhone SE (3rd generation)"
 SDK="iphonesimulator"
 SHELL=/bin/bash -o pipefail
 XCODE_MAJOR_VERSION=$(shell xcodebuild -version | HEAD -n 1 | sed -E 's/Xcode ([0-9]+).*/\1/')
