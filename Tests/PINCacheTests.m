@@ -362,7 +362,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertTrue(self.cache.memoryCache.totalCost == 1, @"cache had an unexpected total cost");
 }
 
-- (void)testMemoryCostByDate
+- (void)testMemoryCostByLRU
 {
     NSString *key1 = @"key1";
     NSString *key2 = @"key2";
@@ -370,7 +370,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
     [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
 
-    [self.cache.memoryCache trimToCostByDate:1];
+    [self.cache.memoryCache trimToCostByEvictionStrategy:1];
 
     id object1 = self.cache.memoryCache[key1];
     id object2 = self.cache.memoryCache[key2];
@@ -378,6 +378,48 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertNil(object1, @"object was not trimmed despite exceeding cost");
     XCTAssertNil(object2, @"object was not trimmed despite exceeding cost");
     XCTAssertTrue(self.cache.memoryCache.totalCost == 0, @"cache had an unexpected total cost");
+}
+
+- (void)testMemoryCostByLFU
+{
+    NSString *key1 = @"key1";
+    NSString *key2 = @"key2";
+
+    self.cache.memoryCache.evictionStrategy = PINCacheEvictionStrategyLeastFrequentlyUsed;
+    
+    [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
+    [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
+
+    [self.cache.memoryCache trimToCostByEvictionStrategy:1];
+
+    id object1 = self.cache.memoryCache[key1];
+    id object2 = self.cache.memoryCache[key2];
+
+    XCTAssertNil(object1, @"object was not trimmed despite exceeding cost");
+    XCTAssertNil(object2, @"object was not trimmed despite exceeding cost");
+    XCTAssertTrue(self.cache.memoryCache.totalCost == 0, @"cache had an unexpected total cost");
+}
+
+- (void)testMemoryCostByLFUOnlyOneNeeded
+{
+    NSString *key1 = @"key1";
+    NSString *key2 = @"key2";
+
+    self.cache.memoryCache.evictionStrategy = PINCacheEvictionStrategyLeastFrequentlyUsed;
+    
+    // Least recently used will be key1, but least frequently used will be key2
+    [self.cache.memoryCache setObject:key1 forKey:key1 withCost:1];
+    (void)self.cache.memoryCache[key1]; // 2nd access count
+    [self.cache.memoryCache setObject:key2 forKey:key2 withCost:2];
+    
+    [self.cache.memoryCache trimToCostByEvictionStrategy:1];
+
+    id object1 = self.cache.memoryCache[key1];
+    id object2 = self.cache.memoryCache[key2];
+
+    XCTAssertNotNil(object1, @"object was trimmed despite not exceeding cost");
+    XCTAssertNil(object2, @"object was not trimmed despite exceeding cost");
+    XCTAssertTrue(self.cache.memoryCache.totalCost == 1, @"cache had an unexpected total cost");
 }
 
 - (void)testMemoryCostByDateWithObjectExpiration
@@ -408,7 +450,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     [NSDate startMockingDateWithDate:[NSDate dateWithTimeIntervalSinceNow:45]];
 
     // Trim the cache enough to evict two objects.
-    [self.cache.memoryCache trimToCostByDate:self.cache.memoryCache.totalCost - cost * 2];
+    [self.cache.memoryCache trimToCostByEvictionStrategy:self.cache.memoryCache.totalCost - cost * 2];
 
     // Go back to current time, so we can check if objects exist in cache. If we don't do this, the getters will return nil
     // even if the objects are in the cache.
@@ -475,7 +517,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
 
     // Trim the cache enough to evict two objects.
-    [self.cache.diskCache trimToSizeByDate:sizeOfThreeObjects - 1];
+    [self.cache.diskCache trimToSizeByEvictionStrategy:sizeOfThreeObjects - 1];
 
     // Go back to current time, so we can check if objects exist in cache. If we don't do this, the getters will return nil
     // even if the objects are in the cache.
@@ -815,6 +857,78 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
                                                                                error:&error];
         XCTAssertNil(error);
         XCTAssert(contents.count == 0);
+    }];
+}
+
+- (void)testByteLimitWithLFU
+{
+    self.cache.diskCache.evictionStrategy = PINCacheEvictionStrategyLeastFrequentlyUsed;
+    [self.cache removeAllObjects];
+    NSString *key = @"key";
+    self.cache[key] = [self image];
+    
+    // Below is the size it's actually on disk.
+    [self.cache.diskCache setByteLimit:983040];
+    
+    // ensure the object is returned
+    XCTAssert([self.cache.diskCache objectForKey:key] != nil, @"object should be stored");
+    
+    [self.cache.diskCache setByteLimit:1];
+    
+    // wait for disk cache to be trimmed
+    sleep(2);
+    
+    XCTAssert([self.cache.diskCache objectForKey:key] == nil, @"object should be cleared");
+    
+    // check to see if it's actually deleted
+    [self.cache.diskCache synchronouslyLockFileAccessWhileExecutingBlock:^(id<PINCaching>  _Nonnull cache) {
+        NSError *error = nil;
+        NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:self.cache.diskCache.cacheURL
+                                                          includingPropertiesForKeys:@[]
+                                                                             options:0
+                                                                               error:&error];
+        XCTAssertNil(error);
+        XCTAssert(contents.count == 0);
+    }];
+}
+
+- (void)testByteLimitWithLFUEvictingOne
+{
+    self.cache.diskCache.evictionStrategy = PINCacheEvictionStrategyLeastFrequentlyUsed;
+    [self.cache removeAllObjects];
+    NSString *key1 = @"key1";
+    NSString *key2 = @"key2";
+    self.cache[key1] = [self image];
+    
+    NSInteger imageSizeOnDisk = self.cache.diskCache.byteCount;
+    self.cache[key2] = [self image];
+
+    // Below is the size it's actually on disk.
+    [self.cache.diskCache setByteLimit:2 * imageSizeOnDisk];
+    
+    // ensure the object is returned (also access key1 twice)
+    XCTAssert([self.cache.diskCache objectForKey:key1] != nil, @"object should be stored");
+    XCTAssert([self.cache.diskCache objectForKey:key1] != nil, @"object should be stored");
+    XCTAssert([self.cache.diskCache objectForKey:key2] != nil, @"object should be stored");
+
+    // Force one to be evicted
+    [self.cache.diskCache setByteLimit:imageSizeOnDisk];
+    
+    // wait for disk cache to be trimmed
+    sleep(2);
+
+    XCTAssert([self.cache.diskCache objectForKey:key1] != nil, @"object should not be cleared");
+    XCTAssert([self.cache.diskCache objectForKey:key2] == nil, @"object should be cleared");
+    
+    // check to see if it's actually deleted
+    [self.cache.diskCache synchronouslyLockFileAccessWhileExecutingBlock:^(id<PINCaching>  _Nonnull cache) {
+        NSError *error = nil;
+        NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:self.cache.diskCache.cacheURL
+                                                          includingPropertiesForKeys:@[]
+                                                                             options:0
+                                                                               error:&error];
+        XCTAssertNil(error);
+        XCTAssert(contents.count == 1);
     }];
 }
 
@@ -1388,7 +1502,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 }
 
 - (void)testTTLCacheIsSet {
-    PINCache *cache = [[PINCache alloc] initWithName:@"test" rootPath:PINDiskCachePrefix serializer:nil deserializer:nil keyEncoder:nil keyDecoder:nil ttlCache:YES];
+    PINCache *cache = [[PINCache alloc] initWithName:@"test" rootPath:PINDiskCachePrefix serializer:nil deserializer:nil keyEncoder:nil keyDecoder:nil ttlCache:YES evictionStrategy:PINCacheEvictionStrategyLeastRecentlyUsed];
     XCTAssert(cache.diskCache.isTTLCache);
     XCTAssert(cache.memoryCache.isTTLCache);
 }

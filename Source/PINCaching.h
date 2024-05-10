@@ -34,6 +34,11 @@ typedef void (^PINCacheObjectEnumerationBlock)(__kindof id<PINCaching> cache, NS
  */
 typedef void (^PINCacheObjectContainmentBlock)(BOOL containsObject);
 
+typedef NS_ENUM(NSInteger, PINCacheEvictionStrategy) {
+  PINCacheEvictionStrategyLeastRecentlyUsed,
+  PINCacheEvictionStrategyLeastFrequentlyUsed,
+};
+
 @protocol PINCaching <NSObject>
 
 #pragma mark - Core
