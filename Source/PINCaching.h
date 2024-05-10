@@ -6,7 +6,6 @@
 //  Copyright © 2017 Pinterest. All rights reserved.
 //
 
-#pragma once
 #import <Foundation/Foundation.h>
 
 

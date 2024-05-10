@@ -2,25 +2,15 @@
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
-
-#if !__has_include (<PINCache/PINCache.h>)
-#import "PINCache.h"
-#else
 #import <PINCache/PINCache.h>
-#endif
-
-#if !__has_include (<PINOperation/PINOperation.h>)
-#import "PINOperation.h"
-#else
 #import <PINOperation/PINOperation.h>
-#endif
 
 #import "PINCacheTests.h"
 #import "NSDate+PINCacheTests.h"
 #import "PINDiskCache+PINCacheTests.h"
 
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TARGET_OS_IPHONE
   typedef UIImage PINImage;
 #else
   typedef NSImage PINImage;
@@ -65,8 +55,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertNotNil(self.cache, @"test cache does not exist");
 }
 
-- (void)tearDown
-{
+- (void)tearDownWithCompletionHandler:(void (^)(NSError * _Nullable))completion {
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
@@ -82,7 +71,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
 
     XCTAssertNil(self.cache, @"test cache did not deallocate");
     
-    [super tearDown];
+    completion(nil);
 }
 
 #pragma mark - Private Methods
@@ -542,7 +531,7 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     }
 }
 
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#if TARGET_OS_IOS || TARGET_OS_TV || TARGET_OS_VISION
 - (void)testMemoryWarningBlock
 {
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
@@ -573,22 +562,9 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
         dispatch_semaphore_signal(semaphore);
     };
     
-    BOOL isiOS8OrGreater = NO;
-    NSString *reqSysVer = @"8";
-    NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
-    if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
-        isiOS8OrGreater = YES;
+    NSNotification *notification = [NSNotification notificationWithName:UIApplicationDidEnterBackgroundNotification object:nil];
 
-    if (isiOS8OrGreater) {
-        //sending didEnterBackgroundNotification causes crash on iOS 8.
-        NSNotification *notification = [NSNotification notificationWithName:UIApplicationDidEnterBackgroundNotification object:nil];
-        [self.cache.memoryCache performSelector:@selector(didReceiveEnterBackgroundNotification:) withObject:notification];
-        
-    } else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:UIApplicationDidEnterBackgroundNotification
-                                                            object:[UIApplication sharedApplication]];
-
-    }
+    [self.cache.memoryCache performSelector:@selector(didReceiveEnterBackgroundNotification:) withObject:notification];
     
     dispatch_semaphore_wait(semaphore, [self timeout]);
 
