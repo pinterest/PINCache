@@ -48,8 +48,6 @@ typedef NS_ENUM(NSInteger, PINCacheEvictionStrategy) {
  */
 @property (readonly) NSString *name;
 
-@property (nonatomic) NSUInteger maxConcurrentOperations;
-
 #pragma mark - Asynchronous Methods
 
 /// @name Asynchronous Methods

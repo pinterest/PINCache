@@ -43,6 +43,11 @@ PIN_SUBCLASSING_RESTRICTED
 @property (readonly) NSUInteger diskByteCount;
 
 /**
+ Sets/gets the maximum number of concurrent operations when handling async requests.
+ */
+@property (nonatomic) NSUInteger maxConcurrentOperations;
+
+/**
  The underlying disk cache, see <PINDiskCache> for additional configuration and trimming options.
  */
 @property (readonly) PINDiskCache *diskCache;
