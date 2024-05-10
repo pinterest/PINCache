@@ -389,6 +389,16 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
     [_diskCache removeAllObjects];
 }
 
+- (NSUInteger)maxConcurrentOperations
+{
+    return _operationQueue.maxConcurrentOperations;
+}
+
+- (void)setMaxConcurrentOperations:(NSUInteger)maxOperations
+{
+    _operationQueue.maxConcurrentOperations = maxOperations;
+}
+
 @end
 
 @implementation PINCache (Deprecated)
