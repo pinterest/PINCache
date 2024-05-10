@@ -1,14 +1,10 @@
-//  PINCache is a modified version of PINCache
+//  PINCache is a modified version of TMCache
 //  Modifications by Garrett Moon
 //  Copyright (c) 2015 Pinterest. All rights reserved.
 
 #import "PINCache.h"
 
-#if !__has_include (<PINOperation/PINOperation.h>)
-#import "PINOperation.h"
-#else
 #import <PINOperation/PINOperation.h>
-#endif
 
 static NSString * const PINCachePrefix = @"com.pinterest.PINCache";
 static NSString * const PINCacheSharedName = @"PINCacheShared";
