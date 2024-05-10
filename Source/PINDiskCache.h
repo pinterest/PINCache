@@ -357,7 +357,6 @@ PIN_SUBCLASSING_RESTRICTED
  @param ttlCache Whether or not the cache should behave as a TTL cache.
  @param byteLimit The maximum number of bytes allowed on disk. Defaults to 50MB.
  @param ageLimit The maximum number of seconds an object is allowed to exist in the cache. Defaults to 30 days.
- @param evictionStrategy How the cache decides to evict objects
  @result A new cache with the specified name.
  */
 - (instancetype)initWithName:(nonnull NSString *)name
