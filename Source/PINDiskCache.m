@@ -54,6 +54,45 @@ const char * PINDiskCacheFileSystemRepresentation(NSURL *url)
     return url.fileSystemRepresentation;
 }
 
+// Metadata dates and size are nil when -resourceValuesForKeys: failed during the
+// initial disk scan (e.g. the file disappeared mid-scan). Passing nil to -compare:
+// is undefined: [NSDate compare:nil] returns NSOrderedSame in practice, making the
+// date sorts weakly inconsistent (nil-dated entries compare "equal" to everything,
+// so eviction order becomes arbitrary), while [NSNumber compare:nil] RAISES
+// NSInvalidArgumentException — a real crash in trimDiskToSize: with a nil size.
+// Define total orders instead, placing nil so that unknown-metadata entries are
+// evicted FIRST on every trim path: nil dates sort ascending-first (oldest), and
+// nil sizes sort descending-last (largest) because trimDiskToSize: walks its sort
+// in reverse, largest first.
+NS_INLINE NSComparisonResult PINDiskCacheCompareDates(NSDate *date1, NSDate *date2)
+{
+    if (date1 == nil && date2 == nil) {
+        return NSOrderedSame;
+    }
+    if (date1 == nil) {
+        return NSOrderedAscending;
+    }
+    if (date2 == nil) {
+        return NSOrderedDescending;
+    }
+    return [date1 compare:date2];
+}
+
+NS_INLINE NSComparisonResult PINDiskCacheCompareSizes(NSNumber *size1, NSNumber *size2)
+{
+    if (size1 == nil && size2 == nil) {
+        return NSOrderedSame;
+    }
+    if (size1 == nil) {
+        return NSOrderedDescending;
+    }
+    if (size2 == nil) {
+        return NSOrderedAscending;
+    }
+    return [size1 compare:size2];
+}
+
+
 @interface PINDiskCacheMetadata : NSObject
 // When the object was added to the disk cache
 @property (nonatomic, strong) NSDate *createdDate;
@@ -65,6 +104,48 @@ const char * PINDiskCacheFileSystemRepresentation(NSURL *url)
 // Access count is how many times this object has been fetched. Used with the LFU
 @property (nonatomic) NSInteger accessCount;
 @end
+
+// Comparator ordering metadata by eviction priority: entries that sort first are evicted first.
+typedef NSComparisonResult (^PINDiskCacheEvictionPriorityComparator)(PINDiskCacheMetadata *metadata1, PINDiskCacheMetadata *metadata2);
+
+// Bounded selection of eviction candidates: one pass over the metadata keeping at most
+// `limit` keys that sort first under `priorityComparator`, in O(limit) memory.
+//
+// This replaces -keysSortedByValueUsingComparator: in the trim paths. The full sort
+// materializes O(N) contiguous keys+values storage inside CoreFoundation; on
+// heavily-loaded caches under memory pressure that allocation can fail (trapping in
+// __CFCreateArrayStorage) — which also meant a cache that grew too big to sort could
+// never trim again. Must be called with the instance lock held.
+static NSArray<NSString *> *PINDiskCacheSelectEvictionCandidates(
+    NSDictionary<NSString *, PINDiskCacheMetadata *> *metadata,
+    NSUInteger limit,
+    NSSet<NSString *> *excludedKeys,
+    PINDiskCacheEvictionPriorityComparator priorityComparator)
+{
+    NSMutableArray<NSString *> *candidates = [[NSMutableArray alloc] initWithCapacity:limit + 1];
+    NSComparisonResult (^keyComparator)(NSString *, NSString *) = ^NSComparisonResult(NSString *key1, NSString *key2) {
+        return priorityComparator(metadata[key1], metadata[key2]);
+    };
+    [metadata enumerateKeysAndObjectsUsingBlock:^(NSString *key, PINDiskCacheMetadata *entryMetadata, BOOL *stop) {
+        if ([excludedKeys containsObject:key]) {
+            return;
+        }
+        // Cheap rejection: not higher priority than the lowest-priority retained candidate.
+        if (candidates.count == limit &&
+            priorityComparator(entryMetadata, metadata[candidates.lastObject]) != NSOrderedAscending) {
+            return;
+        }
+        NSUInteger insertionIndex = [candidates indexOfObject:key
+                                              inSortedRange:NSMakeRange(0, candidates.count)
+                                                    options:NSBinarySearchingInsertionIndex
+                                            usingComparator:keyComparator];
+        [candidates insertObject:key atIndex:insertionIndex];
+        if (candidates.count > limit) {
+            [candidates removeLastObject];
+        }
+    }];
+    return candidates;
+}
 
 @interface PINDiskCache () {
     PINDiskCacheSerializerBlock _serializer;
@@ -797,34 +878,58 @@ static NSURL *_sharedTrashURL;
     return YES;
 }
 
+// Upper bound on eviction candidates selected per pass. Bounds the trim's memory to
+// O(batch) regardless of cache entry count; the outer loop repeats until under target.
+static const NSUInteger PINDiskCacheEvictionBatchLimit = 256;
+
 - (void)trimDiskToSize:(NSUInteger)trimByteCount
 {
-    NSMutableArray *keysToRemove = nil;
-    
-    [self lockForWriting];
-        if (_byteCount > trimByteCount) {
-            keysToRemove = [[NSMutableArray alloc] init];
-            
-            NSArray *keysSortedBySize = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
-                return [obj1.size compare:obj2.size];
-            }];
-            
-            NSUInteger bytesSaved = 0;
-            for (NSString *key in [keysSortedBySize reverseObjectEnumerator]) { // largest objects first
-                [keysToRemove addObject:key];
-                NSNumber *byteSize = _metadata[key].size;
-                if (byteSize) {
-                    bytesSaved += [byteSize unsignedIntegerValue];
+    // Largest entries evicted first; nil sizes treated as largest (their disk usage is
+    // unaccounted, so they are the least trustworthy entries to keep).
+    PINDiskCacheEvictionPriorityComparator largestFirst = ^NSComparisonResult(PINDiskCacheMetadata *metadata1, PINDiskCacheMetadata *metadata2) {
+        return PINDiskCacheCompareSizes(metadata2.size, metadata1.size);
+    };
+
+    // Keys already attempted this trim: removeFileAndExecuteBlocksForKey: can decline a
+    // key without touching its metadata (file already gone), so without exclusion the
+    // next batch would select the same key forever.
+    NSMutableSet<NSString *> *attemptedKeys = [[NSMutableSet alloc] init];
+    BOOL trimming = YES;
+    while (trimming) {
+        NSMutableArray<NSString *> *keysToRemove = nil;
+
+        [self lockForWriting];
+            if (_byteCount > trimByteCount) {
+                NSArray<NSString *> *candidates = PINDiskCacheSelectEvictionCandidates(_metadata, PINDiskCacheEvictionBatchLimit, attemptedKeys, largestFirst);
+                keysToRemove = [[NSMutableArray alloc] init];
+                NSUInteger bytesSaved = 0;
+                for (NSString *key in candidates) {
+                    [keysToRemove addObject:key];
+                    NSNumber *byteSize = _metadata[key].size;
+                    if (byteSize) {
+                        bytesSaved += [byteSize unsignedIntegerValue];
+                    }
+                    // Avoid NSUInteger underflow when metadata sizes overshoot _byteCount
+                    // (stale bookkeeping): a wrapped subtraction never satisfies the break
+                    // and the loop evicts the entire cache.
+                    if (bytesSaved >= _byteCount || _byteCount - bytesSaved <= trimByteCount) {
+                        trimming = NO;
+                        break;
+                    }
                 }
-                if (_byteCount - bytesSaved <= trimByteCount) {
-                    break;
-                }
+            } else {
+                trimming = NO;
             }
+        [self unlock];
+
+        if (keysToRemove.count == 0) {
+            // Nothing evictable this pass (metadata empty or fully attempted); stop rather than spin.
+            break;
         }
-    [self unlock];
-    
-    for (NSString *key in keysToRemove) {
-        [self removeFileAndExecuteBlocksForKey:key];
+        for (NSString *key in keysToRemove) {
+            [attemptedKeys addObject:key];
+            [self removeFileAndExecuteBlocksForKey:key];
+        }
     }
 }
 
@@ -835,77 +940,84 @@ static NSURL *_sharedTrashURL;
         [self removeExpiredObjects];
     }
 
-    NSMutableArray *keysToRemove = nil;
-  
-    [self lockForWriting];
-        if (_byteCount > trimByteCount) {
-            PINCacheEvictionStrategy strategy = self->_evictionStrategy;
-            keysToRemove = [[NSMutableArray alloc] init];
-            
-            // last modified represents last access.
-            NSArray *keysSortedByEvictionStrategy = nil;
-            switch (strategy) {
-                case PINCacheEvictionStrategyLeastRecentlyUsed:
-                    keysSortedByEvictionStrategy = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
-                        return [obj1.lastModifiedDate compare:obj2.lastModifiedDate];
-                    }];
-                    break;
-                    
-                case PINCacheEvictionStrategyLeastFrequentlyUsed:
-                    keysSortedByEvictionStrategy = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
-                        if (obj1.accessCount < obj2.accessCount) {
-                            return NSOrderedAscending;
-                        } else if (obj1.accessCount > obj2.accessCount) {
-                            return NSOrderedDescending;
-                        } else {
-                            return [obj1.lastModifiedDate compare:obj2.lastModifiedDate];
-                        }
-                    }];
-                    break;
-            }
-            
-            NSUInteger bytesSaved = 0;
-            // objects accessed last first.
-            for (NSString *key in keysSortedByEvictionStrategy) {
-                [keysToRemove addObject:key];
-                NSNumber *byteSize = _metadata[key].size;
-                if (byteSize) {
-                    bytesSaved += [byteSize unsignedIntegerValue];
-                }
-                if (_byteCount - bytesSaved <= trimByteCount) {
-                    break;
-                }
-            }
+    // last modified represents last access; least-recently/frequently used evicted first.
+    PINDiskCacheEvictionPriorityComparator lruFirst = ^NSComparisonResult(PINDiskCacheMetadata *metadata1, PINDiskCacheMetadata *metadata2) {
+        return PINDiskCacheCompareDates(metadata1.lastModifiedDate, metadata2.lastModifiedDate);
+    };
+    PINDiskCacheEvictionPriorityComparator lfuFirst = ^NSComparisonResult(PINDiskCacheMetadata *metadata1, PINDiskCacheMetadata *metadata2) {
+        if (metadata1.accessCount < metadata2.accessCount) {
+            return NSOrderedAscending;
+        } else if (metadata1.accessCount > metadata2.accessCount) {
+            return NSOrderedDescending;
+        } else {
+            return PINDiskCacheCompareDates(metadata1.lastModifiedDate, metadata2.lastModifiedDate);
         }
-    [self unlock];
-    
-    for (NSString *key in keysToRemove) {
-        [self removeFileAndExecuteBlocksForKey:key];
+    };
+
+    // Keys already attempted this trim: removeFileAndExecuteBlocksForKey: can decline a
+    // key without touching its metadata (file already gone), so without exclusion the
+    // next batch would select the same key forever.
+    NSMutableSet<NSString *> *attemptedKeys = [[NSMutableSet alloc] init];
+    BOOL trimming = YES;
+    while (trimming) {
+        NSMutableArray<NSString *> *keysToRemove = nil;
+
+        [self lockForWriting];
+            if (_byteCount > trimByteCount) {
+                PINDiskCacheEvictionPriorityComparator priorityComparator =
+                    (self->_evictionStrategy == PINCacheEvictionStrategyLeastFrequentlyUsed) ? lfuFirst : lruFirst;
+                NSArray<NSString *> *candidates = PINDiskCacheSelectEvictionCandidates(_metadata, PINDiskCacheEvictionBatchLimit, attemptedKeys, priorityComparator);
+                keysToRemove = [[NSMutableArray alloc] init];
+                NSUInteger bytesSaved = 0;
+                for (NSString *key in candidates) {
+                    [keysToRemove addObject:key];
+                    NSNumber *byteSize = _metadata[key].size;
+                    if (byteSize) {
+                        bytesSaved += [byteSize unsignedIntegerValue];
+                    }
+                    // Avoid NSUInteger underflow when metadata sizes overshoot _byteCount
+                    // (stale bookkeeping): a wrapped subtraction never satisfies the break
+                    // and the loop evicts the entire cache.
+                    if (bytesSaved >= _byteCount || _byteCount - bytesSaved <= trimByteCount) {
+                        trimming = NO;
+                        break;
+                    }
+                }
+            } else {
+                trimming = NO;
+            }
+        [self unlock];
+
+        if (keysToRemove.count == 0) {
+            // Nothing evictable this pass (metadata empty or fully attempted); stop rather than spin.
+            break;
+        }
+        for (NSString *key in keysToRemove) {
+            [attemptedKeys addObject:key];
+            [self removeFileAndExecuteBlocksForKey:key];
+        }
     }
 }
 
 - (void)trimDiskToDate:(NSDate *)trimDate
 {
     [self lockForWriting];
-        NSArray *keysSortedByCreatedDate = [_metadata keysSortedByValueUsingComparator:^NSComparisonResult(PINDiskCacheMetadata * _Nonnull obj1, PINDiskCacheMetadata * _Nonnull obj2) {
-            return [obj1.createdDate compare:obj2.createdDate];
-        }];
-    
+        // Date trimming is a pure threshold filter, so no sort is needed — the previous
+        // full sort existed only to enable an early break, and its O(N) temporary
+        // storage is the same allocation-failure hazard as the sorts replaced above.
         NSMutableArray *keysToRemove = [[NSMutableArray alloc] init];
-        
-        for (NSString *key in keysSortedByCreatedDate) { // oldest files first
-            NSDate *createdDate = _metadata[key].createdDate;
-            if (!createdDate || _metadata[key].ageLimit > 0.0)
-                continue;
-            
+
+        [_metadata enumerateKeysAndObjectsUsingBlock:^(NSString *key, PINDiskCacheMetadata *metadata, BOOL *stop) {
+            NSDate *createdDate = metadata.createdDate;
+            if (!createdDate || metadata.ageLimit > 0.0) {
+                return;
+            }
             if ([createdDate compare:trimDate] == NSOrderedAscending) { // older than trim date
                 [keysToRemove addObject:key];
-            } else {
-                break;
             }
-        }
+        }];
     [self unlock];
-    
+
     for (NSString *key in keysToRemove) {
         [self removeFileAndExecuteBlocksForKey:key];
     }

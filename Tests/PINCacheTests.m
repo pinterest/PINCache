@@ -535,6 +535,31 @@ const NSTimeInterval PINCacheTestBlockTimeout = 20.0;
     XCTAssertTrue([keys.lastObject isEqualToString:key1] || [keys.lastObject isEqualToString:key4]);
 }
 
+// The bounded-batch trim (256 candidates per pass) must evict across multiple batches
+// and still reach its byte target. This guards the replacement of the full
+// keysSortedByValueUsingComparator: sort, whose O(N) temporary storage could fail to
+// allocate on heavily-loaded caches under memory pressure (trapping in
+// __CFCreateArrayStorage) — after which the cache could never trim again.
+- (void)testTrimToSizeByEvictionStrategyWithMoreEntriesThanOneBatch
+{
+    [self.cache.diskCache removeAllObjects];
+
+    const NSUInteger entryCount = 300; // > one 256-entry selection batch
+    for (NSUInteger i = 0; i < entryCount; i++) {
+        [self.cache.diskCache setObject:@"value" forKey:[NSString stringWithFormat:@"batchKey%03lu", (unsigned long)i]];
+    }
+    XCTAssertTrue(self.cache.diskCache.byteCount > 0, @"setup should have written bytes");
+
+    [self.cache.diskCache trimToSizeByEvictionStrategy:1];
+
+    __block NSUInteger remainingKeys = 0;
+    [self.cache.diskCache enumerateObjectsWithBlock:^(NSString * _Nonnull key, NSURL * _Nullable fileURL, BOOL * _Nonnull stop) {
+        remainingKeys++;
+    }];
+    XCTAssertTrue(remainingKeys <= 1, @"trim must evict past the first selection batch (had %lu keys left)", (unsigned long)remainingKeys);
+    XCTAssertTrue(self.cache.diskCache.byteCount <= 1, @"trim must reach its byte target across batches");
+}
+
 - (void)testOneThousandAndOneWrites
 {
     NSUInteger max = 1001;
