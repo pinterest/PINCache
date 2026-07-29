@@ -1,4 +1,4 @@
-PLATFORM="platform=iOS Simulator,name=iPhone 15"
+PLATFORM="platform=iOS Simulator,name=iPhone 17"
 SDK="iphonesimulator"
 SHELL=/bin/bash -o pipefail
 XCODE_MAJOR_VERSION=$(shell xcodebuild -version | HEAD -n 1 | sed -E 's/Xcode ([0-9]+).*/\1/')
@@ -16,14 +16,14 @@ analyze:
 	ONLY_ACTIVE_ARCH=NO \
 	CODE_SIGNING_REQUIRED=NO \
 	CLANG_ANALYZER_OUTPUT=plist-html \
-	CLANG_ANALYZER_OUTPUT_DIR="$(shell pwd)/clang" | xcpretty
+	CLANG_ANALYZER_OUTPUT_DIR="$(shell pwd)/clang" | xcbeautify
 	if [[ -n `find $(shell pwd)/clang -name "*.html"` ]] ; then rm -rf `pwd`/clang; exit 1; fi
 	rm -rf $(shell pwd)/clang
 
 test:
 	xcodebuild clean test -destination ${PLATFORM} -sdk ${SDK} -workspace PINCache.xcworkspace -scheme PINCache \
 	ONLY_ACTIVE_ARCH=NO \
-	CODE_SIGNING_REQUIRED=NO | xcpretty
+	CODE_SIGNING_REQUIRED=NO | xcbeautify
 
 carthage:
 	carthage update --no-use-binaries --no-build
@@ -41,6 +41,6 @@ example:
 	fi
 	xcodebuild clean build -project ${IOS_EXAMPLE_PROJECT} -scheme ${EXAMPLE_SCHEME} -destination ${PLATFORM} -sdk ${SDK} \
 	ONLY_ACTIVE_ARCH=NO \
-	CODE_SIGNING_REQUIRED=NO | xcpretty
+	CODE_SIGNING_REQUIRED=NO | xcbeautify
 
 all: carthage cocoapods test analyze spm example
