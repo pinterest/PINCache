@@ -178,7 +178,37 @@ PIN_SUBCLASSING_RESTRICTED
                   keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
                   keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
                     ttlCache:(BOOL)ttlCache 
-            evictionStrategy:(PINCacheEvictionStrategy)evictionStrategy NS_DESIGNATED_INITIALIZER;
+            evictionStrategy:(PINCacheEvictionStrategy)evictionStrategy;
+
+/**
+ Multiple instances with the same name are *not* allowed and can *not* safely
+ access the same data on disk. Also used to create the <diskCache>.
+ Initializer allows you to override default NSKeyedArchiver/NSKeyedUnarchiver serialization for <diskCache>.
+ You must provide both serializer and deserializer, or opt-out to default implementation providing nil values.
+ 
+ @see name
+ @param name The name of the cache.
+ @param rootPath The path of the cache on disk.
+ @param serializer   A block used to serialize object before writing to disk. If nil provided, default NSKeyedArchiver serialized will be used.
+ @param deserializer A block used to deserialize object read from disk. If nil provided, default NSKeyedUnarchiver serialized will be used.
+ @param keyEncoder A block used to encode key(filename). If nil provided, default url encoder will be used
+ @param keyDecoder A block used to decode key(filename). If nil provided, default url decoder will be used
+ @param ttlCache Whether or not the cache should behave as a TTL cache.
+ @param evictionStrategy How the cache decide to evict objects when over cost.
+ @param byteLimit The maximum number of bytes allowed on disk. Defaults to 50MB.
+ @param ageLimit The maximum number of seconds an object is allowed to exist in the cache. Defaults to 30 days.
+ @result A new cache with the specified name.
+ */
+- (instancetype)initWithName:(nonnull NSString *)name
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
+                    ttlCache:(BOOL)ttlCache
+            evictionStrategy:(PINCacheEvictionStrategy)evictionStrategy
+                   byteLimit:(NSUInteger)byteLimit
+                    ageLimit:(NSTimeInterval)ageLimit NS_DESIGNATED_INITIALIZER;
 
 @end
 

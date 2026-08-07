@@ -68,6 +68,20 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                     ttlCache:(BOOL)ttlCache
             evictionStrategy:(PINCacheEvictionStrategy)evictionStrategy
 {
+    return [self initWithName:name rootPath:rootPath serializer:serializer deserializer:deserializer keyEncoder:keyEncoder keyDecoder:keyDecoder ttlCache:ttlCache evictionStrategy:evictionStrategy byteLimit:PINDiskCacheDefaultByteLimit ageLimit:PINDiskCacheDefaultAgeLimit];
+}
+
+- (instancetype)initWithName:(nonnull NSString *)name
+                    rootPath:(nonnull NSString *)rootPath
+                  serializer:(nullable PINDiskCacheSerializerBlock)serializer
+                deserializer:(nullable PINDiskCacheDeserializerBlock)deserializer
+                  keyEncoder:(nullable PINDiskCacheKeyEncoderBlock)keyEncoder
+                  keyDecoder:(nullable PINDiskCacheKeyDecoderBlock)keyDecoder
+                    ttlCache:(BOOL)ttlCache
+            evictionStrategy:(PINCacheEvictionStrategy)evictionStrategy
+                   byteLimit:(NSUInteger)byteLimit
+                    ageLimit:(NSTimeInterval)ageLimit
+{
     if (!name)
         return nil;
     
@@ -85,8 +99,8 @@ static NSString * const PINCacheSharedName = @"PINCacheShared";
                                              keyDecoder:keyDecoder
                                          operationQueue:_operationQueue
                                                ttlCache:ttlCache
-                                              byteLimit:PINDiskCacheDefaultByteLimit
-                                               ageLimit:PINDiskCacheDefaultAgeLimit
+                                              byteLimit:byteLimit
+                                               ageLimit:ageLimit
                                        evictionStrategy:evictionStrategy];
         _memoryCache = [[PINMemoryCache alloc] initWithName:_name operationQueue:_operationQueue ttlCache:ttlCache evictionStrategy:evictionStrategy];
     }
